@@ -1,6 +1,13 @@
 @import 'tailwindcss';
 
-/* Paleta do projecto (CLAUDE.md §7). Gera utilitários como bg-ivory, text-forest, border-sage. */
+/*
+ * Tokens do projecto (CLAUDE.md §7). Geram utilitários como bg-ivory, text-forest, font-display.
+ *
+ * Contraste verificado sobre Warm Ivory (#F7F6EF), WCAG 2.1:
+ *   Forest 8,9:1 · Charcoal 12,4:1 · Earth Brown 4,9:1 — adequados para texto normal.
+ *   Rain Blue 4,0:1 — só para texto grande (≥ 24 px), elementos gráficos e anel de foco.
+ * Sobre Forest: Ivory 8,9:1 e Sage 7,5:1. Rain Blue sobre Forest (2,2:1) NÃO serve para foco.
+ */
 @theme {
   --color-forest: #214d3a;
   --color-ivory: #f7f6ef;
@@ -8,18 +15,61 @@
   --color-rain: #477fa3;
   --color-sage: #dce7d9;
   --color-charcoal: #26312b;
+
+  /* Serifa editorial do sistema: sem pedidos de rede, funciona sem ligação. */
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
 }
 
 @layer base {
   html {
     background-color: var(--color-ivory);
     color: var(--color-charcoal);
+    -webkit-text-size-adjust: 100%;
   }
 
-  /* Foco sempre visível para navegação por teclado. */
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-sage);
+    color: var(--color-forest);
+  }
+
+  /* Foco sempre visível para navegação por teclado. Em superfícies escuras usa Ivory. */
   :focus-visible {
-    outline: 3px solid var(--color-rain);
-    outline-offset: 2px;
+    outline: 3px solid var(--focus-ring, var(--color-rain));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  [data-surface='dark'] {
+    --focus-ring: var(--color-ivory);
+  }
+
+  /* Destinos de foco programático (conteúdo principal, secções) não mostram contorno. */
+  [tabindex='-1']:focus {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
