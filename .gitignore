@@ -1,0 +1,19 @@
+# Variáveis de ambiente locais (em qualquer pasta). Só os exemplos são versionados.
+.env
+.env.*
+!.env.example
+
+# Dependências e artefactos de build
+node_modules/
+dist/
+coverage/
+
+# Definições locais do editor/assistente
+.claude/settings.local.json
+.vscode/*
+!.vscode/extensions.json
+
+# Sistema
+.DS_Store
+Thumbs.db
+npm-debug.log*

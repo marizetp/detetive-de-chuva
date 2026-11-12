@@ -1,0 +1,33 @@
+@import 'tailwindcss';
+
+/* Paleta do projecto (CLAUDE.md §7). Gera utilitários como bg-ivory, text-forest, border-sage. */
+@theme {
+  --color-forest: #214d3a;
+  --color-ivory: #f7f6ef;
+  --color-earth: #82664b;
+  --color-rain: #477fa3;
+  --color-sage: #dce7d9;
+  --color-charcoal: #26312b;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ivory);
+    color: var(--color-charcoal);
+  }
+
+  /* Foco sempre visível para navegação por teclado. */
+  :focus-visible {
+    outline: 3px solid var(--color-rain);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
