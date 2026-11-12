@@ -319,7 +319,7 @@ describe('ConsultationPage — falha de apenas um endpoint', () => {
     ).toBeInTheDocument();
     expect(
       within(section('Transparência e limitações')).getByText(
-        'Sem informação: a avaliação técnica não está disponível.',
+        /Sem informação: a avaliação técnica não está disponível\. Não foi possível confirmar/,
       ),
     ).toBeInTheDocument();
     expect(
@@ -343,5 +343,50 @@ describe('ConsultationPage — falha de apenas um endpoint', () => {
     expect(alert).toHaveTextContent("Província 'X' não suportada.");
     expect(alert).not.toHaveTextContent('Value error');
     expect(within(alert).queryByRole('button')).not.toBeInTheDocument();
+  });
+});
+
+describe('ConsultationPage — datas (decisão: passadas e actual sim, futuras não)', () => {
+  it('a data actual (predefinida) é aceite e enviada aos dois endpoints', async () => {
+    const api = setupApi();
+    await renderReady();
+    fillForm();
+    await submitAndWaitForBoth();
+
+    const today = getLocalIsoDate();
+    expect(JSON.parse(api.callsTo(ADVISORY)[0][1].body).data_consulta).toBe(today);
+    expect(JSON.parse(api.callsTo(EVALUATE)[0][1].body).data_consulta).toBe(today);
+  });
+
+  it('uma data passada é aceite, enviada e contextualizada no relatório', async () => {
+    const api = setupApi();
+    await renderReady();
+    fillForm({ data: '2025-11-12' });
+    await submitAndWaitForBoth();
+
+    expect(JSON.parse(api.callsTo(ADVISORY)[0][1].body).data_consulta).toBe('2025-11-12');
+    expect(JSON.parse(api.callsTo(EVALUATE)[0][1].body).data_consulta).toBe('2025-11-12');
+    expect(
+      within(section('Indicadores agroclimáticos')).getByText('Consulta para uma data passada'),
+    ).toBeInTheDocument();
+    expect(
+      within(section('Recomendação de extensão')).getByText('Contexto para ler esta recomendação'),
+    ).toBeInTheDocument();
+  });
+
+  it('datas futuras: desactivadas no selector e recusadas se escritas à mão (sem pedidos)', async () => {
+    const api = setupApi();
+    await renderReady();
+    const dateInput = screen.getByLabelText(/Data da consulta/);
+    expect(dateInput).toHaveAttribute('max', getLocalIsoDate());
+
+    for (const daysAhead of [1, 3, 7, 30]) {
+      const future = getLocalIsoDate(new Date(Date.now() + (daysAhead * 24 + 12) * 60 * 60 * 1000));
+      fillForm({ data: future });
+      fireEvent.click(submitButton());
+      expect(screen.getByText('Escolha a data de hoje ou uma data anterior.')).toBeInTheDocument();
+    }
+    expect(api.callsTo(ADVISORY)).toHaveLength(0);
+    expect(api.callsTo(EVALUATE)).toHaveLength(0);
   });
 });

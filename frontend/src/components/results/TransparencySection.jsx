@@ -1,6 +1,6 @@
 import { RESULT_SOURCES } from '../../config/api.js';
 import { formatIsoDateLong } from '../../utils/format.js';
-import { describeIssues, isPastIsoDate } from '../../utils/report.js';
+import { describeIssues, getFallbackStatus, isPastIsoDate } from '../../utils/report.js';
 import InlineNotice from '../ui/InlineNotice.jsx';
 import DivergenceNotice from './DivergenceNotice.jsx';
 import ReportSection from './ReportSection.jsx';
@@ -10,6 +10,7 @@ const SUBHEADING = 'text-xs font-semibold tracking-[0.16em] text-earth uppercase
 const BODY = 'max-w-prose leading-relaxed text-charcoal/85';
 
 const LIMITATIONS = [
+  'Os indicadores podem ser valores de referência, por exemplo históricos ou mensais, e não medições nem previsões meteorológicas para a data consultada. A fonte e o método não estão documentados.',
   'O nível de confiança é uma pontuação atribuída pelo sistema (0 a 100). Não é uma probabilidade de sucesso, salvo confirmação do serviço.',
   'A avaliação apoia a decisão; não garante a germinação, a produtividade nem o sucesso da sementeira.',
   'O texto da recomendação é produzido pelo serviço e a sua redacção pode variar entre consultas.',
@@ -49,26 +50,39 @@ function Comparison({ advisory, evaluate, comparison }) {
 }
 
 function WeatherData({ evaluate }) {
-  const fallback = evaluate.status === 'success' ? evaluate.result?.isFallbackWeather : undefined;
+  const fallbackStatus = getFallbackStatus(evaluate);
   let evaluateStatement;
-  if (fallback === true) {
+  if (fallbackStatus === 'confirmed') {
     evaluateStatement = (
-      <InlineNotice tone="info" title="Dados meteorológicos de substituição">
-        A avaliação técnica indica que usou dados meteorológicos de substituição. Os
-        indicadores não devem ser lidos como observações medidas.
+      <InlineNotice tone="info" title="Valores de substituição">
+        A avaliação técnica indica que usou dados meteorológicos de substituição. Os indicadores
+        não correspondem necessariamente a medições nem a previsões meteorológicas para a data
+        consultada: podem ser valores de referência, por exemplo históricos ou mensais. A fonte e
+        o método não estão documentados.
       </InlineNotice>
     );
-  } else if (fallback === false) {
+  } else if (fallbackStatus === 'denied') {
     evaluateStatement = (
       <p className={BODY}>A avaliação técnica indica que não usou dados de substituição.</p>
     );
-  } else if (evaluate.status === 'success') {
+  } else if (fallbackStatus === 'unconfirmed' && evaluate.status === 'success') {
     evaluateStatement = (
-      <p className={BODY}>A avaliação técnica não indicou se usou dados de substituição.</p>
+      <p className={BODY}>
+        A avaliação técnica não indicou se usou dados de substituição. Não foi possível confirmar a
+        natureza dos indicadores: não devem ser lidos como medições nem como previsões reais.
+      </p>
+    );
+  } else if (fallbackStatus === 'unconfirmed') {
+    evaluateStatement = (
+      <p className={BODY}>
+        Sem informação: a avaliação técnica não está disponível. Não foi possível confirmar se os
+        indicadores são valores de substituição; não devem ser lidos como medições nem como
+        previsões reais.
+      </p>
     );
   } else {
     evaluateStatement = (
-      <p className={BODY}>Sem informação: a avaliação técnica não está disponível.</p>
+      <p className={BODY}>A aguardar a avaliação técnica para confirmar a natureza dos dados.</p>
     );
   }
 
@@ -150,7 +164,7 @@ export default function TransparencySection({ params, advisory, evaluate, today,
         <Subsection title="Data da consulta">
           <p className={BODY}>
             {isPast
-              ? `Consulta retrospectiva para ${dateText}. Os resultados descrevem as condições indicadas pelo serviço para essa data e não são uma previsão a partir de hoje.`
+              ? `Consulta para uma data passada (${dateText}). O serviço não confirma que os indicadores sejam observações desse dia; podem ser valores de referência, por exemplo históricos ou mensais.`
               : `Consulta para hoje, ${dateText}, segundo o relógio deste dispositivo.`}
           </p>
         </Subsection>

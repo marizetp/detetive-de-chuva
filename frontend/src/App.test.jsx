@@ -67,6 +67,17 @@ describe('página inicial', () => {
     ]);
   });
 
+  it('não afirma que o sistema usa previsão meteorológica', () => {
+    render(<App />);
+    const main = screen.getByRole('main');
+    expect(main).not.toHaveTextContent(/previsão para os próximos dias/i);
+    expect(main).not.toHaveTextContent(/chuva prevista para os próximos/i);
+    expect(
+      screen.getByText(/apresenta os indicadores agroclimáticos\s+disponibilizados pelo sistema/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/O serviço analisa indicadores agroclimáticos/)).toBeInTheDocument();
+  });
+
   it('lista as três classificações documentadas com texto, não só ícones', () => {
     render(<App />);
     const list = screen.getByRole('list', { name: 'Classificações possíveis' });

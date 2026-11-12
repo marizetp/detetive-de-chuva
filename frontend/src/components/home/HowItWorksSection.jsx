@@ -12,7 +12,7 @@ const STEPS = [
   },
   {
     title: 'Analisar as condições agroclimáticas',
-    text: 'O serviço avalia a chuva recente, a humidade do solo na zona das raízes e a chuva prevista para os próximos sete dias.',
+    text: 'O serviço analisa indicadores agroclimáticos, como a chuva e a humidade do solo na zona das raízes, e devolve uma classificação para a província e a cultura escolhidas.',
   },
   {
     title: 'Consultar a recomendação',

@@ -1,7 +1,7 @@
 import { RESULT_SOURCES } from '../../config/api.js';
 import { METRIC_DEFINITIONS, METRIC_UNIT_LABELS } from '../../config/metrics.js';
 import { formatIsoDateLong, formatMetricValue } from '../../utils/format.js';
-import { isPastIsoDate } from '../../utils/report.js';
+import { getFallbackStatus, isPastIsoDate } from '../../utils/report.js';
 import InlineNotice from '../ui/InlineNotice.jsx';
 import MissingValue from './MissingValue.jsx';
 import ReportSection from './ReportSection.jsx';
@@ -27,18 +27,53 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
   const states = { [RESULT_SOURCES.advisory]: advisory, [RESULT_SOURCES.evaluate]: evaluate };
   const divergentFields = new Set(comparison?.divergences.map((d) => d.field) ?? []);
   const isPast = isPastIsoDate(params.data_consulta, today);
-  const usesFallbackWeather = evaluate.result?.isFallbackWeather === true;
+  const fallbackStatus = getFallbackStatus(evaluate);
+  const hasValuesToShow = advisory.status === 'success' || evaluate.status === 'success';
   const hasMissingValue = SOURCES.some((source) =>
     states[source].result?.metrics.some((metric) => metric.value === null),
   );
+  // Só se afirma que as fontes coincidem quando as duas responderam e nenhuma métrica diverge.
+  const metricsMatchAcrossSources =
+    comparison !== null &&
+    comparison !== undefined &&
+    !comparison.divergences.some((d) => d.field.startsWith('metricas.')) &&
+    !comparison.notComparable.some((d) => d.field.startsWith('metricas.'));
+  const consultedDate = formatIsoDateLong(params.data_consulta);
 
   return (
     <ReportSection section={REPORT_SECTIONS.indicators}>
       <p className="max-w-prose leading-relaxed text-charcoal/85">
-        Valores devolvidos por cada serviço para {params.provincia}, na data de{' '}
-        {formatIsoDateLong(params.data_consulta)}. São apresentados tal como recebidos, sem limiares
-        nem interpretação.
+        Valores devolvidos por cada serviço para a consulta de {params.provincia} com data de{' '}
+        {consultedDate}. São apresentados tal como recebidos, sem limiares nem interpretação.
       </p>
+
+      {fallbackStatus === 'unconfirmed' && hasValuesToShow ? (
+        <InlineNotice tone="info" title="Natureza dos dados por confirmar" className="mt-6">
+          <p>
+            {evaluate.status === 'error'
+              ? 'A avaliação técnica não está disponível, por isso não foi possível confirmar se estes valores são de substituição.'
+              : 'A avaliação técnica não indicou se usou dados de substituição, por isso não foi possível confirmar a natureza destes valores.'}{' '}
+            Não devem ser lidos como medições nem como previsões meteorológicas para{' '}
+            {consultedDate}: podem ser valores de referência.
+          </p>
+        </InlineNotice>
+      ) : null}
+
+      {fallbackStatus === 'confirmed' ? (
+        <InlineNotice tone="info" title="Valores de substituição" className="mt-6">
+          <p>
+            A avaliação técnica indica que usou dados meteorológicos de substituição. Por isso, estes
+            valores não correspondem necessariamente a medições nem a previsões meteorológicas para{' '}
+            {consultedDate}: podem ser valores de referência, por exemplo históricos ou mensais. A
+            fonte e o método não estão documentados.
+          </p>
+          <p className="mt-2">
+            {metricsMatchAcrossSources
+              ? 'Os valores da recomendação coincidem com os da avaliação técnica. O serviço de recomendação não indica, por si, se usou dados de substituição.'
+              : 'O serviço de recomendação não indica se usou dados de substituição.'}
+          </p>
+        </InlineNotice>
+      ) : null}
 
       <div className="mt-8 overflow-x-auto">
         <table className="w-full min-w-[20rem] border-collapse text-left">
@@ -99,18 +134,11 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
       </dl>
 
       <div className="mt-8 space-y-5">
-        {usesFallbackWeather ? (
-          <InlineNotice tone="info" title="Dados meteorológicos de substituição">
-            A avaliação técnica indica que usou dados meteorológicos de substituição. Estes valores
-            não devem ser lidos como observações medidas. O serviço de recomendação não indica se
-            usou dados de substituição.
-          </InlineNotice>
-        ) : null}
         {isPast ? (
           <InlineNotice tone="info" title="Consulta para uma data passada">
-            Os valores referem-se a {formatIsoDateLong(params.data_consulta)}, tal como devolvidos
-            pelo serviço. A «chuva prevista» corresponde aos sete dias seguintes a essa data; não é
-            uma previsão a partir de hoje.
+            O serviço não confirma que estes valores sejam observações de {consultedDate}. Podem
+            ser valores de referência, por exemplo históricos ou mensais, e não as condições
+            meteorológicas desse dia.
           </InlineNotice>
         ) : null}
         {hasMissingValue ? (

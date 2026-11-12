@@ -152,12 +152,33 @@ describe('02 — Indicadores', () => {
     expect(within(section('Indicadores agroclimáticos')).getByText(/«Sem dado»: o serviço não enviou/)).toBeInTheDocument();
   });
 
-  it('consulta de data passada: não confunde com previsão a partir de hoje', () => {
+  it('consulta de data passada: não apresenta os valores como observações desse dia', () => {
     renderReport({ params: { ...PARAMS, data_consulta: '2026-08-01' } });
     const indicators = section('Indicadores agroclimáticos');
     expect(within(indicators).getByText('Consulta para uma data passada')).toBeInTheDocument();
-    expect(within(indicators).getByText(/não é\s+uma previsão a partir de hoje/)).toBeInTheDocument();
-    expect(within(section('Resumo da avaliação')).getByText(/avaliação retrospectiva/)).toBeInTheDocument();
+    expect(
+      within(indicators).getByText(/O serviço não confirma que estes valores sejam observações de 1 de agosto de 2026/),
+    ).toBeInTheDocument();
+    expect(
+      within(section('Resumo da avaliação')).getByText(
+        'Data passada: os valores podem não corresponder às condições observadas nesse dia.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(section('Transparência e limitações')).getByText(
+        /O serviço não confirma que os indicadores sejam observações desse dia/,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('data actual: sem nota de data passada', () => {
+    renderReport();
+    expect(
+      within(section('Indicadores agroclimáticos')).queryByText('Consulta para uma data passada'),
+    ).not.toBeInTheDocument();
+    expect(
+      within(section('Transparência e limitações')).getByText(/Consulta para hoje, 12 de novembro de 2026/),
+    ).toBeInTheDocument();
   });
 });
 
@@ -177,6 +198,41 @@ describe('03 — Recomendação de extensão', () => {
     expect(alert).toHaveTextContent('Recomendação indisponível. O servidor demorou demasiado a responder.');
     within(alert).getByRole('button', { name: 'Tentar novamente' }).click();
     expect(onRetry).toHaveBeenCalledWith('advisory');
+  });
+
+  it('data passada: nota contextual antes do texto, que se mantém inalterado', async () => {
+    renderReport({ params: { ...PARAMS, data_consulta: '2026-08-01' } });
+    const recommendation = section('Recomendação de extensão');
+    const note = within(recommendation).getByText('Contexto para ler esta recomendação');
+    expect(
+      within(recommendation).getByText(
+        /A consulta é para 1 de agosto de 2026, uma data passada\. O texto abaixo pode referir-se ao «período actual»/,
+      ),
+    ).toBeInTheDocument();
+    const heading = await within(recommendation).findByRole('heading', { level: 4, name: 'Justificações Técnicas:' });
+    expect(note.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // O texto do serviço continua presente tal como veio, incluindo a primeira frase.
+    expect(
+      within(recommendation).getByText(
+        'FAVORÁVEL: O período atual é favorável para a sementeira de Milho na província do Huambo.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('dados de substituição: a nota contextual indica-o também na recomendação', () => {
+    renderReport();
+    expect(
+      within(section('Recomendação de extensão')).getByText(
+        /os indicadores desta consulta são valores de substituição/,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('data actual sem substituição: sem nota contextual', () => {
+    renderReport({ evaluate: evaluateOk({ ...evaluateHuamboMilho, is_fallback_weather: false }) });
+    expect(
+      within(section('Recomendação de extensão')).queryByText('Contexto para ler esta recomendação'),
+    ).not.toBeInTheDocument();
   });
 
   it('resposta sem texto: avisa em vez de inventar', () => {
@@ -244,23 +300,52 @@ describe('05 — Transparência e limitações', () => {
     ]);
   });
 
-  it('dados meteorológicos de substituição: assinalados nos indicadores e na transparência', () => {
+  it('dados de substituição: aviso junto da tabela de indicadores e na transparência', () => {
     renderReport();
+    const indicators = section('Indicadores agroclimáticos');
+    const notice = within(indicators).getByText('Valores de substituição');
+    const table = within(indicators).getByRole('table');
+    // O aviso aparece antes da tabela, para ser lido antes dos valores.
+    expect(notice.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(
-      within(section('Indicadores agroclimáticos')).getByText('Dados meteorológicos de substituição'),
+      within(indicators).getByText(
+        /não correspondem necessariamente a medições nem a previsões meteorológicas para\s+12 de novembro de 2026/,
+      ),
     ).toBeInTheDocument();
+    expect(within(indicators).getByText(/A\s+fonte e o método não estão documentados/)).toBeInTheDocument();
+    expect(
+      within(indicators).getByText(/Os valores da recomendação coincidem com os da avaliação técnica/),
+    ).toBeInTheDocument();
+
     const transparency = section('Transparência e limitações');
-    expect(within(transparency).getByText('Dados meteorológicos de substituição')).toBeInTheDocument();
-    expect(within(transparency).getByText(/não devem ser lidos como observações medidas/)).toBeInTheDocument();
+    expect(within(transparency).getByText('Valores de substituição')).toBeInTheDocument();
     expect(
       within(transparency).getByText('O serviço de recomendação não indica se usou dados de substituição.'),
+    ).toBeInTheDocument();
+  });
+
+  it('dados de substituição com métricas divergentes: não afirma que as fontes coincidem', () => {
+    renderReport({
+      evaluate: evaluateOk({
+        ...evaluateHuamboMilho,
+        metricas: { ...evaluateHuamboMilho.metricas, humidade_solo_raiz: 0.32 },
+      }),
+    });
+    const indicators = section('Indicadores agroclimáticos');
+    expect(within(indicators).getByText('Valores de substituição')).toBeInTheDocument();
+    expect(within(indicators).queryByText(/coincidem com os da avaliação técnica/)).not.toBeInTheDocument();
+    expect(
+      within(indicators).getByText('O serviço de recomendação não indica se usou dados de substituição.'),
     ).toBeInTheDocument();
   });
 
   it('is_fallback_weather = false: sem aviso de substituição', () => {
     renderReport({ evaluate: evaluateOk({ ...evaluateHuamboMilho, is_fallback_weather: false }) });
     expect(
-      within(section('Indicadores agroclimáticos')).queryByText('Dados meteorológicos de substituição'),
+      within(section('Indicadores agroclimáticos')).queryByText('Valores de substituição'),
+    ).not.toBeInTheDocument();
+    expect(
+      within(section('Transparência e limitações')).queryByText('Valores de substituição'),
     ).not.toBeInTheDocument();
     expect(
       within(section('Transparência e limitações')).getByText(
@@ -302,5 +387,111 @@ describe('05 — Transparência e limitações', () => {
     const transparency = section('Transparência e limitações');
     expect(within(transparency).getByText(/Não é uma probabilidade de sucesso/)).toBeInTheDocument();
     expect(within(transparency).getByText(/não garante a germinação, a produtividade/)).toBeInTheDocument();
+  });
+});
+
+describe('Linguagem: valores de referência não são apresentados como observações', () => {
+  // Expressões que apresentariam os indicadores como medições ou previsões da data consultada.
+  const FORBIDDEN = [
+    /retrospectiv/i,
+    /registad[oa]s? na data/i,
+    /valores registados/i,
+    /previsão para os próximos 7 dias/i,
+    /chuva prevista para os próximos 7 dias/i,
+    /referem-se a \d/i,
+    /descrevem as condições/i,
+    /climatológic/i,
+  ];
+
+  it.each([
+    ['data actual', TODAY],
+    ['data passada', '2026-08-01'],
+  ])('%s: nenhuma expressão proibida no relatório', async (_label, date) => {
+    const { container } = render(
+      <ResultsArea
+        submittedParams={{ ...PARAMS, data_consulta: date }}
+        advisory={advisoryOk()}
+        evaluate={evaluateOk()}
+        onRetry={() => {}}
+        today={TODAY}
+      />,
+    );
+    await screen.findByRole('heading', { level: 4, name: 'Justificações Técnicas:' });
+
+    // O texto do serviço é excluído: é apresentado sem alterações e não é da responsabilidade
+    // da interface (pode conter, por exemplo, «período atual»).
+    const ownText = [...container.querySelectorAll('section[id^="relatorio-"]')]
+      .filter((element) => element.id !== 'relatorio-recomendacao')
+      .map((element) => element.textContent)
+      .join(' ');
+    const recommendationNotes = container.querySelector('#relatorio-recomendacao [class*="border-l-4"]');
+    const textToCheck = `${ownText} ${recommendationNotes?.textContent ?? ''}`;
+
+    for (const pattern of FORBIDDEN) expect(textToCheck).not.toMatch(pattern);
+  });
+
+  it('o rótulo do campo de 7 dias não promete uma previsão', () => {
+    renderReport();
+    const table = within(section('Indicadores agroclimáticos')).getByRole('table');
+    expect(within(table).getByText('Chuva indicada para 7 dias')).toBeInTheDocument();
+    expect(within(table).getByText(/Pode ser um valor de referência, e não uma previsão meteorológica/)).toBeInTheDocument();
+  });
+});
+
+describe('Falha da avaliação técnica: natureza dos dados por confirmar', () => {
+  it('/evaluate falha e /advisory responde: avisa que a natureza não foi confirmada, sem assumir substituição', () => {
+    renderReport({ evaluate: failed() });
+    const indicators = section('Indicadores agroclimáticos');
+    expect(within(indicators).getByText('Natureza dos dados por confirmar')).toBeInTheDocument();
+    expect(
+      within(indicators).getByText(
+        /A avaliação técnica não está disponível, por isso não foi possível confirmar se estes valores são de substituição/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(indicators).getByText(/Não devem ser lidos como medições nem como previsões meteorológicas/),
+    ).toBeInTheDocument();
+    // Não é classificado automaticamente como substituição confirmada.
+    expect(within(indicators).queryByText('Valores de substituição')).not.toBeInTheDocument();
+
+    const transparency = section('Transparência e limitações');
+    expect(
+      within(transparency).getByText(/Sem informação: a avaliação técnica não está disponível/),
+    ).toBeInTheDocument();
+    expect(within(transparency).queryByText('Valores de substituição')).not.toBeInTheDocument();
+    expect(within(transparency).getByText('Avaliação técnica: sem resposta do serviço.')).toBeInTheDocument();
+
+    expect(
+      within(section('Recomendação de extensão')).getByText(
+        /Não foi possível confirmar a natureza dos valores em que o texto se apoia/,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('/evaluate responde sem is_fallback_weather: também fica por confirmar', () => {
+    renderReport({ evaluate: evaluateOk({ ...evaluateHuamboMilho, is_fallback_weather: undefined }) });
+    const indicators = section('Indicadores agroclimáticos');
+    expect(within(indicators).getByText('Natureza dos dados por confirmar')).toBeInTheDocument();
+    expect(within(indicators).getByText(/não indicou se usou dados de substituição/)).toBeInTheDocument();
+    expect(within(indicators).queryByText('Valores de substituição')).not.toBeInTheDocument();
+  });
+
+  it('/evaluate ainda a carregar: nenhuma conclusão antecipada', () => {
+    renderReport({ evaluate: loading });
+    expect(
+      within(section('Indicadores agroclimáticos')).queryByText('Natureza dos dados por confirmar'),
+    ).not.toBeInTheDocument();
+    expect(
+      within(section('Transparência e limitações')).getByText(
+        'A aguardar a avaliação técnica para confirmar a natureza dos dados.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('as duas fontes falham: sem aviso sobre valores que não existem', () => {
+    renderReport({ advisory: failed(), evaluate: failed() });
+    expect(
+      within(section('Indicadores agroclimáticos')).queryByText('Natureza dos dados por confirmar'),
+    ).not.toBeInTheDocument();
   });
 });

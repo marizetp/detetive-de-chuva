@@ -83,6 +83,9 @@ export default function ResultsArea({ submittedParams, advisory, evaluate, onRet
         <IndicatorsSection {...sectionProps} />
         <RecommendationSection
           advisory={advisory}
+          evaluate={evaluate}
+          params={submittedParams}
+          today={today}
           onRetry={() => onRetry(RESULT_SOURCES.advisory)}
         />
         <TechnicalSection evaluate={evaluate} onRetry={() => onRetry(RESULT_SOURCES.evaluate)} />

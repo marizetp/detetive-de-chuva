@@ -160,7 +160,7 @@ export default function SummarySection({ params, advisory, evaluate, today, comp
               </dd>
               {isPast ? (
                 <dd className="mt-1 text-charcoal/80">
-                  Data passada: avaliação retrospectiva, não uma previsão a partir de hoje.
+                  Data passada: os valores podem não corresponder às condições observadas nesse dia.
                 </dd>
               ) : null}
             </div>

@@ -23,8 +23,9 @@ export default function HeroSection() {
           </p>
 
           <p className="mt-7 max-w-lg text-lg leading-relaxed text-charcoal/80">
-            Uma plataforma de apoio à decisão agrícola que reúne a chuva recente, a humidade do solo
-            e a previsão para os próximos dias, para ajudar a decidir quando semear.
+            Uma plataforma de apoio à decisão agrícola que apresenta os indicadores agroclimáticos
+            disponibilizados pelo sistema, como a chuva e a humidade do solo, para ajudar a decidir
+            quando semear.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3">

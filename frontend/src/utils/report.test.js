@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { describeIssues, isPastIsoDate, selectSummarySource } from './report.js';
+import { describeIssues, getFallbackStatus, isPastIsoDate, selectSummarySource } from './report.js';
 
 const state = (status) => ({ status, result: status === 'success' ? {} : null, error: null });
 
@@ -42,5 +42,24 @@ describe('describeIssues', () => {
       },
       { field: 'campo_novo', label: 'campo_novo', problem: 'não enviado' },
     ]);
+  });
+});
+
+describe('getFallbackStatus', () => {
+  const evaluate = (status, isFallbackWeather) => ({
+    status,
+    result: status === 'success' ? { isFallbackWeather } : null,
+    error: null,
+  });
+
+  it.each([
+    ['success', true, 'confirmed'],
+    ['success', false, 'denied'],
+    ['success', null, 'unconfirmed'], // o serviço não indicou
+    ['error', undefined, 'unconfirmed'], // /evaluate falhou: nada confirmado
+    ['loading', undefined, 'pending'],
+    ['idle', undefined, 'pending'],
+  ])('evaluate=%s, is_fallback_weather=%s → %s', (status, flag, expected) => {
+    expect(getFallbackStatus(evaluate(status, flag))).toBe(expected);
   });
 });

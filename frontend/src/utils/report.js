@@ -25,6 +25,26 @@ export function selectSummarySource(advisory, evaluate) {
 }
 
 /**
+ * O que se sabe sobre a natureza dos indicadores, segundo `is_fallback_weather` (só o /evaluate
+ * o devolve). Nunca se assume substituição sem confirmação, nem dados reais sem confirmação.
+ * - confirmed:   /evaluate indica dados de substituição
+ * - denied:      /evaluate indica que não usou dados de substituição
+ * - unconfirmed: /evaluate falhou ou não indicou o campo — natureza por confirmar
+ * - pending:     /evaluate ainda não respondeu
+ * @returns {'confirmed' | 'denied' | 'unconfirmed' | 'pending'}
+ */
+export function getFallbackStatus(evaluate) {
+  if (evaluate.status === 'success') {
+    const flag = evaluate.result?.isFallbackWeather;
+    if (flag === true) return 'confirmed';
+    if (flag === false) return 'denied';
+    return 'unconfirmed';
+  }
+  if (evaluate.status === 'error') return 'unconfirmed';
+  return 'pending';
+}
+
+/**
  * Converte os `issues` dos mappers em avisos legíveis, sem repetir o mesmo campo.
  * @param {{ field: string, problem: 'missing' | 'invalid' }[]} issues
  * @returns {{ field: string, label: string, problem: string }[]}
