@@ -1,8 +1,12 @@
-import { API_PATHS, RESULT_SOURCES } from '../../config/api.js';
-import { formatIsoDateLong } from '../../utils/format.js';
+import { RESULT_SOURCES } from '../../config/api.js';
+import { compareConsultationResults } from '../../utils/divergences.js';
 import Eyebrow from '../ui/Eyebrow.jsx';
-import DivergenceNotice from './DivergenceNotice.jsx';
-import SourcePanel from './SourcePanel.jsx';
+import IndicatorsSection from './IndicatorsSection.jsx';
+import RecommendationSection from './RecommendationSection.jsx';
+import ReportContents from './ReportContents.jsx';
+import SummarySection from './SummarySection.jsx';
+import TechnicalSection from './TechnicalSection.jsx';
+import TransparencySection from './TransparencySection.jsx';
 
 const SOURCE_NAMES = {
   [RESULT_SOURCES.advisory]: 'recomendação',
@@ -11,7 +15,7 @@ const SOURCE_NAMES = {
 
 /**
  * Frase para a região "ao vivo", anunciada por leitores de ecrã quando muda.
- * Só anuncia o que terminou: o carregamento já é anunciado pelo LoadingIndicator de cada painel.
+ * Só anuncia o que terminou: o carregamento já é anunciado pelo LoadingIndicator de cada secção.
  */
 function describeCompletion(advisory, evaluate) {
   return [
@@ -28,97 +32,62 @@ function describeCompletion(advisory, evaluate) {
     .join('; ');
 }
 
+const HEADING = 'mt-4 text-3xl leading-tight font-semibold text-forest sm:text-4xl';
+
 /**
- * Área de resultados. Estrutura preparada para o relatório completo: cada fonte tem o seu
- * painel, e as divergências aparecem antes dos painéis.
+ * Relatório da consulta. Usa apenas os estados já recebidos (não faz pedidos).
+ * Ordem de leitura: resultado geral → indicadores → recomendação → fundamentação → limites.
  */
-export default function ResultsArea({ submittedParams, advisory, evaluate, onRetry, headingRef }) {
+export default function ResultsArea({ submittedParams, advisory, evaluate, onRetry, today, headingRef }) {
   if (!submittedParams) {
     return (
       <section aria-labelledby="resultados-titulo">
-        <Eyebrow>Resultados</Eyebrow>
-        <h2
-          id="resultados-titulo"
-          ref={headingRef}
-          tabIndex={-1}
-          className="mt-4 text-3xl leading-tight font-semibold text-forest"
-        >
+        <Eyebrow>Relatório</Eyebrow>
+        <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
           Ainda sem consulta
         </h2>
         <p className="mt-4 max-w-prose text-lg leading-relaxed text-charcoal/80">
-          Escolha a província, a cultura e a data, e seleccione «Consultar». A recomendação e a
-          avaliação técnica do serviço aparecem aqui, cada uma com a sua origem identificada.
+          Escolha a província, a cultura e a data, e seleccione «Consultar». O relatório reúne a
+          recomendação e a avaliação técnica do serviço, cada uma com a sua origem identificada.
         </p>
       </section>
     );
   }
 
-  const bothSucceeded = advisory.status === 'success' && evaluate.status === 'success';
+  const comparison =
+    advisory.status === 'success' && evaluate.status === 'success'
+      ? compareConsultationResults(advisory.result, evaluate.result)
+      : null;
+  const sectionProps = { params: submittedParams, advisory, evaluate, today, comparison };
 
   return (
     <section aria-labelledby="resultados-titulo">
-      <Eyebrow>Resultados</Eyebrow>
-      <h2
-        id="resultados-titulo"
-        ref={headingRef}
-        tabIndex={-1}
-        className="mt-4 text-3xl leading-tight font-semibold text-forest"
-      >
-        Resultados da consulta
+      <Eyebrow>Relatório</Eyebrow>
+      <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
+        Relatório da consulta
       </h2>
-      <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm">
-        <div className="flex gap-2">
-          <dt className="text-charcoal/75">Província</dt>
-          <dd className="font-semibold text-charcoal">{submittedParams.provincia}</dd>
-        </div>
-        <div className="flex gap-2">
-          <dt className="text-charcoal/75">Cultura</dt>
-          <dd className="font-semibold text-charcoal">{submittedParams.cultura}</dd>
-        </div>
-        <div className="flex gap-2">
-          <dt className="text-charcoal/75">Data</dt>
-          <dd className="font-semibold text-charcoal">
-            {formatIsoDateLong(submittedParams.data_consulta)}
-          </dd>
-        </div>
-      </dl>
+      <p className="mt-3 text-charcoal/80">
+        {submittedParams.provincia} · {submittedParams.cultura}
+      </p>
 
       <p className="sr-only" role="status" aria-live="polite">
         {describeCompletion(advisory, evaluate)}
       </p>
 
-      {bothSucceeded ? (
-        <div className="mt-8">
-          <DivergenceNotice advisoryResult={advisory.result} evaluateResult={evaluate.result} />
-        </div>
-      ) : null}
-
-      <div className="mt-10 space-y-14">
-        <SourcePanel
-          id="fonte-recomendacao"
-          title="Recomendação"
-          sourceLabel="Serviço de recomendação"
-          endpoint={API_PATHS.advisory}
-          loadingLabel="A obter a recomendação…"
-          state={advisory}
-          onRetry={() => onRetry(RESULT_SOURCES.advisory)}
-        />
-        <SourcePanel
-          id="fonte-avaliacao"
-          title="Avaliação técnica"
-          sourceLabel="Serviço de avaliação técnica"
-          endpoint={API_PATHS.evaluate}
-          loadingLabel="A obter a avaliação técnica…"
-          state={evaluate}
-          onRetry={() => onRetry(RESULT_SOURCES.evaluate)}
-        />
+      <div className="mt-7">
+        <ReportContents />
       </div>
 
-      <p className="mt-12 border-t border-charcoal/10 pt-5 text-sm leading-relaxed text-charcoal/80">
-        O nível de confiança é uma pontuação atribuída pelo sistema, não uma garantia de sucesso da
-        sementeira. O relatório detalhado — a recomendação de extensão e as justificações técnicas —
-        será apresentado nesta área numa próxima versão.
-      </p>
+      <div className="mt-10 space-y-16">
+        <SummarySection {...sectionProps} />
+        <IndicatorsSection {...sectionProps} />
+        <RecommendationSection
+          advisory={advisory}
+          onRetry={() => onRetry(RESULT_SOURCES.advisory)}
+        />
+        <TechnicalSection evaluate={evaluate} onRetry={() => onRetry(RESULT_SOURCES.evaluate)} />
+        <TransparencySection {...sectionProps} />
+      </div>
     </section>
   );
 }

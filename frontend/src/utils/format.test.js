@@ -53,9 +53,12 @@ describe('humidade do solo (fracção 0–1)', () => {
 });
 
 describe('formatConfidenceScore (0–100)', () => {
-  it('formata a pontuação como percentagem', () => {
-    expect(formatConfidenceScore(95)).toBe('95%');
-    expect(formatConfidenceScore(72)).toBe('72%');
+  it('formata a pontuação como «N/100», não como percentagem', () => {
+    expect(formatConfidenceScore(95)).toBe('95/100');
+    expect(formatConfidenceScore(72)).toBe('72/100');
+    expect(formatConfidenceScore(0)).toBe('0/100');
+    expect(formatConfidenceScore(82.5)).toBe('82,5/100');
+    expect(formatConfidenceScore(95)).not.toContain('%');
     expect(formatConfidenceScore(null)).toBe(MISSING_VALUE_TEXT);
   });
 });

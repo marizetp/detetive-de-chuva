@@ -11,6 +11,7 @@ const percentFormatter = new Intl.NumberFormat(LOCALE, {
   style: 'percent',
   maximumFractionDigits: 1,
 });
+const scoreFormatter = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 });
 const longDateFormatter = new Intl.DateTimeFormat(LOCALE, { dateStyle: 'long', timeZone: 'UTC' });
 
 /** Espaço não separável (U+00A0): impede que o número e a unidade fiquem em linhas diferentes. */
@@ -36,10 +37,13 @@ export function formatFractionAsPercent(fraction) {
   return percentFormatter.format(fraction);
 }
 
-/** `score_confianca` (0–100). Ex.: 95 → "95%". É uma pontuação do sistema, não uma garantia. */
+/**
+ * `score_confianca` (0–100) no formato "95/100" (decisão de 2026-11-12): evita que a pontuação
+ * do sistema seja lida como percentagem de probabilidade. Mostrar sempre com a legenda explicativa.
+ */
 export function formatConfidenceScore(score) {
   if (!isFiniteNumber(score)) return MISSING_VALUE_TEXT;
-  return percentFormatter.format(score / 100);
+  return `${scoreFormatter.format(score)}/100`;
 }
 
 /** Formata um item de métrica do view model segundo a sua unidade. */

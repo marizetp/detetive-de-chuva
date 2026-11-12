@@ -50,7 +50,7 @@ describe('compareConsultationResults', () => {
   it('formatDivergenceValue formata cada campo segundo o seu tipo', () => {
     expect(formatDivergenceValue('status', 'AGUARDAR')).toBe('Aguardar');
     expect(formatDivergenceValue('status', 'NOVO')).toBe('NOVO');
-    expect(formatDivergenceValue('score_confianca', 85)).toBe('85%');
+    expect(formatDivergenceValue('score_confianca', 85)).toBe('85/100');
     expect(formatDivergenceValue('metricas.humidade_solo_raiz', 0.32)).toBe('32%');
     expect(formatDivergenceValue('metricas.previsao_7dias_mm', 60.5)).toMatch(/^60,5.mm$/);
   });

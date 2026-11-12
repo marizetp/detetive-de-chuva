@@ -2,6 +2,7 @@
 // Regras: nada é inventado; valores em falta ou inválidos ficam `null` e são registados em `issues`.
 
 import { RESULT_SOURCES } from '../config/api.js';
+import { RESPONSE_FIELD } from '../config/fieldLabels.js';
 import { CONFIDENCE_SCORE_RANGE, METRIC_DEFINITIONS } from '../config/metrics.js';
 import { MISSING_STATUS, STATUS_DEFINITIONS, UNKNOWN_STATUS } from '../config/status.js';
 import {
@@ -17,8 +18,6 @@ import {
  * @typedef {{ code: string|null, known: boolean, label: string, tone: string }} StatusViewModel
  * @typedef {{ key: string, label: string, unit: string, value: number|null }} MetricViewModel
  */
-
-const RESPONSE_FIELD = '(resposta)';
 
 function isMissing(value) {
   return value === undefined || value === null;

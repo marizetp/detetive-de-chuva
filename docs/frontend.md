@@ -193,7 +193,7 @@ Do not expose technical stack traces to end users.
 
 - Rainfall values: display in `mm`, preserving meaningful precision.
 - Soil moisture: API value is between 0.0 and 1.0; multiply by 100 for percentage display.
-- Confidence score: display as a percentage, with explanatory copy that it is a score supplied by the system, not a guarantee.
+- Confidence score: display as `N/100` (e.g. `95/100`), with explanatory copy that it is a score supplied by the system, not a probability or a guarantee. **Decided 2026-11-12:** replaces the earlier percentage display, to avoid reading the score as a probability.
 - Do not invent thresholds or interpretive labels for metrics unless the backend team provides them.
 
 ## 8. Historical trend proposal — not yet confirmed as a live API

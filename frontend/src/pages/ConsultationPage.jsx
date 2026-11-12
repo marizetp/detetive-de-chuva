@@ -65,6 +65,7 @@ export default function ConsultationPage() {
             advisory={consultation.advisory}
             evaluate={consultation.evaluate}
             onRetry={consultation.retrySource}
+            today={today}
             headingRef={resultsHeadingRef}
           />
         </div>

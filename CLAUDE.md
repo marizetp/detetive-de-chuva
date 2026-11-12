@@ -159,6 +159,8 @@ Do not build the entire application in one unreviewed operation.
 - Reference date: the device's **local** date (`getLocalIsoDate` in `frontend/src/utils/dates.js`), not the server's `data_servidor`. Do not switch to `data_servidor` in this phase.
 - **Known limitation:** if the device clock or time zone is wrong, validation may wrongly reject today's date or accept a date that is already in the future for the server (typically a one-day offset).
 
+**2026-11-12 — Confidence score display:** show `score_confianca` as `N/100` (e.g. `95/100`), never as a percentage, always with the caption that it is a system score (0–100), not a probability or a guarantee. Formatting lives in `formatConfidenceScore` (`frontend/src/utils/format.js`).
+
 ## 12. Known pending decisions
 
 - Confirm whether the historical NASA POWER trend outputs described in the PDF will be exposed to the frontend during this event.

@@ -1,24 +1,7 @@
-import { METRIC_DEFINITIONS, METRIC_UNITS } from '../../config/metrics.js';
+import { METRIC_DEFINITIONS, METRIC_UNIT_LABELS } from '../../config/metrics.js';
 import { SECTION_IDS } from '../../routing/routes.js';
 import Container from '../ui/Container.jsx';
 import SectionHeading from '../ui/SectionHeading.jsx';
-
-/**
- * Descrição de cada métrica documentada. Os rótulos vêm de config/metrics.js (fonte única).
- * Sem limiares nem interpretações: o serviço ainda não os documentou.
- */
-const METRIC_DESCRIPTIONS = {
-  chuva_acumulada_recente_mm:
-    'Chuva acumulada nos dias anteriores à consulta, segundo o serviço de avaliação.',
-  humidade_solo_raiz:
-    'Água disponível na camada de solo onde a raiz se desenvolve. O serviço indica-a numa escala de 0 a 1; aqui é apresentada em percentagem.',
-  previsao_7dias_mm: 'Chuva esperada para a semana seguinte à consulta.',
-};
-
-const UNIT_LABELS = {
-  [METRIC_UNITS.millimetres]: 'mm',
-  [METRIC_UNITS.fraction]: '%',
-};
 
 export default function AboutSection() {
   const headingId = `${SECTION_IDS.about}-titulo`;
@@ -59,11 +42,11 @@ export default function AboutSection() {
                     {metric.label}
                   </span>
                   <span className="font-mono text-sm text-earth sm:mt-1 sm:block">
-                    {UNIT_LABELS[metric.unit]}
+                    {METRIC_UNIT_LABELS[metric.unit]}
                   </span>
                 </dt>
                 <dd className="text-base leading-relaxed text-charcoal/80 sm:col-span-7">
-                  {METRIC_DESCRIPTIONS[metric.key]}
+                  {metric.description}
                 </dd>
               </div>
             ))}
