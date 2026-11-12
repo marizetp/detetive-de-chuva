@@ -1,6 +1,11 @@
 import { RESULT_SOURCES } from '../../config/api.js';
+import { CONSULTATION_ANCHORS, ROUTES } from '../../routing/routes.js';
 import { compareConsultationResults } from '../../utils/divergences.js';
+import { getUserErrorMessage } from '../../utils/errorMessages.js';
+import { describeConsultation } from '../../utils/report.js';
+import AppLink from '../ui/AppLink.jsx';
 import Eyebrow from '../ui/Eyebrow.jsx';
+import InlineNotice from '../ui/InlineNotice.jsx';
 import IndicatorsSection from './IndicatorsSection.jsx';
 import RecommendationSection from './RecommendationSection.jsx';
 import ReportContents from './ReportContents.jsx';
@@ -38,7 +43,15 @@ const HEADING = 'mt-4 text-3xl leading-tight font-semibold text-ink sm:text-4xl'
  * Relatório da consulta. Usa apenas os estados já recebidos (não faz pedidos).
  * Ordem de leitura: resultado geral → indicadores → recomendação → fundamentação → limites.
  */
-export default function ResultsArea({ submittedParams, advisory, evaluate, onRetry, today, headingRef }) {
+export default function ResultsArea({
+  submittedParams,
+  advisory,
+  evaluate,
+  onRetry,
+  today,
+  headingRef,
+  isStale = false,
+}) {
   if (!submittedParams) {
     return (
       <section aria-labelledby="resultados-titulo">
@@ -59,6 +72,15 @@ export default function ResultsArea({ submittedParams, advisory, evaluate, onRet
       ? compareConsultationResults(advisory.result, evaluate.result)
       : null;
   const sectionProps = { params: submittedParams, advisory, evaluate, today, comparison };
+  // Repete as fontes que falharam com erro que admite nova tentativa (ex.: não um 422).
+  const retryAll = () => {
+    for (const [source, state] of [
+      [RESULT_SOURCES.advisory, advisory],
+      [RESULT_SOURCES.evaluate, evaluate],
+    ]) {
+      if (state.status === 'error' && getUserErrorMessage(state.error)?.canRetry) onRetry(source);
+    }
+  };
 
   return (
     <section aria-labelledby="resultados-titulo">
@@ -66,9 +88,22 @@ export default function ResultsArea({ submittedParams, advisory, evaluate, onRet
       <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
         Relatório da consulta
       </h2>
-      <p className="mt-3 text-ink-muted">
-        {submittedParams.provincia} · {submittedParams.cultura}
-      </p>
+      <div className="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+        <p className="text-ink-muted">{describeConsultation(submittedParams)}</p>
+        <AppLink
+          to={`${ROUTES.consultation}#${CONSULTATION_ANCHORS.form}`}
+          className="inline-flex min-h-11 items-center rounded-sm text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
+        >
+          Alterar dados da consulta
+        </AppLink>
+      </div>
+
+      {isStale ? (
+        <InlineNotice tone="info" title="Este relatório corresponde à consulta anterior" className="mt-6">
+          Os dados do formulário foram alterados depois desta consulta. Seleccione «Actualizar
+          consulta» para obter um relatório com os novos dados.
+        </InlineNotice>
+      ) : null}
 
       <p className="sr-only" role="status" aria-live="polite">
         {describeCompletion(advisory, evaluate)}
@@ -79,7 +114,7 @@ export default function ResultsArea({ submittedParams, advisory, evaluate, onRet
       </div>
 
       <div className="mt-10 space-y-16">
-        <SummarySection {...sectionProps} />
+        <SummarySection {...sectionProps} onRetryAll={retryAll} />
         <IndicatorsSection {...sectionProps} />
         <RecommendationSection
           advisory={advisory}

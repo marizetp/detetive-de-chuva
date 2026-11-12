@@ -13,11 +13,11 @@ function Triggers({ triggers }) {
     return <p className={EMPTY_TEXT}>O serviço não enviou esta informação.</p>;
   }
   if (triggers.length === 0) {
-    return <p className={EMPTY_TEXT}>Nenhum trigger activado, segundo o serviço.</p>;
+    return <p className={EMPTY_TEXT}>Nenhum gatilho activado, segundo o serviço.</p>;
   }
   return (
     <>
-      <ul className="flex flex-wrap gap-2" aria-label="Códigos dos triggers activados">
+      <ul className="flex flex-wrap gap-2" aria-label="Códigos dos gatilhos activados">
         {triggers.map((trigger, index) => (
           <li key={`${index}-${trigger}`}>
             <code className="inline-block rounded-md bg-surface px-2.5 py-1 font-mono text-sm text-ink">
@@ -57,7 +57,7 @@ function Justifications({ justifications }) {
 export default function TechnicalSection({ evaluate, onRetry }) {
   let content = null;
   if (evaluate.status === 'loading') {
-    content = <LoadingIndicator label="A obter a avaliação técnica…" />;
+    content = <LoadingIndicator label="A obter a avaliação técnica…" slowNotice={false} live={false} />;
   } else if (evaluate.status === 'error') {
     content = (
       <SourceError source={RESULT_SOURCES.evaluate} error={evaluate.error} onRetry={onRetry} />
@@ -70,7 +70,7 @@ export default function TechnicalSection({ evaluate, onRetry }) {
           apresentados tal como foram recebidos.
         </p>
         <div>
-          <h4 className={SUBHEADING}>Triggers activados</h4>
+          <h4 className={SUBHEADING}>Gatilhos activados (triggers)</h4>
           <div className="mt-4">
             <Triggers triggers={evaluate.result.triggers} />
           </div>

@@ -1,6 +1,13 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App.jsx';
+import { jsonResponse, stubFetch } from './test/fetchMock.js';
+import {
+  advisoryHuamboMilho,
+  cropsResponse,
+  evaluateHuamboMilho,
+  provincesResponse,
+} from './test/fixtures/liveResponses.js';
 
 beforeEach(() => {
   window.history.replaceState(null, '', '/');
@@ -151,6 +158,38 @@ describe('navegação', () => {
     );
     expect(`${window.location.pathname}${window.location.hash}`).toBe('/#fontes');
     expect(document.activeElement).toHaveAttribute('id', 'fontes');
+  });
+
+  it('«Alterar dados da consulta» leva ao formulário e move o foco, sem perder o relatório', async () => {
+    const responses = {
+      '/api/v1/provinces': provincesResponse,
+      '/api/v1/crops': cropsResponse,
+      '/api/v1/advisory': advisoryHuamboMilho,
+      '/api/v1/evaluate': evaluateHuamboMilho,
+    };
+    const fetchMock = stubFetch(async (url) => jsonResponse(responses[new URL(url).pathname]));
+    window.history.replaceState(null, '', '/consulta');
+    render(<App />);
+
+    await screen.findByRole('option', { name: 'Huambo' });
+    await screen.findByRole('option', { name: 'Milho' });
+    fireEvent.change(screen.getByLabelText('Província'), { target: { value: 'Huambo' } });
+    fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Milho' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Consultar' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Consultar' })).not.toHaveAttribute('aria-disabled'));
+    expect(screen.getByRole('heading', { level: 2, name: 'Relatório da consulta' })).toBeInTheDocument();
+    const callsBefore = fetchMock.mock.calls.length;
+
+    fireEvent.click(screen.getByRole('link', { name: 'Alterar dados da consulta' }));
+
+    expect(`${window.location.pathname}${window.location.hash}`).toBe('/consulta#consulta-formulario');
+    const form = screen.getByRole('form', { name: 'Dados da consulta' });
+    expect(form).toHaveAttribute('id', 'consulta-formulario');
+    expect(document.activeElement).toBe(form);
+    // Mesma página: nada é remontado nem pedido de novo; o relatório e os valores mantêm-se.
+    expect(screen.getByRole('heading', { level: 2, name: 'Relatório da consulta' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Cultura')).toHaveValue('Milho');
+    expect(fetchMock.mock.calls).toHaveLength(callsBefore);
   });
 
   it('caminhos desconhecidos mostram a página "não encontrada"', () => {

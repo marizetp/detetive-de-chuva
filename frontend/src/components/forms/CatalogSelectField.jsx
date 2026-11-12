@@ -37,7 +37,8 @@ export default function CatalogSelectField({
 
   let extra = null;
   if (catalog.status === 'loading') {
-    extra = <LoadingIndicator label={`A carregar ${resourceLabel}…`} />;
+    // O aviso de demora e o anúncio para leitores de ecrã são dados uma vez pelo formulário.
+    extra = <LoadingIndicator label={`A carregar ${resourceLabel}…`} slowNotice={false} live={false} />;
   } else if (catalog.status === 'error') {
     const message = getUserErrorMessage(catalog.error);
     extra = (

@@ -4,7 +4,7 @@ import BrandMark from '../ui/BrandMark.jsx';
 import Container from '../ui/Container.jsx';
 
 const FOOTER_LINK =
-  'rounded-sm text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-accent hover:decoration-accent';
+  'inline-block rounded-sm py-1 text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-accent hover:decoration-accent';
 
 const FOOTER_HEADING = 'font-mono text-xs font-medium tracking-[0.14em] text-ink-subtle uppercase';
 
@@ -25,7 +25,7 @@ export default function SiteFooter() {
 
           <nav aria-label="Rodapé" className="md:col-span-3">
             <h2 className={FOOTER_HEADING}>Navegar</h2>
-            <ul className="mt-4 space-y-2.5 text-sm">
+            <ul className="mt-3 space-y-1 text-sm">
               {NAV_ITEMS.map((item) => (
                 <li key={item.to}>
                   <AppLink to={item.to} className={FOOTER_LINK}>

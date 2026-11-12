@@ -1,9 +1,14 @@
 import { useRef, useState } from 'react';
+import { CONSULTATION_ANCHORS } from '../../routing/routes.js';
+import { describeConsultation } from '../../utils/report.js';
 import { ConsultationInputError, validateConsultationParams } from '../../utils/validators.js';
 import Button from '../ui/Button.jsx';
+import InlineNotice from '../ui/InlineNotice.jsx';
+import LoadingIndicator from '../ui/LoadingIndicator.jsx';
 import CatalogSelectField from './CatalogSelectField.jsx';
 import DateField from './DateField.jsx';
 
+const CONSULTATION_FORM_ID = CONSULTATION_ANCHORS.form;
 const FIELD_ORDER = ['provincia', 'cultura', 'data_consulta'];
 const SUBMIT_HINT_ID = 'consulta-submeter-dica';
 
@@ -16,7 +21,16 @@ function isOptionAvailable(catalog, value) {
  * que a província e a cultura pertencem às listas devolvidas pela API.
  * Nomes de campos = nomes da API (`provincia`, `cultura`, `data_consulta`).
  */
-export default function ConsultationForm({ provinces, crops, today, isPending, onSubmit }) {
+export default function ConsultationForm({
+  provinces,
+  crops,
+  today,
+  isPending,
+  onSubmit,
+  onValuesChange,
+  lastSubmitted = null,
+  isStale = false,
+}) {
   const [values, setValues] = useState({ provincia: '', cultura: '', data_consulta: today });
   const [errors, setErrors] = useState({});
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
@@ -43,6 +57,7 @@ export default function ConsultationForm({ provinces, crops, today, isPending, o
   const updateField = (name, value) => {
     const next = { ...values, [name]: value };
     setValues(next);
+    onValuesChange?.(next);
     // Depois da primeira tentativa, os erros acompanham as correcções em tempo real.
     if (hasAttemptedSubmit) setErrors(validate(next));
   };
@@ -78,12 +93,33 @@ export default function ConsultationForm({ provinces, crops, today, isPending, o
   if (isPending) submitHint = 'A consulta está em curso. Aguarde a resposta do serviço.';
   else if (!catalogsReady) submitHint = 'Disponível quando as províncias e as culturas estiverem carregadas.';
 
+  const loadingCatalogs = [
+    provinces.status === 'loading' ? 'as províncias' : null,
+    crops.status === 'loading' ? 'as culturas' : null,
+  ].filter(Boolean);
+
+  let submitLabel = 'Consultar';
+  if (isPending) submitLabel = 'A consultar…';
+  else if (isStale) submitLabel = 'Actualizar consulta';
+
   return (
-    <form noValidate onSubmit={handleSubmit} aria-labelledby="consulta-formulario-titulo">
+    <form
+      id={CONSULTATION_FORM_ID}
+      noValidate
+      onSubmit={handleSubmit}
+      aria-labelledby="consulta-formulario-titulo"
+    >
       <h2 id="consulta-formulario-titulo" className="text-2xl leading-snug font-semibold text-ink">
         Dados da consulta
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">Todos os campos são obrigatórios.</p>
+
+      {/* Um único aviso de carregamento (e de demora) para os dois catálogos. */}
+      {loadingCatalogs.length > 0 ? (
+        <div className="mt-6">
+          <LoadingIndicator label={`A carregar ${loadingCatalogs.join(' e ')} do serviço…`} />
+        </div>
+      ) : null}
 
       <div className="mt-7 space-y-6">
         <CatalogSelectField
@@ -122,6 +158,13 @@ export default function ConsultationForm({ provinces, crops, today, isPending, o
         />
       </div>
 
+      {isStale && !isPending && lastSubmitted ? (
+        <InlineNotice tone="info" role="status" title="Dados alterados" className="mt-8">
+          O relatório ao lado mostra a consulta anterior ({describeConsultation(lastSubmitted)}).
+          Seleccione «Actualizar consulta» para obter um relatório com os novos dados.
+        </InlineNotice>
+      ) : null}
+
       <div className="mt-8">
         <Button
           type="submit"
@@ -129,7 +172,7 @@ export default function ConsultationForm({ provinces, crops, today, isPending, o
           aria-describedby={submitHint ? SUBMIT_HINT_ID : undefined}
           className="w-full justify-center"
         >
-          {isPending ? 'A consultar…' : 'Consultar'}
+          {submitLabel}
         </Button>
         {submitHint ? (
           <p id={SUBMIT_HINT_ID} className="mt-3 text-sm leading-relaxed text-ink-muted">

@@ -2,7 +2,26 @@
 
 import { RESULT_SOURCES } from '../config/api.js';
 import { FIELD_LABELS, ISSUE_PROBLEM_LABELS } from '../config/fieldLabels.js';
+import { formatIsoDateLong } from './format.js';
 import { isValidIsoDate } from './validators.js';
+
+const CONSULTATION_FIELDS = ['provincia', 'cultura', 'data_consulta'];
+
+/** "Huambo · Milho · 12 de novembro de 2026" — identificação curta de uma consulta. */
+export function describeConsultation(params) {
+  if (!params) return '';
+  return [params.provincia, params.cultura, formatIsoDateLong(params.data_consulta)].join(' · ');
+}
+
+/**
+ * `true` quando dois conjuntos de parâmetros descrevem a mesma consulta.
+ * Serve para avisar quando o formulário já não corresponde ao relatório apresentado.
+ */
+export function isSameConsultation(a, b) {
+  if (!a || !b) return false;
+  const norm = (value) => (typeof value === 'string' ? value.trim() : value ?? '');
+  return CONSULTATION_FIELDS.every((field) => norm(a[field]) === norm(b[field]));
+}
 
 /** `true` quando a data consultada é anterior à data de referência (YYYY-MM-DD). */
 export function isPastIsoDate(isoDate, today) {

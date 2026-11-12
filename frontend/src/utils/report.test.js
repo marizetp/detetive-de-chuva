@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { describeIssues, getFallbackStatus, isPastIsoDate, selectSummarySource } from './report.js';
+import {
+  describeConsultation,
+  describeIssues,
+  getFallbackStatus,
+  isPastIsoDate,
+  isSameConsultation,
+  selectSummarySource,
+} from './report.js';
 
 const state = (status) => ({ status, result: status === 'success' ? {} : null, error: null });
 
@@ -61,5 +68,30 @@ describe('getFallbackStatus', () => {
     ['idle', undefined, 'pending'],
   ])('evaluate=%s, is_fallback_weather=%s → %s', (status, flag, expected) => {
     expect(getFallbackStatus(evaluate(status, flag))).toBe(expected);
+  });
+});
+
+describe('isSameConsultation', () => {
+  const base = { provincia: 'Huambo', cultura: 'Milho', data_consulta: '2026-11-12' };
+
+  it('compara província, cultura e data', () => {
+    expect(isSameConsultation(base, { ...base })).toBe(true);
+    expect(isSameConsultation(base, { ...base, provincia: ' Huambo ' })).toBe(true);
+    expect(isSameConsultation(base, { ...base, cultura: 'Soja' })).toBe(false);
+    expect(isSameConsultation(base, { ...base, data_consulta: '2026-11-11' })).toBe(false);
+  });
+
+  it('sem um dos lados não há consulta igual', () => {
+    expect(isSameConsultation(null, base)).toBe(false);
+    expect(isSameConsultation(base, undefined)).toBe(false);
+  });
+});
+
+describe('describeConsultation', () => {
+  it('identifica a consulta numa linha', () => {
+    expect(describeConsultation({ provincia: 'Bié', cultura: 'Feijão', data_consulta: '2026-08-01' })).toBe(
+      'Bié · Feijão · 1 de agosto de 2026',
+    );
+    expect(describeConsultation(null)).toBe('');
   });
 });

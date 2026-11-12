@@ -8,6 +8,7 @@ import { useConsultation } from '../hooks/useConsultation.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
 import { getCrops, getProvinces } from '../services/catalog.js';
 import { getLocalIsoDate } from '../utils/dates.js';
+import { isSameConsultation } from '../utils/report.js';
 
 const STACKED_LAYOUT_QUERY = '(max-width: 1023px)';
 
@@ -27,10 +28,20 @@ export default function ConsultationPage() {
   const crops = useCatalogOptions(getCrops);
   const consultation = useConsultation();
   const resultsHeadingRef = useRef(null);
+  // Valores actuais do formulário (só depois de o utilizador mexer), para detectar quando já não
+  // correspondem à consulta apresentada no relatório.
+  const [draftValues, setDraftValues] = useState(null);
+  const isStale =
+    consultation.submittedParams !== null &&
+    draftValues !== null &&
+    !isSameConsultation(draftValues, consultation.submittedParams);
 
   const handleSubmit = (params) => {
     const started = consultation.submit(params);
-    if (started) requestAnimationFrame(() => revealResults(resultsHeadingRef.current));
+    if (started) {
+      setDraftValues(params);
+      requestAnimationFrame(() => revealResults(resultsHeadingRef.current));
+    }
   };
 
   return (
@@ -55,6 +66,9 @@ export default function ConsultationPage() {
               today={today}
               isPending={consultation.isPending}
               onSubmit={handleSubmit}
+              onValuesChange={setDraftValues}
+              lastSubmitted={consultation.submittedParams}
+              isStale={isStale}
             />
           </div>
         </div>
@@ -67,6 +81,7 @@ export default function ConsultationPage() {
             onRetry={consultation.retrySource}
             today={today}
             headingRef={resultsHeadingRef}
+            isStale={isStale}
           />
         </div>
       </div>

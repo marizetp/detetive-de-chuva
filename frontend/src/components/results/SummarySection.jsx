@@ -1,9 +1,11 @@
 import { RESULT_SOURCES } from '../../config/api.js';
 import { ROUTES } from '../../routing/routes.js';
+import { getUserErrorMessage } from '../../utils/errorMessages.js';
 import { formatConfidenceScore, formatIsoDateLong } from '../../utils/format.js';
 import { isPastIsoDate, selectSummarySource } from '../../utils/report.js';
 import AppLink from '../ui/AppLink.jsx';
-import { StatusIcon } from '../ui/icons.jsx';
+import Button from '../ui/Button.jsx';
+import { RetryIcon, StatusIcon } from '../ui/icons.jsx';
 import InlineNotice from '../ui/InlineNotice.jsx';
 import LoadingIndicator from '../ui/LoadingIndicator.jsx';
 import MissingValue from './MissingValue.jsx';
@@ -95,18 +97,36 @@ function PrimaryResult({ result, source }) {
 }
 
 /** 01 — Resumo: o resultado geral, a consulta efectuada e o estado de cada fonte. */
-export default function SummarySection({ params, advisory, evaluate, today, comparison }) {
+export default function SummarySection({ params, advisory, evaluate, today, comparison, onRetryAll }) {
   const summarySource = selectSummarySource(advisory, evaluate);
   const primaryState = summarySource === RESULT_SOURCES.evaluate ? evaluate : advisory;
   const isPast = isPastIsoDate(params.data_consulta, today);
+  const loadingCount = [advisory, evaluate].filter((state) => state.status === 'loading').length;
+  const canRetryAny = [advisory, evaluate].some(
+    (state) => state.status === 'error' && getUserErrorMessage(state.error)?.canRetry,
+  );
 
   let primary;
   if (summarySource === 'loading') {
-    primary = <LoadingIndicator label="A obter o resultado da avaliação…" />;
+    // Silencioso: o progresso (e o aviso de demora) é dado uma vez, em «Fontes desta consulta».
+    primary = (
+      <LoadingIndicator label="A obter o resultado da avaliação…" slowNotice={false} live={false} />
+    );
   } else if (summarySource === 'unavailable') {
     primary = (
-      <InlineNotice tone="error" title="Nenhuma das fontes respondeu.">
-        Pode tentar novamente cada fonte nas secções{' '}
+      <InlineNotice
+        tone="error"
+        title="Nenhuma das fontes respondeu."
+        action={
+          onRetryAll && canRetryAny ? (
+            <Button variant="outline" size="sm" onClick={onRetryAll}>
+              <RetryIcon className="size-4" />
+              <span>Tentar novamente as duas fontes</span>
+            </Button>
+          ) : null
+        }
+      >
+        Pode tentar novamente as duas de uma vez, ou cada fonte nas secções{' '}
         <AppLink to={sectionHref(REPORT_SECTIONS.recommendation)} className={SECTION_LINK}>
           03
         </AppLink>{' '}
@@ -174,6 +194,17 @@ export default function SummarySection({ params, advisory, evaluate, today, comp
               <SourceStateLine source={RESULT_SOURCES.advisory} state={advisory} />
               <SourceStateLine source={RESULT_SOURCES.evaluate} state={evaluate} />
             </ul>
+            {loadingCount > 0 ? (
+              <div className="mt-4">
+                <LoadingIndicator
+                  label={
+                    loadingCount === 2
+                      ? 'A consultar os dois serviços…'
+                      : '1 de 2 serviços respondeu; a aguardar o outro…'
+                  }
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

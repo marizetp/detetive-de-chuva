@@ -11,7 +11,7 @@ export const FIELD_LABELS = Object.freeze({
   score_confianca: 'Nível de confiança',
   metricas: 'Indicadores (métricas)',
   recomendacao_extensao: 'Recomendação de extensão',
-  triggers_ativados: 'Triggers activados',
+  triggers_ativados: 'Gatilhos activados (triggers)',
   justificacoes_tecnicas: 'Justificações técnicas',
   is_fallback_weather: 'Indicação de dados meteorológicos de substituição',
   ...Object.fromEntries(METRIC_DEFINITIONS.map(({ key, label }) => [`metricas.${key}`, label])),

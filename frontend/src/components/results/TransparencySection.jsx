@@ -41,6 +41,9 @@ function Comparison({ advisory, evaluate, comparison }) {
   if (advisory.status === 'loading' || evaluate.status === 'loading') {
     return <p className={BODY}>A comparação fica disponível quando as duas fontes responderem.</p>;
   }
+  if (advisory.status === 'error' && evaluate.status === 'error') {
+    return <p className={BODY}>Comparação indisponível: nenhuma das fontes respondeu.</p>;
+  }
   return (
     <p className={BODY}>
       Comparação indisponível: só uma das fontes respondeu. Os valores apresentados vêm de uma

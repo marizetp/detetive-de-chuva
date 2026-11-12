@@ -42,7 +42,7 @@ function contextNotes({ params, today, evaluate }) {
 export default function RecommendationSection({ advisory, evaluate, params, today, onRetry }) {
   let content;
   if (advisory.status === 'loading') {
-    content = <LoadingIndicator label="A obter a recomendação…" />;
+    content = <LoadingIndicator label="A obter a recomendação…" slowNotice={false} live={false} />;
   } else if (advisory.status === 'error') {
     content = (
       <SourceError source={RESULT_SOURCES.advisory} error={advisory.error} onRetry={onRetry} />
@@ -61,7 +61,7 @@ export default function RecommendationSection({ advisory, evaluate, params, toda
           </InlineNotice>
         ) : null}
         <div className="max-w-prose border-l-2 border-line-strong pl-5 sm:pl-7">
-          <Suspense fallback={<LoadingIndicator label="A preparar o texto da recomendação…" />}>
+          <Suspense fallback={<LoadingIndicator label="A preparar o texto da recomendação…" slowNotice={false} live={false} />}>
             <MarkdownContent text={advisory.result.recommendationText} />
           </Suspense>
         </div>

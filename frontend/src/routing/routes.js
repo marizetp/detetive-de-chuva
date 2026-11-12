@@ -18,6 +18,11 @@ export const SECTION_IDS = Object.freeze({
   sources: 'fontes',
 });
 
+/** Âncoras da página de consulta. */
+export const CONSULTATION_ANCHORS = Object.freeze({
+  form: 'consulta-formulario',
+});
+
 export const NAV_ITEMS = Object.freeze([
   Object.freeze({ label: 'Início', to: ROUTES.home }),
   Object.freeze({ label: 'Como funciona', to: `${ROUTES.home}#${SECTION_IDS.howItWorks}` }),

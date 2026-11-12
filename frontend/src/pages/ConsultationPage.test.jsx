@@ -61,7 +61,8 @@ function fillForm({ provincia = 'Huambo', cultura = 'Milho', data } = {}) {
   }
 }
 
-const submitButton = () => screen.getByRole('button', { name: /Consultar|A consultar/ });
+const submitButton = () =>
+  screen.getByRole('button', { name: /^(Consultar|A consultar…|Actualizar consulta)$/ });
 
 describe('ConsultationPage — catálogos', () => {
   it('carrega províncias e culturas da API', async () => {
@@ -388,5 +389,95 @@ describe('ConsultationPage — datas (decisão: passadas e actual sim, futuras n
     }
     expect(api.callsTo(ADVISORY)).toHaveLength(0);
     expect(api.callsTo(EVALUATE)).toHaveLength(0);
+  });
+});
+
+describe('ConsultationPage — Fase 7: repetir consultas e estados', () => {
+  it('alterar o formulário depois de um relatório: aviso, botão «Actualizar consulta» e nova consulta', async () => {
+    const api = setupApi();
+    await renderReady();
+    fillForm();
+    await submitAndWaitForBoth();
+    expect(submitButton()).toHaveTextContent('Consultar');
+    expect(screen.queryByText('Dados alterados')).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Soja' } });
+    expect(screen.getByText('Dados alterados')).toBeInTheDocument();
+    expect(screen.getByText(/O relatório ao lado mostra a consulta anterior \(Huambo · Milho ·/)).toBeInTheDocument();
+    expect(screen.getByText('Este relatório corresponde à consulta anterior')).toBeInTheDocument();
+    expect(submitButton()).toHaveTextContent('Actualizar consulta');
+
+    // Voltar aos dados anteriores elimina o aviso.
+    fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Milho' } });
+    expect(screen.queryByText('Dados alterados')).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Soja' } });
+    await submitAndWaitForBoth();
+    expect(screen.queryByText('Dados alterados')).not.toBeInTheDocument();
+    expect(screen.queryByText('Este relatório corresponde à consulta anterior')).not.toBeInTheDocument();
+    expect(JSON.parse(api.callsTo(ADVISORY)[1][1].body).cultura).toBe('Soja');
+    expect(JSON.parse(api.callsTo(EVALUATE)[1][1].body).cultura).toBe('Soja');
+  });
+
+  it('as duas fontes falham: «Tentar novamente as duas fontes» repete os dois pedidos', async () => {
+    // Contadores separados: a primeira tentativa de cada endpoint falha, a segunda responde.
+    const attempts = { advisory: 0, evaluate: 0 };
+    const api = setupApi({
+      [ADVISORY]: () =>
+        ++attempts.advisory === 1 ? jsonResponse({}, { status: 503 }) : jsonResponse(advisoryHuamboMilho),
+      [EVALUATE]: () =>
+        ++attempts.evaluate === 1 ? jsonResponse({}, { status: 503 }) : jsonResponse(evaluateHuamboMilho),
+    });
+    await renderReady();
+    fillForm();
+    await submitAndWaitForBoth();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente as duas fontes' }));
+    expect(await within(section('Resumo da avaliação')).findByText('Estado da recomendação')).toBeInTheDocument();
+    expect(api.callsTo(ADVISORY)).toHaveLength(2);
+    expect(api.callsTo(EVALUATE)).toHaveLength(2);
+  });
+
+  it('falha mista (advisory 503, evaluate 422): só o endpoint recuperável é pedido de novo', async () => {
+    let advisoryAttempts = 0;
+    const api = setupApi({
+      [ADVISORY]: () =>
+        ++advisoryAttempts === 1 ? jsonResponse({}, { status: 503 }) : jsonResponse(advisoryHuamboMilho),
+      [EVALUATE]: () =>
+        jsonResponse(
+          { detail: [{ type: 'value_error', msg: "Value error, Província 'X' não suportada." }] },
+          { status: 422 },
+        ),
+    });
+    await renderReady();
+    fillForm();
+    await submitAndWaitForBoth();
+
+    fireEvent.click(
+      within(section('Resumo da avaliação')).getByRole('button', { name: 'Tentar novamente as duas fontes' }),
+    );
+    expect(await within(section('Resumo da avaliação')).findByText('Estado da recomendação')).toBeInTheDocument();
+    expect(api.callsTo(ADVISORY)).toHaveLength(2);
+    expect(api.callsTo(EVALUATE)).toHaveLength(1);
+    // O 422 mantém-se visível e sem botão de repetir.
+    const technicalAlert = within(section('Fundamentação técnica')).getByRole('alert');
+    expect(technicalAlert).toHaveTextContent("Província 'X' não suportada.");
+    expect(within(technicalAlert).queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('catálogos lentos: um único aviso de demora para os dois campos', async () => {
+    vi.useFakeTimers();
+    try {
+      setupApi({
+        [PROVINCES]: () => new Promise(() => {}),
+        [CROPS]: () => new Promise(() => {}),
+      });
+      render(<ConsultationPage />);
+      expect(screen.getByText('A carregar as províncias e as culturas do serviço…')).toBeInTheDocument();
+      act(() => vi.advanceTimersByTime(8000));
+      expect(screen.getAllByText(/Está a demorar mais do que o habitual/)).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

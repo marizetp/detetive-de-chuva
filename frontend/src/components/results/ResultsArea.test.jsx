@@ -1,5 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../../services/api.js';
 import {
   advisoryHuamboMilho,
@@ -247,7 +247,7 @@ describe('04 — Fundamentação técnica', () => {
   it('mostra triggers e justificações tal como recebidos', () => {
     renderReport();
     const technical = section('Fundamentação técnica');
-    const triggers = within(technical).getByRole('list', { name: 'Códigos dos triggers activados' });
+    const triggers = within(technical).getByRole('list', { name: 'Códigos dos gatilhos activados' });
     expect(within(triggers).getByText('RECENT_RAIN_TRIGGER_SATISFIED')).toBeInTheDocument();
     for (const justification of evaluateHuamboMilho.justificacoes_tecnicas) {
       expect(within(technical).getByText(justification)).toBeInTheDocument();
@@ -258,7 +258,7 @@ describe('04 — Fundamentação técnica', () => {
   it('distingue lista vazia de campo ausente', () => {
     renderReport({ evaluate: evaluateOk(evaluateHuilaDesfavoravel) }); // triggers [], sem justificações
     const technical = section('Fundamentação técnica');
-    expect(within(technical).getByText('Nenhum trigger activado, segundo o serviço.')).toBeInTheDocument();
+    expect(within(technical).getByText('Nenhum gatilho activado, segundo o serviço.')).toBeInTheDocument();
     expect(within(technical).getByText('O serviço não enviou esta informação.')).toBeInTheDocument();
   });
 
@@ -493,5 +493,85 @@ describe('Falha da avaliação técnica: natureza dos dados por confirmar', () =
     expect(
       within(section('Indicadores agroclimáticos')).queryByText('Natureza dos dados por confirmar'),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe('Fase 7 — estados e orientação no relatório', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('carregamento prolongado: um único aviso de demora e um único anúncio de progresso', () => {
+    vi.useFakeTimers();
+    renderReport({ advisory: loading, evaluate: loading });
+    act(() => vi.advanceTimersByTime(8000));
+
+    expect(screen.getAllByText(/Está a demorar mais do que o habitual/)).toHaveLength(1);
+    expect(screen.getByText('A consultar os dois serviços…')).toBeInTheDocument();
+    // Regiões anunciadas: o progresso no resumo + a região de conclusão (sem duplicados por secção).
+    expect(screen.getAllByRole('status')).toHaveLength(2);
+    // As secções continuam a mostrar que estão a carregar, mas em silêncio.
+    expect(within(section('Recomendação de extensão')).getByText('A obter a recomendação…')).toBeInTheDocument();
+    expect(within(section('Fundamentação técnica')).getByText('A obter a avaliação técnica…')).toBeInTheDocument();
+  });
+
+  it('uma fonte já respondeu: o progresso di-lo', () => {
+    renderReport({ evaluate: loading });
+    expect(screen.getByText('1 de 2 serviços respondeu; a aguardar o outro…')).toBeInTheDocument();
+  });
+
+  it('as duas fontes falham: texto correcto e nova tentativa das duas a partir do resumo', () => {
+    const { onRetry } = renderReport({ advisory: failed(), evaluate: failed('network', null) });
+    expect(
+      within(section('Transparência e limitações')).getByText('Comparação indisponível: nenhuma das fontes respondeu.'),
+    ).toBeInTheDocument();
+    expect(within(section('Transparência e limitações')).queryByText(/só uma das fontes respondeu/)).not.toBeInTheDocument();
+
+    fireEvent.click(within(section('Resumo da avaliação')).getByRole('button', { name: 'Tentar novamente as duas fontes' }));
+    expect(onRetry).toHaveBeenCalledTimes(2);
+    expect(onRetry).toHaveBeenCalledWith('advisory');
+    expect(onRetry).toHaveBeenCalledWith('evaluate');
+  });
+
+  it('falha mista (503 + 422): «Tentar novamente as duas fontes» repete só a fonte recuperável', () => {
+    const { onRetry } = renderReport({ advisory: failed('http', 503), evaluate: failed('validation', 422) });
+    fireEvent.click(within(section('Resumo da avaliação')).getByRole('button', { name: 'Tentar novamente as duas fontes' }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(onRetry).toHaveBeenCalledWith('advisory');
+  });
+
+  it('as duas fontes falham com erros que não admitem repetição (422): sem botão de repetir', () => {
+    renderReport({ advisory: failed('validation', 422), evaluate: failed('validation', 422) });
+    expect(
+      within(section('Resumo da avaliação')).queryByRole('button', { name: 'Tentar novamente as duas fontes' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('cabeçalho identifica a consulta (com data) e permite voltar ao formulário', () => {
+    renderReport();
+    expect(screen.getByText('Huambo · Milho · 12 de novembro de 2026')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Alterar dados da consulta' })).toHaveAttribute(
+      'href',
+      '/consulta#consulta-formulario',
+    );
+  });
+
+  it('relatório desactualizado face ao formulário: aviso visível', () => {
+    render(
+      <ResultsArea
+        submittedParams={PARAMS}
+        advisory={advisoryOk()}
+        evaluate={evaluateOk()}
+        onRetry={() => {}}
+        today={TODAY}
+        isStale
+      />,
+    );
+    expect(screen.getByText('Este relatório corresponde à consulta anterior')).toBeInTheDocument();
+  });
+
+  it('terminologia: gatilhos em português, com o termo técnico entre parênteses', () => {
+    renderReport();
+    expect(
+      within(section('Fundamentação técnica')).getByRole('heading', { level: 4, name: 'Gatilhos activados (triggers)' }),
+    ).toBeInTheDocument();
   });
 });
