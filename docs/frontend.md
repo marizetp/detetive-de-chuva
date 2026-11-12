@@ -239,4 +239,4 @@ Therefore:
 3. Are actual historical NASA POWER trend data available to the frontend during this release?
 4. Is there a documented offline/demo requirement?
 5. Are there approved thresholds or explanatory descriptions for the metrics?
-6. Should the date of consultation be user-selectable?
+6. ~~Should the date of consultation be user-selectable?~~ **Decided 2026-11-12:** yes — today or any past date; future dates disabled. Validated against the device's local date (known limitation: an incorrect device clock can affect validation). See `CLAUDE.md` §11.

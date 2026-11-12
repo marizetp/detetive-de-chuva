@@ -153,10 +153,15 @@ Do not build the entire application in one unreviewed operation.
 
 **2026-11-12 — Version control:** a git repository is initialised at the project root.
 
+**2026-11-12 — Request timeout:** default `120000` ms (120 s), defined in `frontend/src/config/api.js` and overridable with `VITE_API_TIMEOUT_MS` (accepted range 5000–300000 ms). Rationale: a live `/advisory` request exceeded the previous 90 s limit.
+
+**2026-11-12 — Consultation date:** the user may choose today or any past date; future dates are disabled in the date picker and rejected by validation. `data_consulta` is required in the form (it remains optional in the API contract).
+- Reference date: the device's **local** date (`getLocalIsoDate` in `frontend/src/utils/dates.js`), not the server's `data_servidor`. Do not switch to `data_servidor` in this phase.
+- **Known limitation:** if the device clock or time zone is wrong, validation may wrongly reject today's date or accept a date that is already in the future for the server (typically a one-day offset).
+
 ## 12. Known pending decisions
 
 - Confirm whether the historical NASA POWER trend outputs described in the PDF will be exposed to the frontend during this event.
 - Confirm whether the API's live responses match the supplied examples. (Partially verified on 2026-11-12: shapes match, with extra undocumented fields in `/provinces`, `/crops`, and `/evaluate`.)
-- Confirm whether the consultation date (`data_consulta`) should be user-selectable.
 - Confirm whether map/geospatial data is available for the current release.
 - Confirm whether offline operation is required for the frontend demo and what data must be cached.

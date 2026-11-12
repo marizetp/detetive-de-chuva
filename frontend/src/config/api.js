@@ -4,10 +4,11 @@
 export const DEFAULT_API_BASE_URL = 'https://detetive-da-chuva.onrender.com';
 
 /**
- * Tempo máximo por pedido. Observado em 2026-11-12: arranque a frio ~54 s,
- * /advisory 8–22 s (um pedido excedeu 60 s).
+ * Tempo máximo por pedido, substituível por VITE_API_TIMEOUT_MS (decisão de 2026-11-12).
+ * Observado em 2026-11-12: arranque a frio ~54 s; /advisory 8–22 s, com pedidos acima de 60 s
+ * e de 90 s (o anterior limite de 90 s cortou uma resposta real).
  */
-export const DEFAULT_API_TIMEOUT_MS = 90_000;
+export const DEFAULT_API_TIMEOUT_MS = 120_000;
 
 /** Limites aceites para VITE_API_TIMEOUT_MS, para evitar valores absurdos. */
 export const MIN_API_TIMEOUT_MS = 5_000;

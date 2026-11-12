@@ -1,6 +1,23 @@
 // Compara os resultados de /advisory e /evaluate. As divergências são reportadas, nunca reconciliadas.
 
+import { METRIC_DEFINITIONS } from '../config/metrics.js';
+import { formatConfidenceScore, formatMetricValue } from './format.js';
+import { mapStatus } from './mappers.js';
+
 const NUMBER_TOLERANCE = 1e-9;
+const METRIC_FIELD_PREFIX = 'metricas.';
+
+/** Formata um valor de divergência para apresentação, segundo o campo comparado. */
+export function formatDivergenceValue(field, value) {
+  if (field === 'status') return mapStatus(value).known ? mapStatus(value).label : String(value);
+  if (field === 'score_confianca') return formatConfidenceScore(value);
+  if (field.startsWith(METRIC_FIELD_PREFIX)) {
+    const key = field.slice(METRIC_FIELD_PREFIX.length);
+    const definition = METRIC_DEFINITIONS.find((metric) => metric.key === key);
+    if (definition) return formatMetricValue({ unit: definition.unit, value });
+  }
+  return String(value);
+}
 
 function sameNumber(a, b) {
   return Math.abs(a - b) <= NUMBER_TOLERANCE;

@@ -4,12 +4,15 @@ import App from './App.jsx';
 
 beforeEach(() => {
   window.history.replaceState(null, '', '/');
-  // Nesta fase nenhuma página pode chamar a API.
+  // Pedidos que nunca terminam: estes testes verificam a estrutura e a navegação, não a API
+  // (o comportamento da consulta é testado em pages/ConsultationPage.test.jsx).
   vi.stubGlobal(
     'fetch',
-    vi.fn(() => Promise.reject(new Error('fetch não deve ser chamado'))),
+    vi.fn(() => new Promise(() => {})),
   );
 });
+
+const requestedUrls = () => fetch.mock.calls.map(([url, init]) => `${init?.method ?? 'GET'} ${url}`);
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -93,11 +96,17 @@ describe('navegação', () => {
     fireEvent.click(screen.getAllByRole('link', { name: /Iniciar consulta agrícola/ })[0]);
 
     expect(window.location.pathname).toBe('/consulta');
-    expect(screen.getByRole('heading', { level: 1, name: 'Consulta agrícola' })).toBeInTheDocument();
-    expect(screen.getByText('Em preparação')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Avaliar as condições para semear' }),
+    ).toBeInTheDocument();
     expect(document.title).toBe('Consulta agrícola · Detetive da Chuva');
     expect(document.activeElement).toBe(screen.getByRole('main'));
-    expect(fetch).not.toHaveBeenCalled();
+
+    // Abrir a página só carrega os catálogos; nenhuma consulta é enviada sem o utilizador pedir.
+    expect(requestedUrls()).toEqual([
+      expect.stringMatching(/^GET .*\/api\/v1\/provinces$/),
+      expect.stringMatching(/^GET .*\/api\/v1\/crops$/),
+    ]);
   });
 
   it('marca a página actual na navegação', () => {
@@ -110,7 +119,9 @@ describe('navegação', () => {
   it('os botões recuar/avançar do navegador actualizam a página', () => {
     render(<App />);
     fireEvent.click(screen.getAllByRole('link', { name: /Iniciar consulta agrícola/ })[0]);
-    expect(screen.getByRole('heading', { level: 1, name: 'Consulta agrícola' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Avaliar as condições para semear' }),
+    ).toBeInTheDocument();
 
     act(() => {
       window.history.replaceState(null, '', '/');

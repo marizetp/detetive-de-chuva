@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { advisoryHuamboMilho, evaluateHuamboMilho } from '../test/fixtures/liveResponses.js';
-import { compareConsultationResults } from './divergences.js';
+import { compareConsultationResults, formatDivergenceValue } from './divergences.js';
 import { mapAdvisoryResponse, mapEvaluateResponse } from './mappers.js';
 
 const compare = (advisoryRaw, evaluateRaw) =>
@@ -45,6 +45,14 @@ describe('compareConsultationResults', () => {
       'score_confianca',
       'metricas.previsao_7dias_mm',
     ]);
+  });
+
+  it('formatDivergenceValue formata cada campo segundo o seu tipo', () => {
+    expect(formatDivergenceValue('status', 'AGUARDAR')).toBe('Aguardar');
+    expect(formatDivergenceValue('status', 'NOVO')).toBe('NOVO');
+    expect(formatDivergenceValue('score_confianca', 85)).toBe('85%');
+    expect(formatDivergenceValue('metricas.humidade_solo_raiz', 0.32)).toBe('32%');
+    expect(formatDivergenceValue('metricas.previsao_7dias_mm', 60.5)).toMatch(/^60,5.mm$/);
   });
 
   it('estados desconhecidos diferentes também divergem', () => {

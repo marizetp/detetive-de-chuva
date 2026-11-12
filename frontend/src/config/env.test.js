@@ -24,8 +24,10 @@ describe('resolveApiBaseUrl', () => {
 });
 
 describe('resolveApiTimeoutMs', () => {
-  it('usa o valor predefinido quando não está definido', () => {
-    expect(resolveApiTimeoutMs({})).toBe(DEFAULT_API_TIMEOUT_MS);
+  it('usa o valor predefinido (120 s) quando não está definido ou está vazio', () => {
+    expect(DEFAULT_API_TIMEOUT_MS).toBe(120_000);
+    expect(resolveApiTimeoutMs({})).toBe(120_000);
+    expect(resolveApiTimeoutMs({ VITE_API_TIMEOUT_MS: ' ' })).toBe(120_000);
   });
 
   it('aceita inteiros dentro dos limites', () => {

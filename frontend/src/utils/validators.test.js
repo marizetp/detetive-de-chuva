@@ -3,6 +3,7 @@ import {
   ConsultationInputError,
   buildConsultationPayload,
   isFiniteNumber,
+  isFutureIsoDate,
   isNumberInRange,
   isPlainObject,
   isValidIsoDate,
@@ -63,6 +64,38 @@ describe('validateConsultationParams', () => {
     expect(
       validateConsultationParams({ provincia: 'Huambo', cultura: 'Milho', data_consulta: '' }),
     ).toEqual({});
+  });
+});
+
+describe('validateConsultationParams — data (decisão de 2026-11-12)', () => {
+  const base = { provincia: 'Huambo', cultura: 'Milho' };
+  const today = '2026-11-12';
+
+  it('requireDate exige a data', () => {
+    expect(validateConsultationParams(base, { requireDate: true, today })).toEqual({
+      data_consulta: 'Indique a data da consulta.',
+    });
+    expect(validateConsultationParams(base, { today })).toEqual({});
+  });
+
+  it('aceita a data actual e datas passadas', () => {
+    expect(validateConsultationParams({ ...base, data_consulta: today }, { today })).toEqual({});
+    expect(validateConsultationParams({ ...base, data_consulta: '2000-01-01' }, { today })).toEqual(
+      {},
+    );
+  });
+
+  it('recusa datas futuras', () => {
+    expect(
+      validateConsultationParams({ ...base, data_consulta: '2026-11-13' }, { today }),
+    ).toEqual({ data_consulta: 'Escolha a data de hoje ou uma data anterior.' });
+  });
+
+  it('isFutureIsoDate compara datas YYYY-MM-DD', () => {
+    expect(isFutureIsoDate('2026-11-13', today)).toBe(true);
+    expect(isFutureIsoDate('2026-11-12', today)).toBe(false);
+    expect(isFutureIsoDate('2027-01-01', '2026-12-31')).toBe(true);
+    expect(isFutureIsoDate('inválida', today)).toBe(false);
   });
 });
 

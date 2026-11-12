@@ -34,6 +34,22 @@ export function MenuIcon(props) {
   );
 }
 
+export function ChevronDownIcon(props) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M6 9l6 6 6-6" />
+    </SvgIcon>
+  );
+}
+
+export function RetryIcon(props) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.7h3.7" />
+    </SvgIcon>
+  );
+}
+
 export function CloseIcon(props) {
   return (
     <SvgIcon {...props}>
@@ -64,6 +80,13 @@ export function StatusIcon({ tone, ...props }) {
         <SvgIcon {...props}>
           <path d="M12 3.5L21.5 20h-19L12 3.5z" />
           <path d="M12 10v4.5M12 17.4v.1" />
+        </SvgIcon>
+      );
+    case 'neutral-info':
+      return (
+        <SvgIcon {...props}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11v5.5M12 7.6v.1" />
         </SvgIcon>
       );
     default:
