@@ -1,13 +1,16 @@
 // Ilustração do Planalto Central: nuvem de chuva sobre colinas, uma árvore e campos lavrados
-// com plântulas. Apenas ilustrativa — não representa dados. Desenhada só com a paleta do projecto.
+// com plântulas. Apenas ilustrativa — não representa dados. Desenhada só com a paleta do projecto
+// (NASA Earth Science — Dark Technology), por papel de cada elemento.
 
 const C = {
-  forest: 'var(--color-forest)',
-  ivory: 'var(--color-ivory)',
-  earth: 'var(--color-earth)',
-  rain: 'var(--color-rain)',
-  sage: 'var(--color-sage)',
-  charcoal: 'var(--color-charcoal)',
+  sky: 'var(--color-mission-navy)',
+  detail: 'var(--color-orbital-white)',
+  cloud: 'var(--color-steel-blue)',
+  rain: 'var(--color-telemetry-cyan)',
+  hills: 'var(--color-nasa-blue)',
+  ground: 'var(--color-space-black)',
+  sprout: 'var(--color-telemetry-cyan)',
+  outline: 'var(--color-steel-blue)',
 };
 
 /** Arco de janela: semicírculo no topo, base recta. */
@@ -66,17 +69,17 @@ export default function PlanaltoIllustration({ className = '' }) {
 
       <g clipPath="url(#planalto-arch)">
         {/* Céu */}
-        <rect width="480" height="560" fill={C.sage} />
+        <rect width="480" height="560" fill={C.sky} />
 
         {/* Linhas de nível subtis: referência topográfica */}
-        <g fill="none" stroke={C.forest} strokeOpacity="0.09" strokeWidth="1.2">
+        <g fill="none" stroke={C.detail} strokeOpacity="0.08" strokeWidth="1.2">
           <path d="M-20 70 C80 40 200 52 300 34 S440 20 520 40" />
           <path d="M-20 96 C90 70 210 82 310 64 S450 52 520 70" />
           <path d="M-20 260 C60 236 150 246 240 232 S400 218 520 236" />
         </g>
 
         {/* Nuvem de chuva */}
-        <g fill={C.forest}>
+        <g fill={C.cloud}>
           <circle cx="172" cy="132" r="44" />
           <circle cx="232" cy="110" r="58" />
           <circle cx="294" cy="128" r="46" />
@@ -92,7 +95,7 @@ export default function PlanaltoIllustration({ className = '' }) {
         </g>
 
         {/* Escala de medição */}
-        <g stroke={C.charcoal} strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round">
+        <g stroke={C.detail} strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round">
           <line x1="452" y1="196" x2="452" y2="296" />
           {SCALE_TICKS.map((y, i) => (
             <line key={y} x1={i % 5 === 0 ? 436 : 443} y1={y} x2="452" y2={y} />
@@ -102,32 +105,32 @@ export default function PlanaltoIllustration({ className = '' }) {
         {/* Colinas ao longe e a meia distância */}
         <path
           d="M0 318 C70 296 140 288 214 300 C290 312 360 286 480 296 V560 H0 Z"
-          fill={C.forest}
-          fillOpacity="0.2"
+          fill={C.hills}
+          fillOpacity="0.5"
         />
         <path
           d="M0 372 C88 344 176 338 262 356 C340 372 410 352 480 344 V560 H0 Z"
-          fill={C.forest}
-          fillOpacity="0.55"
+          fill={C.hills}
+          fillOpacity="1"
         />
 
         {/* Árvore de copa larga */}
-        <g fill={C.forest}>
+        <g fill={C.ground}>
           <rect x="381" y="322" width="5" height="34" rx="2" />
           <ellipse cx="384" cy="318" rx="34" ry="11" />
           <ellipse cx="370" cy="326" rx="18" ry="6" />
         </g>
 
         {/* Campo lavrado */}
-        <path d="M0 424 C120 398 300 404 480 432 V560 H0 Z" fill={C.earth} />
-        <g fill="none" stroke={C.ivory} strokeOpacity="0.3" strokeWidth="1.6">
+        <path d="M0 424 C120 398 300 404 480 432 V560 H0 Z" fill={C.ground} />
+        <g fill="none" stroke={C.outline} strokeOpacity="0.7" strokeWidth="1.6">
           {FURROWS.map((d) => (
             <path key={d} d={d} />
           ))}
         </g>
 
         {/* Plântulas */}
-        <g fill="none" stroke={C.sage} strokeWidth="2.4" strokeLinecap="round">
+        <g fill="none" stroke={C.sprout} strokeWidth="2.4" strokeLinecap="round">
           {SPROUTS.map(([x, y]) => (
             <g key={x}>
               <path d={`M${x} ${y} V${y - 18}`} />
@@ -139,7 +142,7 @@ export default function PlanaltoIllustration({ className = '' }) {
       </g>
 
       {/* Contorno do arco */}
-      <path d={ARCH_PATH} fill="none" stroke={C.forest} strokeOpacity="0.25" strokeWidth="1.5" />
+      <path d={ARCH_PATH} fill="none" stroke={C.outline} strokeOpacity="0.6" strokeWidth="1.5" />
     </svg>
   );
 }

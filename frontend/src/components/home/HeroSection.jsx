@@ -13,16 +13,16 @@ export default function HeroSection() {
 
           <h1
             id="hero-title"
-            className="mt-6 text-5xl leading-[0.98] font-semibold tracking-tight text-forest sm:text-6xl lg:text-7xl"
+            className="mt-6 text-5xl leading-[0.98] font-semibold tracking-tight text-ink sm:text-6xl lg:text-7xl"
           >
             Detetive da Chuva
           </h1>
 
-          <p className="mt-8 max-w-xl border-l-2 border-rain pl-5 font-display text-2xl leading-snug text-charcoal italic sm:text-3xl">
+          <p className="mt-8 max-w-xl border-l-2 border-accent pl-5 font-display text-2xl leading-snug font-medium text-ink sm:text-3xl">
             O calendário agrícola de sempre ainda é fiável?
           </p>
 
-          <p className="mt-7 max-w-lg text-lg leading-relaxed text-charcoal/80">
+          <p className="mt-7 max-w-lg text-lg leading-relaxed text-ink-muted">
             Uma plataforma de apoio à decisão agrícola que apresenta os indicadores agroclimáticos
             disponibilizados pelo sistema, como a chuva e a humidade do solo, para ajudar a decidir
             quando semear.
@@ -42,8 +42,8 @@ export default function HeroSection() {
 
         <figure className="mx-auto w-full max-w-sm sm:max-w-md lg:col-span-5 lg:max-w-none">
           <PlanaltoIllustration className="h-auto w-full" />
-          <figcaption className="mt-4 flex gap-3 font-mono text-xs leading-relaxed text-charcoal/70">
-            <span className="shrink-0 text-earth">Fig. 1</span>
+          <figcaption className="mt-4 flex gap-3 font-mono text-xs leading-relaxed text-ink-subtle">
+            <span className="shrink-0 text-accent">Fig. 1</span>
             <span>Chuva sobre campos de cultivo no Planalto Central. Ilustração.</span>
           </figcaption>
         </figure>

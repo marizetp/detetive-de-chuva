@@ -13,7 +13,7 @@ import SourceLabel from './SourceLabel.jsx';
 import StatusDisplay from './StatusDisplay.jsx';
 import { statusToneStyles } from './statusTone.js';
 
-const SECTION_LINK = 'font-semibold text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest';
+const SECTION_LINK = 'font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent';
 
 function sectionHref(section) {
   return `${ROUTES.consultation}#${section.id}`;
@@ -29,7 +29,7 @@ function SourceStateLine({ source, state }) {
       <span className={`inline-flex flex-wrap items-center gap-x-2 font-semibold ${tone.text}`}>
         <StatusIcon tone={state.result.status.tone} className="size-4 shrink-0" />
         <span>{state.result.status.label}</span>
-        <span className="font-normal text-charcoal/80">
+        <span className="font-normal text-ink-muted">
           · confiança{' '}
           {state.result.confidenceScore === null ? (
             <MissingValue className="text-sm" />
@@ -41,7 +41,7 @@ function SourceStateLine({ source, state }) {
     );
   } else if (state.status === 'error') {
     content = (
-      <span className="text-charcoal">
+      <span className="text-ink">
         Indisponível —{' '}
         <AppLink to={sectionHref(meta.section)} className={SECTION_LINK}>
           ver secção {meta.section.index}
@@ -49,12 +49,12 @@ function SourceStateLine({ source, state }) {
       </span>
     );
   } else {
-    content = <span className="text-charcoal/80">A aguardar resposta…</span>;
+    content = <span className="text-ink-muted">A aguardar resposta…</span>;
   }
 
   return (
-    <li className="flex flex-col gap-0.5 border-t border-charcoal/10 py-2.5 first:border-t-0 first:pt-0">
-      <span className="text-xs text-charcoal/75">
+    <li className="flex flex-col gap-0.5 border-t border-line py-2.5 first:border-t-0 first:pt-0">
+      <span className="text-xs text-ink-muted">
         {meta.name} · <code className="font-mono">{meta.endpoint}</code>
       </span>
       {content}
@@ -72,17 +72,17 @@ function PrimaryResult({ result, source }) {
         caption={isFallbackSource ? 'Estado segundo a avaliação técnica' : 'Estado da recomendação'}
       />
       <div className="mt-8 border-l-4 border-transparent pl-4">
-        <p className="text-xs font-semibold tracking-[0.16em] text-charcoal/75 uppercase">
+        <p className="font-mono text-xs font-medium tracking-[0.14em] text-ink-muted uppercase">
           Nível de confiança
         </p>
-        <p className="mt-1.5 font-display text-4xl leading-none text-forest tabular-nums">
+        <p className="mt-1.5 font-display text-4xl leading-none text-ink tabular-nums">
           {result.confidenceScore === null ? (
             <MissingValue />
           ) : (
             formatConfidenceScore(result.confidenceScore)
           )}
         </p>
-        <p className="mt-2 max-w-sm text-sm leading-relaxed text-charcoal/80">
+        <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-muted">
           Pontuação de 0 a 100 atribuída pelo sistema. Não é uma probabilidade nem uma garantia de
           sucesso da sementeira.
         </p>
@@ -146,20 +146,20 @@ export default function SummarySection({ params, advisory, evaluate, today, comp
         <div className="space-y-8 md:col-span-5">
           <dl className="space-y-3 text-sm">
             <div>
-              <dt className="text-charcoal/75">Província</dt>
-              <dd className="font-display text-xl text-forest">{params.provincia}</dd>
+              <dt className="text-ink-muted">Província</dt>
+              <dd className="font-display text-xl text-ink">{params.provincia}</dd>
             </div>
             <div>
-              <dt className="text-charcoal/75">Cultura</dt>
-              <dd className="font-display text-xl text-forest">{params.cultura}</dd>
+              <dt className="text-ink-muted">Cultura</dt>
+              <dd className="font-display text-xl text-ink">{params.cultura}</dd>
             </div>
             <div>
-              <dt className="text-charcoal/75">Data da consulta</dt>
-              <dd className="font-display text-xl text-forest">
+              <dt className="text-ink-muted">Data da consulta</dt>
+              <dd className="font-display text-xl text-ink">
                 {formatIsoDateLong(params.data_consulta)}
               </dd>
               {isPast ? (
-                <dd className="mt-1 text-charcoal/80">
+                <dd className="mt-1 text-ink-muted">
                   Data passada: os valores podem não corresponder às condições observadas nesse dia.
                 </dd>
               ) : null}
@@ -167,7 +167,7 @@ export default function SummarySection({ params, advisory, evaluate, today, comp
           </dl>
 
           <div>
-            <h4 className="text-xs font-semibold tracking-[0.16em] text-earth uppercase">
+            <h4 className="font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase">
               Fontes desta consulta
             </h4>
             <ul className="mt-3 text-sm">

@@ -149,25 +149,47 @@ Unknown status values must display a neutral fallback, not crash the interface.
 
 ## 5. Design direction
 
-Visual references selected by the team:
-- Editorial, natural and scientific.
-- Modern and minimal, not a generic business dashboard.
-- Warm ivory backgrounds, forest-green typography and controls, restrained rain-blue and earth-brown accents.
-- Generous whitespace and strong typographic hierarchy.
-- Photography may be used on the landing page, preferably relevant to Angolan agricultural landscapes.
+Approved identity (2026-11-12): **NASA Earth Science — Dark Technology**. `CLAUDE.md` §7 is the
+reference; this section summarises how it is applied.
+
+- Scientific, technological and editorial; dark backgrounds, strong typographic hierarchy, generous whitespace.
+- Modern and minimal, not a generic business dashboard. No decorative gradients, glassmorphism or glow effects.
 - Forms should be simple and easy to use.
 - Results should feel like a clear, readable field report rather than a dense analytics dashboard.
+- The project is **not an official NASA service**: never use the NASA logo, seals or mission patches.
 
-### Initial palette
+### Palette
 
-| Token | Hex |
-|---|---|
-| Forest Green | `#214D3A` |
-| Warm Ivory | `#F7F6EF` |
-| Earth Brown | `#82664B` |
-| Rain Blue | `#477FA3` |
-| Sage | `#DCE7D9` |
-| Charcoal | `#26312B` |
+| Token | Hex | Main use |
+|---|---|---|
+| Space Black | `#080F1E` | Page background (`canvas`) |
+| Mission Navy | `#0B1D35` | Panels, bands, footer (`surface`) |
+| NASA Blue | `#0B3D91` | Highlight backgrounds with Orbital White text (`raised`); never text on dark |
+| Telemetry Cyan | `#00A6D6` | Actions, links, technical labels, focus ring (`accent`) |
+| NASA Red | `#FC3D21` | Errors and the unfavourable status (`danger`) |
+| Orbital White | `#EAF2F8` | Main text and headings (`ink`; `ink-muted` and `ink-subtle` are mixes) |
+| Steel Blue | `#647F9B` | Control outlines and meaningful rules (`line-strong`); «aguardar» status rule (`caution`) |
+
+### Typography
+
+| Font | Use | Delivery |
+|---|---|---|
+| Inter (variable) | Interface and body text | Self-hosted, Fontsource `@fontsource-variable/inter` (OFL-1.1) |
+| Space Grotesk (variable) | Headings | Self-hosted, `@fontsource-variable/space-grotesk` (OFL-1.1) |
+| JetBrains Mono (variable) | Metadata, codes, endpoints, units, captions, section labels | Self-hosted, `@fontsource-variable/jetbrains-mono` (OFL-1.1) |
+
+Fonts are bundled with the app (no third-party font requests); browsers download only the Latin
+subsets used by Portuguese text.
+
+### Implementation
+
+- Tokens live only in `frontend/src/styles/index.css` (`@theme`): a palette layer and a semantic layer
+  (`canvas`, `surface`, `raised`, `ink`, `ink-muted`, `ink-subtle`, `accent`, `danger`, `caution`,
+  `line`, `line-strong`). Components use semantic tokens only.
+- Status presentation: Favorável — Telemetry Cyan; Aguardar — Orbital White with a Steel Blue rule;
+  Desfavorável — NASA Red; unknown — muted text with a dashed rule. Each status also has a distinct
+  icon shape and a text label.
+- Contrast values for every text token are documented in `index.css` and `CLAUDE.md` §7.
 
 ## 6. API integration and states
 

@@ -80,10 +80,10 @@ export default function ConsultationForm({ provinces, crops, today, isPending, o
 
   return (
     <form noValidate onSubmit={handleSubmit} aria-labelledby="consulta-formulario-titulo">
-      <h2 id="consulta-formulario-titulo" className="text-2xl leading-snug font-semibold text-forest">
+      <h2 id="consulta-formulario-titulo" className="text-2xl leading-snug font-semibold text-ink">
         Dados da consulta
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-charcoal/80">Todos os campos são obrigatórios.</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-muted">Todos os campos são obrigatórios.</p>
 
       <div className="mt-7 space-y-6">
         <CatalogSelectField
@@ -132,7 +132,7 @@ export default function ConsultationForm({ provinces, crops, today, isPending, o
           {isPending ? 'A consultar…' : 'Consultar'}
         </Button>
         {submitHint ? (
-          <p id={SUBMIT_HINT_ID} className="mt-3 text-sm leading-relaxed text-charcoal/80">
+          <p id={SUBMIT_HINT_ID} className="mt-3 text-sm leading-relaxed text-ink-muted">
             {submitHint}
           </p>
         ) : null}

@@ -1,29 +1,64 @@
+/* Tipos de letra alojados com a aplicação (Fontsource, SIL Open Font License 1.1): sem pedidos a
+   serviços externos. O navegador só descarrega os subconjuntos de caracteres que a página usa. */
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/inter/wght-italic.css';
+@import '@fontsource-variable/space-grotesk/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
 @import 'tailwindcss';
 
 /*
- * Tokens do projecto (CLAUDE.md §7). Geram utilitários como bg-ivory, text-forest, font-display.
+ * Identidade visual: NASA Earth Science — Dark Technology (CLAUDE.md §7).
  *
- * Contraste verificado sobre Warm Ivory (#F7F6EF), WCAG 2.1:
- *   Forest 8,9:1 · Charcoal 12,4:1 · Earth Brown 4,9:1 — adequados para texto normal.
- *   Rain Blue 4,0:1 — só para texto grande (≥ 24 px), elementos gráficos e anel de foco.
- * Sobre Forest: Ivory 8,9:1 e Sage 7,5:1. Rain Blue sobre Forest (2,2:1) NÃO serve para foco.
+ * Duas camadas:
+ *  1. Paleta — as 7 cores aprovadas. Não usar directamente nos componentes.
+ *  2. Tokens semânticos — o que os componentes usam (bg-canvas, text-ink, border-line…).
+ *     Mudar a paleta só exige alterar este ficheiro.
+ *
+ * Contraste WCAG 2.1 dos tokens de texto (sobre Space Black / sobre Mission Navy):
+ *   ink         Orbital White           16,9:1 / 14,9:1
+ *   ink-muted   Orbital White a 74 %     9,4:1 /  8,3:1
+ *   ink-subtle  Orbital White a 60 %     6,5:1 /  5,7:1
+ *   accent      Telemetry Cyan           6,8:1 /  6,0:1
+ *   danger      NASA Red                 5,3:1 /  4,7:1
+ *   line-strong Steel Blue               4,6:1 /  4,1:1  (contornos de controlos, ≥ 3:1)
+ * Texto sobre accent (botão principal): Space Black sobre Telemetry Cyan 6,8:1.
+ * NASA Blue não serve para texto sobre fundos escuros (1,9:1): só como fundo de destaque, com
+ * texto Orbital White (8,9:1).
  */
 @theme {
-  --color-forest: #214d3a;
-  --color-ivory: #f7f6ef;
-  --color-earth: #82664b;
-  --color-rain: #477fa3;
-  --color-sage: #dce7d9;
-  --color-charcoal: #26312b;
+  /* 1. Paleta */
+  --color-space-black: #080f1e;
+  --color-mission-navy: #0b1d35;
+  --color-nasa-blue: #0b3d91;
+  --color-telemetry-cyan: #00a6d6;
+  --color-nasa-red: #fc3d21;
+  --color-orbital-white: #eaf2f8;
+  --color-steel-blue: #647f9b;
 
-  /* Serifa editorial do sistema: sem pedidos de rede, funciona sem ligação. */
-  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  /* 2. Tokens semânticos */
+  --color-canvas: var(--color-space-black); /* fundo da página */
+  --color-surface: var(--color-mission-navy); /* painéis, faixas, rodapé */
+  --color-raised: var(--color-nasa-blue); /* destaque com texto ink (8,9:1) */
+  --color-ink: var(--color-orbital-white); /* texto principal e títulos */
+  --color-ink-muted: color-mix(in srgb, var(--color-orbital-white) 74%, var(--color-space-black));
+  --color-ink-subtle: color-mix(in srgb, var(--color-orbital-white) 60%, var(--color-space-black));
+  --color-accent: var(--color-telemetry-cyan); /* acção, ligações, rótulos técnicos, foco */
+  --color-danger: var(--color-nasa-red); /* erros e estado desfavorável */
+  --color-caution: var(--color-steel-blue); /* estado «aguardar» (filete) */
+  --color-line: color-mix(in srgb, var(--color-orbital-white) 14%, transparent); /* fios decorativos */
+  --color-line-strong: var(--color-steel-blue); /* contornos com significado (≥ 3:1) */
+
+  /* Tipografia */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 @layer base {
   html {
-    background-color: var(--color-ivory);
-    color: var(--color-charcoal);
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    color-scheme: dark;
     -webkit-text-size-adjust: 100%;
   }
 
@@ -32,13 +67,16 @@
     line-height: 1.6;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11', 'ss01'; /* Inter: «a» e «1» mais legíveis */
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     font-family: var(--font-display);
     text-wrap: balance;
+    letter-spacing: -0.01em;
   }
 
   p {
@@ -46,19 +84,15 @@
   }
 
   ::selection {
-    background-color: var(--color-sage);
-    color: var(--color-forest);
+    background-color: var(--color-raised);
+    color: var(--color-ink);
   }
 
-  /* Foco sempre visível para navegação por teclado. Em superfícies escuras usa Ivory. */
+  /* Foco sempre visível para navegação por teclado (Telemetry Cyan ≥ 6:1 nos fundos escuros). */
   :focus-visible {
-    outline: 3px solid var(--focus-ring, var(--color-rain));
+    outline: 3px solid var(--color-accent);
     outline-offset: 3px;
     border-radius: 2px;
-  }
-
-  [data-surface='dark'] {
-    --focus-ring: var(--color-ivory);
   }
 
   /* Destinos de foco programático (conteúdo principal, secções) não mostram contorno. */

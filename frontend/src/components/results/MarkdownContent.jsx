@@ -36,7 +36,7 @@ function makeHeading(depth) {
   const size = depth <= 2 ? 'text-xl' : depth === 3 ? 'text-lg' : 'text-base';
   return function MarkdownHeading({ children }) {
     return (
-      <h4 className={`mt-9 mb-3 font-display ${size} leading-snug font-semibold text-forest first:mt-0`}>
+      <h4 className={`mt-9 mb-3 font-display ${size} leading-snug font-semibold text-ink first:mt-0`}>
         {children}
       </h4>
     );
@@ -51,27 +51,27 @@ const COMPONENTS = {
   h5: makeHeading(5),
   h6: makeHeading(6),
   p: ({ children }) => <p className="mt-4 leading-relaxed first:mt-0">{children}</p>,
-  strong: ({ children }) => <strong className="font-semibold text-charcoal">{children}</strong>,
+  strong: ({ children }) => <strong className="font-semibold text-ink">{children}</strong>,
   em: ({ children }) => <em>{children}</em>,
-  ul: ({ children }) => <ul className="mt-4 list-disc space-y-2.5 pl-6 marker:text-earth">{children}</ul>,
+  ul: ({ children }) => <ul className="mt-4 list-disc space-y-2.5 pl-6 marker:text-accent">{children}</ul>,
   ol: ({ children, start }) => (
-    <ol start={start} className="mt-4 list-decimal space-y-2.5 pl-6 marker:font-semibold marker:text-earth">
+    <ol start={start} className="mt-4 list-decimal space-y-2.5 pl-6 marker:font-semibold marker:text-accent">
       {children}
     </ol>
   ),
   li: ({ children }) => <li className="pl-1 leading-relaxed">{children}</li>,
-  hr: () => <hr className="my-8 border-charcoal/15" />,
+  hr: () => <hr className="my-8 border-line" />,
   blockquote: ({ children }) => (
-    <blockquote className="mt-4 border-l-2 border-rain pl-4 text-charcoal/85">{children}</blockquote>
+    <blockquote className="mt-4 border-l-2 border-accent pl-4 text-ink-muted">{children}</blockquote>
   ),
-  code: ({ children }) => <code className="rounded bg-sage px-1 font-mono text-sm">{children}</code>,
+  code: ({ children }) => <code className="rounded bg-surface px-1 font-mono text-sm">{children}</code>,
   pre: ({ children }) => <pre className="mt-4 overflow-x-auto text-sm">{children}</pre>,
   a: ({ href, children }) => (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-forest underline decoration-forest/40 underline-offset-4 hover:decoration-forest"
+      className="text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
     >
       {children}
     </a>
@@ -80,7 +80,7 @@ const COMPONENTS = {
 
 export default function MarkdownContent({ text }) {
   return (
-    <div className="text-base text-charcoal/90">
+    <div className="text-base text-ink-muted">
       <Markdown allowedElements={ALLOWED_ELEMENTS} unwrapDisallowed skipHtml components={COMPONENTS}>
         {text}
       </Markdown>

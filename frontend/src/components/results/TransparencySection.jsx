@@ -6,8 +6,8 @@ import DivergenceNotice from './DivergenceNotice.jsx';
 import ReportSection from './ReportSection.jsx';
 import { REPORT_SECTIONS, SOURCE_META } from './reportStructure.js';
 
-const SUBHEADING = 'text-xs font-semibold tracking-[0.16em] text-earth uppercase';
-const BODY = 'max-w-prose leading-relaxed text-charcoal/85';
+const SUBHEADING = 'font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase';
+const BODY = 'max-w-prose leading-relaxed text-ink-muted';
 
 const LIMITATIONS = [
   'Os indicadores podem ser valores de referência, por exemplo históricos ou mensais, e não medições nem previsões meteorológicas para a data consultada. A fonte e o método não estão documentados.',
@@ -132,8 +132,8 @@ function Completeness({ advisory, evaluate }) {
   return (
     <ul className="max-w-prose space-y-2.5">
       {items.map((item) => (
-        <li key={item.key} className="flex gap-4 leading-relaxed text-charcoal/85">
-          <span className="mt-3 h-px w-5 shrink-0 bg-earth" aria-hidden="true" />
+        <li key={item.key} className="flex gap-4 leading-relaxed text-ink-muted">
+          <span className="mt-3 h-px w-5 shrink-0 bg-caution" aria-hidden="true" />
           <span>{item.text}</span>
         </li>
       ))}
@@ -172,8 +172,8 @@ export default function TransparencySection({ params, advisory, evaluate, today,
         <Subsection title="Limites desta avaliação">
           <ul className="max-w-prose space-y-2.5">
             {LIMITATIONS.map((limitation) => (
-              <li key={limitation} className="flex gap-4 leading-relaxed text-charcoal/85">
-                <span className="mt-3 h-px w-5 shrink-0 bg-rain" aria-hidden="true" />
+              <li key={limitation} className="flex gap-4 leading-relaxed text-ink-muted">
+                <span className="mt-3 h-px w-5 shrink-0 bg-accent" aria-hidden="true" />
                 <span>{limitation}</span>
               </li>
             ))}

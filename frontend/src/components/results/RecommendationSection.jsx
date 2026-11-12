@@ -60,12 +60,12 @@ export default function RecommendationSection({ advisory, evaluate, params, toda
             ))}
           </InlineNotice>
         ) : null}
-        <div className="max-w-prose border-l-2 border-sage pl-5 sm:pl-7">
+        <div className="max-w-prose border-l-2 border-line-strong pl-5 sm:pl-7">
           <Suspense fallback={<LoadingIndicator label="A preparar o texto da recomendação…" />}>
             <MarkdownContent text={advisory.result.recommendationText} />
           </Suspense>
         </div>
-        <p className="mt-8 max-w-prose text-sm leading-relaxed text-charcoal/80">
+        <p className="mt-8 max-w-prose text-sm leading-relaxed text-ink-muted">
           Texto produzido pelo serviço de recomendação e apresentado sem alterações. A redacção
           pode variar entre consultas. É uma orientação de apoio à decisão, não uma garantia de
           produtividade.

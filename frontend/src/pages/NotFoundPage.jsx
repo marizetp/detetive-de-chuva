@@ -11,10 +11,10 @@ export default function NotFoundPage() {
     <Container className="py-20 lg:py-28">
       <div className="max-w-2xl">
         <Eyebrow>Erro 404</Eyebrow>
-        <h1 className="mt-5 text-4xl leading-tight font-semibold text-forest sm:text-5xl">
+        <h1 className="mt-5 text-4xl leading-tight font-semibold text-ink sm:text-5xl">
           Página não encontrada
         </h1>
-        <p className="mt-6 text-lg leading-relaxed text-charcoal/85">
+        <p className="mt-6 text-lg leading-relaxed text-ink-muted">
           O endereço que procurou não existe ou foi alterado.
         </p>
         <ButtonLink to={ROUTES.home} className="mt-10">

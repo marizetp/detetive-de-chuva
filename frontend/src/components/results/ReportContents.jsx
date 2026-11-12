@@ -11,12 +11,12 @@ export default function ReportContents() {
           <li key={section.id}>
             <AppLink
               to={`${ROUTES.consultation}#${section.id}`}
-              className="inline-flex min-h-9 items-center gap-2 rounded-sm text-charcoal/85 hover:text-forest"
+              className="inline-flex min-h-9 items-center gap-2 rounded-sm text-ink-muted hover:text-accent"
             >
-              <span className="font-mono text-xs text-earth" aria-hidden="true">
+              <span className="font-mono text-xs text-accent" aria-hidden="true">
                 {section.index}
               </span>
-              <span className="underline decoration-charcoal/20 underline-offset-4">{section.title}</span>
+              <span className="underline decoration-ink/25 underline-offset-4">{section.title}</span>
             </AppLink>
           </li>
         ))}

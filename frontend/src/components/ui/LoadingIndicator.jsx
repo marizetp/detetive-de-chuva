@@ -16,15 +16,15 @@ export default function LoadingIndicator({ label, slowNoticeMs = SLOW_REQUEST_NO
         {DROP_DELAYS_MS.map((delay) => (
           <span
             key={delay}
-            className="block h-3 w-1.5 rounded-full bg-rain motion-safe:animate-pulse"
+            className="block h-3 w-1.5 rounded-full bg-accent motion-safe:animate-pulse"
             style={{ animationDelay: `${delay}ms` }}
           />
         ))}
       </span>
       <div className="text-sm leading-relaxed">
-        <p className="font-semibold text-charcoal">{label}</p>
+        <p className="font-semibold text-ink">{label}</p>
         {isSlow ? (
-          <p className="mt-1 text-charcoal/80">
+          <p className="mt-1 text-ink-muted">
             Está a demorar mais do que o habitual. O serviço pode estar a arrancar depois de um
             período sem utilização — pode levar até um minuto.
           </p>

@@ -32,7 +32,7 @@ function describeCompletion(advisory, evaluate) {
     .join('; ');
 }
 
-const HEADING = 'mt-4 text-3xl leading-tight font-semibold text-forest sm:text-4xl';
+const HEADING = 'mt-4 text-3xl leading-tight font-semibold text-ink sm:text-4xl';
 
 /**
  * Relatório da consulta. Usa apenas os estados já recebidos (não faz pedidos).
@@ -46,7 +46,7 @@ export default function ResultsArea({ submittedParams, advisory, evaluate, onRet
         <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
           Ainda sem consulta
         </h2>
-        <p className="mt-4 max-w-prose text-lg leading-relaxed text-charcoal/80">
+        <p className="mt-4 max-w-prose text-lg leading-relaxed text-ink-muted">
           Escolha a província, a cultura e a data, e seleccione «Consultar». O relatório reúne a
           recomendação e a avaliação técnica do serviço, cada uma com a sua origem identificada.
         </p>
@@ -66,7 +66,7 @@ export default function ResultsArea({ submittedParams, advisory, evaluate, onRet
       <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
         Relatório da consulta
       </h2>
-      <p className="mt-3 text-charcoal/80">
+      <p className="mt-3 text-ink-muted">
         {submittedParams.provincia} · {submittedParams.cultura}
       </p>
 

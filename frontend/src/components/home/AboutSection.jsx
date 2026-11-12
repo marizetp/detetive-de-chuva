@@ -7,7 +7,7 @@ export default function AboutSection() {
   const headingId = `${SECTION_IDS.about}-titulo`;
 
   return (
-    <section id={SECTION_IDS.about} aria-labelledby={headingId} className="border-t border-charcoal/10">
+    <section id={SECTION_IDS.about} aria-labelledby={headingId} className="border-t border-line">
       <Container className="grid gap-12 py-20 lg:grid-cols-12 lg:gap-16 lg:py-28">
         <SectionHeading
           id={headingId}
@@ -18,7 +18,7 @@ export default function AboutSection() {
         />
 
         <div className="lg:col-span-7">
-          <div className="max-w-prose space-y-5 text-lg leading-relaxed text-charcoal/85">
+          <div className="max-w-prose space-y-5 text-lg leading-relaxed text-ink-muted">
             <p>
               O calendário agrícola tradicional orienta a sementeira no Planalto Central há
               gerações. O Detetive da Chuva parte de uma pergunta simples: as condições deste
@@ -31,21 +31,21 @@ export default function AboutSection() {
             </p>
           </div>
 
-          <h3 className="mt-14 text-xs font-semibold tracking-[0.16em] text-earth uppercase">
+          <h3 className="mt-14 font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase">
             Indicadores considerados
           </h3>
-          <dl className="mt-5 divide-y divide-charcoal/10 border-y border-charcoal/10">
+          <dl className="mt-5 divide-y divide-line border-y border-line">
             {METRIC_DEFINITIONS.map((metric) => (
               <div key={metric.key} className="grid gap-2 py-5 sm:grid-cols-12 sm:gap-6">
                 <dt className="flex items-baseline justify-between gap-4 sm:col-span-5 sm:block">
-                  <span className="font-display text-xl leading-snug text-forest">
+                  <span className="font-display text-xl leading-snug text-ink">
                     {metric.label}
                   </span>
-                  <span className="font-mono text-sm text-earth sm:mt-1 sm:block">
+                  <span className="font-mono text-sm text-accent sm:mt-1 sm:block">
                     {METRIC_UNIT_LABELS[metric.unit]}
                   </span>
                 </dt>
-                <dd className="text-base leading-relaxed text-charcoal/80 sm:col-span-7">
+                <dd className="text-base leading-relaxed text-ink-muted sm:col-span-7">
                   {metric.description}
                 </dd>
               </div>

@@ -26,38 +26,38 @@ export default function HowItWorksSection() {
   const headingId = `${SECTION_IDS.howItWorks}-titulo`;
 
   return (
-    <section id={SECTION_IDS.howItWorks} aria-labelledby={headingId} className="bg-sage">
+    <section id={SECTION_IDS.howItWorks} aria-labelledby={headingId} className="bg-surface">
       <Container className="py-20 lg:py-28">
         <SectionHeading
           id={headingId}
           index="02"
           eyebrow="Funcionamento"
-          eyebrowTone="onSage"
+          eyebrowTone="onSurface"
           title="Três passos, do terreno à recomendação"
           className="max-w-3xl"
         />
 
         <ol className="mt-14 grid gap-12 md:grid-cols-3 md:gap-10">
           {STEPS.map((step, index) => (
-            <li key={step.title} className="border-t-2 border-forest pt-6">
+            <li key={step.title} className="border-t-2 border-line-strong pt-6">
               <span
-                className="block font-display text-5xl leading-none text-forest/40 tabular-nums"
+                className="block font-display text-5xl leading-none text-line-strong tabular-nums"
                 aria-hidden="true"
               >
                 {index + 1}
               </span>
-              <h3 className="mt-5 text-2xl leading-snug font-semibold text-forest">
+              <h3 className="mt-5 text-2xl leading-snug font-semibold text-ink">
                 <span className="sr-only">Passo {index + 1}: </span>
                 {step.title}
               </h3>
-              <p className="mt-3 leading-relaxed text-charcoal/85">{step.text}</p>
+              <p className="mt-3 leading-relaxed text-ink-muted">{step.text}</p>
 
               {index === STEPS.length - 1 ? (
                 <ul className="mt-6 space-y-2.5" aria-label="Classificações possíveis">
                   {STATUS_ORDER.map((code) => {
                     const { label, tone } = STATUS_DEFINITIONS[code];
                     return (
-                      <li key={code} className="flex items-center gap-3 font-semibold text-forest">
+                      <li key={code} className="flex items-center gap-3 font-semibold text-ink">
                         <StatusIcon tone={tone} className="size-5 shrink-0" />
                         <span>{label}</span>
                       </li>
@@ -69,8 +69,8 @@ export default function HowItWorksSection() {
           ))}
         </ol>
 
-        <div className="mt-16 flex flex-col items-start gap-5 border-t border-forest/20 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-md font-display text-xl leading-snug text-forest">
+        <div className="mt-16 flex flex-col items-start gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="max-w-md font-display text-xl leading-snug text-ink">
             Pronto para avaliar as condições da sua zona?
           </p>
           <ButtonLink to={ROUTES.consultation}>Iniciar consulta agrícola</ButtonLink>

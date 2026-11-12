@@ -16,7 +16,7 @@ export default function StatusDisplay({ status, caption = 'Estado', size = 'md' 
 
   return (
     <div className={`border-l-4 pl-4 ${tone.rule}`}>
-      <p className="text-xs font-semibold tracking-[0.16em] text-charcoal/75 uppercase">{caption}</p>
+      <p className="font-mono text-xs font-medium tracking-[0.14em] text-ink-muted uppercase">{caption}</p>
       <p
         className={`mt-1.5 flex items-center gap-3 font-display leading-tight font-semibold ${sizes.label} ${tone.text}`}
       >
@@ -24,7 +24,7 @@ export default function StatusDisplay({ status, caption = 'Estado', size = 'md' 
         <span>{status.label}</span>
       </p>
       {!status.known && status.code ? (
-        <p className="mt-1.5 text-sm text-charcoal/80">
+        <p className="mt-1.5 text-sm text-ink-muted">
           Valor recebido: <code className="font-mono">{status.code}</code>
         </p>
       ) : null}

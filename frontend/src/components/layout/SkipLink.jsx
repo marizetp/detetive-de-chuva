@@ -11,8 +11,7 @@ export default function SkipLink({ targetId }) {
     <a
       href={`#${targetId}`}
       onClick={handleClick}
-      className="sr-only rounded-full bg-forest px-5 py-3 font-semibold text-ivory focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
-      data-surface="dark"
+      className="sr-only rounded-full bg-accent px-5 py-3 font-semibold text-canvas focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50"
     >
       Saltar para o conteúdo
     </a>

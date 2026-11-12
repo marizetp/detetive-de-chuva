@@ -83,13 +83,34 @@ Rules:
 
 ## 7. Design direction
 
-Use the visual direction agreed for the project:
-- Forest Green: `#214D3A`
-- Warm Ivory: `#F7F6EF`
-- Earth Brown: `#82664B`
-- Rain Blue: `#477FA3`
-- Sage: `#DCE7D9`
-- Charcoal: `#26312B`
+Approved visual identity (2026-11-12): **NASA Earth Science — Dark Technology**.
+
+Palette:
+- Space Black: `#080F1E`
+- Mission Navy: `#0B1D35`
+- NASA Blue: `#0B3D91`
+- Telemetry Cyan: `#00A6D6`
+- NASA Red: `#FC3D21`
+- Orbital White: `#EAF2F8`
+- Steel Blue: `#647F9B`
+
+Typography:
+- Inter: interface and body content.
+- Space Grotesk: headings.
+- JetBrains Mono: metadata and technical information (codes, endpoints, units, figure captions).
+- Delivery (decided 2026-11-12): self-hosted with Fontsource variable packages (`@fontsource-variable/inter`, `@fontsource-variable/space-grotesk`, `@fontsource-variable/jetbrains-mono`, all SIL Open Font License 1.1), imported in `frontend/src/styles/index.css`. No third-party font requests.
+
+Measured WCAG 2.1 contrast (verify again for any new pairing):
+- On Space Black: Orbital White 16.9:1, Telemetry Cyan 6.8:1, NASA Red 5.3:1, Steel Blue 4.6:1 — suitable for text. NASA Blue 1.9:1 and Mission Navy 1.1:1 — **not** suitable for text or meaningful graphics.
+- On Mission Navy: Orbital White 14.9:1, Telemetry Cyan 6.0:1, NASA Red 4.7:1 — text; Steel Blue 4.1:1 — large text and graphics only.
+- On Orbital White: Space Black 16.9:1, Mission Navy 14.9:1, NASA Blue 8.9:1 — text; Steel Blue 3.7:1 and NASA Red 3.2:1 — large text and graphics only; Telemetry Cyan 2.5:1 — **not** suitable.
+- Status must never rely on colour alone (see design principles below).
+
+Brand and affiliation:
+- The project is **not an official NASA service**; keep the existing disclaimer visible.
+- Never use the NASA logo (insignia or logotype), seals, mission patches or any element that suggests NASA endorsement. The identity uses colours and typography only.
+
+Implementation (migrated 2026-11-12, Phase 6.1.5): design tokens live only in `frontend/src/styles/index.css`, in two layers — the palette above and semantic tokens (`canvas`, `surface`, `raised`, `ink`, `ink-muted`, `ink-subtle`, `accent`, `danger`, `caution`, `line`, `line-strong`). Components must use the semantic tokens, not palette names or arbitrary colour values. `docs/frontend.md` §5 summarises the mapping.
 
 Design principles:
 - Editorial, natural, scientific, calm, and contemporary.

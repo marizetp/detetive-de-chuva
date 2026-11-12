@@ -5,8 +5,8 @@ import { REPORT_SECTIONS } from './reportStructure.js';
 import SourceError from './SourceError.jsx';
 import SourceLabel from './SourceLabel.jsx';
 
-const SUBHEADING = 'text-xs font-semibold tracking-[0.16em] text-earth uppercase';
-const EMPTY_TEXT = 'text-charcoal/80';
+const SUBHEADING = 'font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase';
+const EMPTY_TEXT = 'text-ink-muted';
 
 function Triggers({ triggers }) {
   if (triggers === null) {
@@ -20,13 +20,13 @@ function Triggers({ triggers }) {
       <ul className="flex flex-wrap gap-2" aria-label="Códigos dos triggers activados">
         {triggers.map((trigger, index) => (
           <li key={`${index}-${trigger}`}>
-            <code className="inline-block rounded-md bg-sage px-2.5 py-1 font-mono text-sm text-forest">
+            <code className="inline-block rounded-md bg-surface px-2.5 py-1 font-mono text-sm text-ink">
               {trigger}
             </code>
           </li>
         ))}
       </ul>
-      <p className="mt-3 max-w-prose text-sm leading-relaxed text-charcoal/80">
+      <p className="mt-3 max-w-prose text-sm leading-relaxed text-ink-muted">
         Códigos técnicos devolvidos pelo serviço. O seu significado não está documentado, por isso
         são apresentados sem tradução nem interpretação.
       </p>
@@ -45,7 +45,7 @@ function Justifications({ justifications }) {
     <ul className="max-w-prose space-y-3">
       {justifications.map((justification, index) => (
         <li key={`${index}-${justification}`} className="flex gap-4 leading-relaxed">
-          <span className="mt-3 h-px w-5 shrink-0 bg-rain" aria-hidden="true" />
+          <span className="mt-3 h-px w-5 shrink-0 bg-accent" aria-hidden="true" />
           <span>{justification}</span>
         </li>
       ))}
@@ -65,7 +65,7 @@ export default function TechnicalSection({ evaluate, onRetry }) {
   } else if (evaluate.status === 'success' && evaluate.result) {
     content = (
       <div className="space-y-10">
-        <p className="max-w-prose leading-relaxed text-charcoal/85">
+        <p className="max-w-prose leading-relaxed text-ink-muted">
           Informação da avaliação técnica, complementar à recomendação. Os códigos e as frases são
           apresentados tal como foram recebidos.
         </p>

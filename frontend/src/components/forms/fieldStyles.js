@@ -1,12 +1,12 @@
 // Estilo e ligações de acessibilidade partilhados pelos controlos de formulário.
-// Contorno Charcoal a 60%: ≥ 3:1 sobre Ivory e sobre Sage (WCAG 1.4.11, componentes de interface).
+// Contorno Steel Blue (line-strong): 4,6:1 sobre Space Black e 4,1:1 sobre Mission Navy (WCAG 1.4.11 ≥ 3:1).
 // Texto a 16 px evita o zoom automático do iOS ao focar.
 
 export const CONTROL_CLASSES =
-  'block min-h-12 w-full rounded-lg border border-charcoal/60 bg-ivory px-4 py-2.5 text-base ' +
-  'text-charcoal [color-scheme:light] transition-colors hover:border-forest ' +
-  'aria-invalid:border-2 aria-invalid:border-earth ' +
-  'disabled:cursor-not-allowed disabled:border-charcoal/30 disabled:bg-ivory/60 disabled:text-charcoal/60';
+  'block min-h-12 w-full rounded-lg border border-line-strong bg-canvas px-4 py-2.5 text-base ' +
+  'text-ink [color-scheme:dark] transition-colors hover:border-accent ' +
+  'aria-invalid:border-2 aria-invalid:border-danger ' +
+  'disabled:cursor-not-allowed disabled:border-line disabled:bg-canvas/60 disabled:text-ink-subtle';
 
 /** ids da dica e do erro, para `aria-describedby` do controlo. */
 export function fieldDescriptionIds(id, { hint, error }) {

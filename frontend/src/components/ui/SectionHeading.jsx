@@ -19,11 +19,11 @@ export default function SectionHeading({
       ) : null}
       <h2
         id={id}
-        className="mt-4 text-3xl leading-[1.12] font-semibold text-forest sm:text-4xl lg:text-[2.75rem]"
+        className="mt-4 text-3xl leading-[1.12] font-semibold text-ink sm:text-4xl lg:text-[2.75rem]"
       >
         {title}
       </h2>
-      {lead ? <p className="mt-5 max-w-prose text-lg text-charcoal/80">{lead}</p> : null}
+      {lead ? <p className="mt-5 max-w-prose text-lg text-ink-muted">{lead}</p> : null}
     </div>
   );
 }

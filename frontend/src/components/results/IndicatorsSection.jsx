@@ -15,11 +15,11 @@ function metricValue(state, key) {
 
 /** Célula de uma fonte: valor, «Sem dado», a carregar ou indisponível — nunca 0 por omissão. */
 function ValueCell({ state, metricKey }) {
-  if (state.status === 'loading') return <span className="text-sm text-charcoal/75">A carregar…</span>;
-  if (state.status !== 'success') return <span className="text-sm text-charcoal/75">Indisponível</span>;
+  if (state.status === 'loading') return <span className="text-sm text-ink-muted">A carregar…</span>;
+  if (state.status !== 'success') return <span className="text-sm text-ink-muted">Indisponível</span>;
   const metric = metricValue(state, metricKey);
   if (!metric || metric.value === null) return <MissingValue />;
-  return <span className="font-display text-2xl text-forest tabular-nums">{formatMetricValue(metric)}</span>;
+  return <span className="font-display text-2xl text-ink tabular-nums">{formatMetricValue(metric)}</span>;
 }
 
 /** 02 — Indicadores: os três valores documentados, de cada fonte, lado a lado. */
@@ -42,7 +42,7 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
 
   return (
     <ReportSection section={REPORT_SECTIONS.indicators}>
-      <p className="max-w-prose leading-relaxed text-charcoal/85">
+      <p className="max-w-prose leading-relaxed text-ink-muted">
         Valores devolvidos por cada serviço para a consulta de {params.provincia} com data de{' '}
         {consultedDate}. São apresentados tal como recebidos, sem limiares nem interpretação.
       </p>
@@ -81,7 +81,7 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
             Indicadores agroclimáticos por fonte: recomendação e avaliação técnica
           </caption>
           <thead>
-            <tr className="border-b-2 border-forest text-xs tracking-[0.12em] text-charcoal/80 uppercase">
+            <tr className="border-b-2 border-line-strong text-xs tracking-[0.12em] text-ink-muted uppercase">
               <th scope="col" className="py-3 pr-4 font-semibold">Indicador</th>
               {SOURCES.map((source) => (
                 <th key={source} scope="col" className="w-[24%] py-3 pr-2 font-semibold">
@@ -94,19 +94,19 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
             {METRIC_DEFINITIONS.map((definition) => {
               const isDivergent = divergentFields.has(`metricas.${definition.key}`);
               return (
-                <tr key={definition.key} className="border-b border-charcoal/10 align-top">
+                <tr key={definition.key} className="border-b border-line align-top">
                   <th scope="row" className="py-4 pr-3 font-normal sm:py-5 sm:pr-4">
-                    <span className="block font-display text-base leading-snug text-forest sm:text-lg">
+                    <span className="block font-display text-base leading-snug text-ink sm:text-lg">
                       {definition.label}{' '}
-                      <span className="font-mono text-sm text-earth">
+                      <span className="font-mono text-sm text-accent">
                         ({METRIC_UNIT_LABELS[definition.unit]})
                       </span>
                     </span>
-                    <span className="mt-1 hidden max-w-md text-sm leading-relaxed text-charcoal/80 sm:block">
+                    <span className="mt-1 hidden max-w-md text-sm leading-relaxed text-ink-muted sm:block">
                       {definition.description}
                     </span>
                     {isDivergent ? (
-                      <span className="mt-2 block text-sm font-semibold text-charcoal">
+                      <span className="mt-2 block text-sm font-semibold text-ink">
                         Valores diferentes entre as fontes — ver secção 05.
                       </span>
                     ) : null}
@@ -127,8 +127,8 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
       <dl className="mt-6 space-y-3 text-sm leading-relaxed sm:hidden">
         {METRIC_DEFINITIONS.map((definition) => (
           <div key={definition.key}>
-            <dt className="font-semibold text-charcoal">{definition.label}</dt>
-            <dd className="text-charcoal/80">{definition.description}</dd>
+            <dt className="font-semibold text-ink">{definition.label}</dt>
+            <dd className="text-ink-muted">{definition.description}</dd>
           </div>
         ))}
       </dl>
@@ -142,7 +142,7 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
           </InlineNotice>
         ) : null}
         {hasMissingValue ? (
-          <p className="text-sm leading-relaxed text-charcoal/80">
+          <p className="text-sm leading-relaxed text-ink-muted">
             «Sem dado»: o serviço não enviou o valor, ou enviou um valor fora do intervalo possível.
           </p>
         ) : null}

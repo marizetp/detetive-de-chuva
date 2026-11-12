@@ -6,17 +6,16 @@ const BASE =
   'aria-disabled:cursor-not-allowed aria-disabled:opacity-60';
 
 const VARIANTS = {
-  /** Acção principal: pílula Forest sobre fundos claros. */
+  /** Acção principal: pílula Telemetry Cyan com texto Space Black (6,8:1); Orbital White ao passar. */
   primary:
-    'rounded-full bg-forest text-ivory hover:bg-charcoal active:bg-charcoal aria-disabled:hover:bg-forest',
-  /** Acção principal sobre superfícies Forest. */
-  inverse: 'rounded-full bg-ivory text-forest hover:bg-sage',
+    'rounded-full bg-accent text-canvas hover:bg-ink active:bg-ink aria-disabled:hover:bg-accent',
+  /** Acção principal alternativa: pílula Orbital White com texto Space Black (16,9:1). */
+  inverse: 'rounded-full bg-ink text-canvas hover:bg-accent',
   /** Acção secundária com contorno, para acções locais (ex.: tentar novamente). */
-  outline:
-    'rounded-full border border-forest/60 text-forest hover:border-forest hover:bg-forest/5',
+  outline: 'rounded-full border border-accent text-accent hover:bg-accent/10',
   /** Acção secundária: texto sublinhado, sem caixa. */
   text:
-    'text-forest underline decoration-forest/30 decoration-2 underline-offset-[6px] hover:decoration-forest',
+    'text-accent underline decoration-accent/40 decoration-2 underline-offset-[6px] hover:decoration-accent',
 };
 
 /** Alvos de toque: 48 px (md) e 40 px (sm, só em barras compactas com alternativa maior). */

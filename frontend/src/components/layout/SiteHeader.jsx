@@ -7,8 +7,8 @@ import Container from '../ui/Container.jsx';
 import { CloseIcon, MenuIcon } from '../ui/icons.jsx';
 
 const NAV_LINK =
-  'rounded-sm text-sm font-medium text-charcoal/80 transition-colors hover:text-forest ' +
-  'aria-[current=page]:text-forest aria-[current=page]:underline aria-[current=page]:decoration-2 ' +
+  'rounded-sm text-sm font-medium text-ink-muted transition-colors hover:text-accent ' +
+  'aria-[current=page]:text-accent aria-[current=page]:underline aria-[current=page]:decoration-2 ' +
   'aria-[current=page]:underline-offset-8';
 
 /** Só ligações para páginas (não âncoras) recebem aria-current="page". */
@@ -33,12 +33,12 @@ export default function SiteHeader({ currentPath }) {
   const onConsultationPage = isCurrentPage(ROUTES.consultation, currentPath);
 
   return (
-    <header className="border-b border-charcoal/10 bg-ivory" onKeyDown={handleKeyDown}>
+    <header className="border-b border-line bg-canvas" onKeyDown={handleKeyDown}>
       <Container className="flex h-18 items-center justify-between gap-6">
         <AppLink
           to={ROUTES.home}
           onClick={closeMenu}
-          className="flex items-center gap-3 rounded-sm text-forest"
+          className="flex items-center gap-3 rounded-sm text-ink"
         >
           <BrandMark className="size-8 shrink-0" />
           <span className="font-display text-xl leading-none font-semibold tracking-tight">
@@ -76,7 +76,7 @@ export default function SiteHeader({ currentPath }) {
         <button
           ref={menuButtonRef}
           type="button"
-          className="-mr-2 inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold text-forest md:hidden"
+          className="-mr-2 inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold text-ink md:hidden"
           aria-expanded={isMenuOpen}
           aria-controls={menuId}
           onClick={() => setIsMenuOpen((open) => !open)}
@@ -86,15 +86,15 @@ export default function SiteHeader({ currentPath }) {
         </button>
       </Container>
 
-      <div id={menuId} hidden={!isMenuOpen} className="border-t border-charcoal/10 md:hidden">
+      <div id={menuId} hidden={!isMenuOpen} className="border-t border-line md:hidden">
         <Container as="nav" aria-label="Principal (telemóvel)" className="py-4">
-          <ul className="divide-y divide-charcoal/10">
+          <ul className="divide-y divide-line">
             {NAV_ITEMS.map((item) => (
               <li key={item.to}>
                 <AppLink
                   to={item.to}
                   onClick={closeMenu}
-                  className="flex min-h-12 items-center text-base font-medium text-charcoal aria-[current=page]:text-forest"
+                  className="flex min-h-12 items-center text-base font-medium text-ink aria-[current=page]:text-accent"
                   aria-current={isCurrentPage(item.to, currentPath) ? 'page' : undefined}
                 >
                   {item.label}

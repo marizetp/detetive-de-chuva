@@ -4,17 +4,17 @@ import BrandMark from '../ui/BrandMark.jsx';
 import Container from '../ui/Container.jsx';
 
 const FOOTER_LINK =
-  'rounded-sm text-sage underline decoration-sage/30 underline-offset-4 hover:text-ivory hover:decoration-ivory';
+  'rounded-sm text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-accent hover:decoration-accent';
 
-const FOOTER_HEADING = 'text-xs font-semibold tracking-[0.16em] text-sage/80 uppercase';
+const FOOTER_HEADING = 'font-mono text-xs font-medium tracking-[0.14em] text-ink-subtle uppercase';
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-forest text-sage" data-surface="dark">
+    <footer className="border-t border-line bg-surface text-ink-muted">
       <Container className="py-14 lg:py-16">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <p className="flex items-center gap-3 text-ivory">
+            <p className="flex items-center gap-3 text-ink">
               <BrandMark className="size-8 shrink-0" />
               <span className="font-display text-xl font-semibold">Detetive da Chuva</span>
             </p>
@@ -45,18 +45,18 @@ export default function SiteFooter() {
             <h2 className={FOOTER_HEADING}>Dados</h2>
             <dl className="mt-4 space-y-3 text-sm leading-relaxed">
               <div>
-                <dt className="font-semibold text-ivory">Avaliações e recomendações</dt>
+                <dt className="font-semibold text-ink">Avaliações e recomendações</dt>
                 <dd>Serviço de avaliação do Detetive da Chuva (API do projecto).</dd>
               </div>
               <div>
-                <dt className="font-semibold text-ivory">Tendências históricas</dt>
+                <dt className="font-semibold text-ink">Tendências históricas</dt>
                 <dd>NASA POWER (reanálise MERRA-2) — em preparação, ainda não disponível.</dd>
               </div>
             </dl>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-sage/20 pt-6 text-xs leading-relaxed text-sage/90 md:flex-row md:justify-between md:gap-8">
+        <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs leading-relaxed text-ink-muted md:flex-row md:justify-between md:gap-8">
           <p className="max-w-2xl">
             Projecto desenvolvido no âmbito do NASA Space Apps Challenge 2026. O Detetive da Chuva
             não é um serviço oficial da NASA.

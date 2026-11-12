@@ -29,7 +29,7 @@ export default function DivergenceNotice({ comparison }) {
             <table className="w-full min-w-[20rem] text-left text-sm">
               <caption className="sr-only">Valores divergentes entre as duas fontes</caption>
               <thead>
-                <tr className="border-b border-charcoal/15 text-charcoal/80">
+                <tr className="border-b border-line text-ink-muted">
                   <th scope="col" className="py-1.5 pr-3 font-semibold">Campo</th>
                   <th scope="col" className="py-1.5 pr-3 font-semibold">Recomendação</th>
                   <th scope="col" className="py-1.5 font-semibold">Avaliação técnica</th>
@@ -37,7 +37,7 @@ export default function DivergenceNotice({ comparison }) {
               </thead>
               <tbody>
                 {divergences.map((divergence) => (
-                  <tr key={divergence.field} className="border-b border-charcoal/10 last:border-0">
+                  <tr key={divergence.field} className="border-b border-line last:border-0">
                     <th scope="row" className="py-1.5 pr-3 font-normal">{divergence.label}</th>
                     <td className="py-1.5 pr-3 tabular-nums">
                       {formatDivergenceValue(divergence.field, divergence.advisoryValue)}

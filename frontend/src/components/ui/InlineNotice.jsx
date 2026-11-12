@@ -2,12 +2,12 @@ import { StatusIcon } from './icons.jsx';
 
 /**
  * Aviso em linha, sem caixa: filete lateral + ícone + texto.
- * - error: Earth (a paleta não tem vermelho; o ícone de triângulo e o texto transmitem o sentido)
- * - info:  Rain Blue no filete (elemento gráfico; o texto fica em Charcoal)
+ * - error: NASA Red no filete e no ícone (triângulo); o título e o texto ficam em Orbital White
+ * - info:  Telemetry Cyan no filete e no ícone (círculo com «i»)
  */
 const TONES = {
-  error: { rule: 'border-earth', icon: 'warning', iconColor: 'text-earth' },
-  info: { rule: 'border-rain', icon: 'neutral-info', iconColor: 'text-rain' },
+  error: { rule: 'border-danger', icon: 'warning', iconColor: 'text-danger' },
+  info: { rule: 'border-accent', icon: 'neutral-info', iconColor: 'text-accent' },
 };
 
 export default function InlineNotice({ tone = 'info', title, children, action, role, className = '' }) {
@@ -17,9 +17,9 @@ export default function InlineNotice({ tone = 'info', title, children, action, r
       <div className="flex gap-3">
         <StatusIcon tone={style.icon} className={`mt-0.5 size-5 shrink-0 ${style.iconColor}`} />
         <div className="min-w-0 flex-1">
-          {title ? <p className="font-semibold text-charcoal">{title}</p> : null}
+          {title ? <p className="font-semibold text-ink">{title}</p> : null}
           {children ? (
-            <div className={`text-sm leading-relaxed text-charcoal/85 ${title ? 'mt-1' : ''}`}>
+            <div className={`text-sm leading-relaxed text-ink-muted ${title ? 'mt-1' : ''}`}>
               {children}
             </div>
           ) : null}
