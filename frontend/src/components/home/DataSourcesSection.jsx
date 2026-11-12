@@ -36,8 +36,6 @@ export default function DataSourcesSection() {
       <Container className="py-20 lg:py-28">
         <SectionHeading
           id={headingId}
-          index="03"
-          eyebrow="Fontes e limites"
           title="De onde vêm os dados, e o que ainda não sabemos"
           className="max-w-3xl"
         />

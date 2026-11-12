@@ -19,7 +19,7 @@ export default function SectionHeading({
       ) : null}
       <h2
         id={id}
-        className="mt-4 text-3xl leading-[1.12] font-semibold text-ink sm:text-4xl lg:text-[2.75rem]"
+        className={`${eyebrow ? 'mt-4 ' : ''}text-3xl leading-[1.12] font-semibold text-ink sm:text-4xl lg:text-[2.75rem]`}
       >
         {title}
       </h2>

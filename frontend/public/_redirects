@@ -1,0 +1,3 @@
+# Fallback de SPA para o Netlify: qualquer caminho sem ficheiro correspondente serve a aplicação
+# (ex.: acesso directo ou refresh em /consulta). Ficheiros existentes em /assets têm prioridade.
+/*    /index.html    200

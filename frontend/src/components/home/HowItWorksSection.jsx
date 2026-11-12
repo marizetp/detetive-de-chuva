@@ -30,9 +30,6 @@ export default function HowItWorksSection() {
       <Container className="py-20 lg:py-28">
         <SectionHeading
           id={headingId}
-          index="02"
-          eyebrow="Funcionamento"
-          eyebrowTone="onSurface"
           title="Três passos, do terreno à recomendação"
           className="max-w-3xl"
         />

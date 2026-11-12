@@ -11,8 +11,6 @@ export default function AboutSection() {
       <Container className="grid gap-12 py-20 lg:grid-cols-12 lg:gap-16 lg:py-28">
         <SectionHeading
           id={headingId}
-          index="01"
-          eyebrow="Apresentação"
           title="Informação agroclimática para decidir quando semear"
           className="lg:col-span-5"
         />
