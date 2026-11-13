@@ -103,9 +103,9 @@ export default function ConsultationForm({
     crops.status === 'loading' ? 'as culturas' : null,
   ].filter(Boolean);
 
-  let submitLabel = 'Consultar';
-  if (isPending) submitLabel = 'A consultar…';
-  else if (isStale) submitLabel = 'Actualizar consulta';
+  let submitLabel = 'Consultar Viabilidade';
+  if (isPending) submitLabel = 'A avaliar viabilidade…';
+  else if (isStale) submitLabel = 'Actualizar Viabilidade';
 
   const availableMunicipalities = values.provincia ? MUNICIPALITIES_BY_PROVINCE[values.provincia] ?? [] : [];
 
@@ -119,7 +119,7 @@ export default function ConsultationForm({
       <h2 id="consulta-formulario-titulo" className="text-2xl leading-snug font-semibold text-ink">
         Dados da consulta
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-ink-muted">Campos com província, cultura e data são obrigatórios.</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-muted">Indique a localização, a cultura e a data pretendida para avaliar as condições de sementeira.</p>
 
       {loadingCatalogs.length > 0 ? (
         <div className="mt-6">
@@ -179,7 +179,7 @@ export default function ConsultationForm({
         />
         <DateField
           id="data_consulta"
-          label="Data da consulta"
+          label="Data da consulta para sementeira"
           hint="Hoje ou qualquer data futura de planeamento de safra."
           value={values.data_consulta}
           onChange={(value) => updateField('data_consulta', value)}

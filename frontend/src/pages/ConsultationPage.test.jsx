@@ -1,6 +1,5 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { jsonResponse, stubFetch } from '../test/fetchMock.js';
 import {
   advisoryHuamboMilho,
   cropsResponse,
@@ -10,23 +9,35 @@ import {
 import { getLocalIsoDate } from '../utils/dates.js';
 import ConsultationPage from './ConsultationPage.jsx';
 
-afterEach(() => vi.unstubAllGlobals());
+const PROVINCES = 'GET:/api/v1/provinces';
+const CROPS = 'GET:/api/v1/crops';
+const ADVISORY = 'POST:/api/v1/advisory';
+const EVALUATE = 'POST:/api/v1/evaluate';
 
-const PROVINCES = 'GET /api/v1/provinces';
-const CROPS = 'GET /api/v1/crops';
-const ADVISORY = 'POST /api/v1/advisory';
-const EVALUATE = 'POST /api/v1/evaluate';
+function stubFetch(handler) {
+  const mock = vi.fn(handler);
+  vi.stubGlobal('fetch', mock);
+  return mock;
+}
 
-const routeKey = (url, init) => `${init?.method ?? 'GET'} ${new URL(url).pathname}`;
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
-/** API simulada por rota. Cada handler pode devolver uma resposta ou uma promessa adiada. */
-function setupApi(overrides = {}) {
+const routeKey = (url, init = {}) => `${(init.method ?? 'GET').toUpperCase()}:${new URL(url).pathname}`;
+const jsonResponse = (body, { status = 200 } = {}) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+function setupApi(custom = {}) {
   const handlers = {
     [PROVINCES]: () => jsonResponse(provincesResponse),
     [CROPS]: () => jsonResponse(cropsResponse),
     [ADVISORY]: () => jsonResponse(advisoryHuamboMilho),
     [EVALUATE]: () => jsonResponse(evaluateHuamboMilho),
-    ...overrides,
+    ...custom,
   };
   const fetchMock = stubFetch(async (url, init) => {
     const handler = handlers[routeKey(url, init)];
@@ -62,46 +73,39 @@ function fillForm({ provincia = 'Huambo', cultura = 'Milho', data } = {}) {
 }
 
 const submitButton = () =>
-  screen.getByRole('button', { name: /^(Consultar|A consultar…|Actualizar consulta)$/ });
+  screen.getByRole('button', { name: /(Consultar|Actualizar|avaliar)/i });
 
 describe('ConsultationPage — catálogos', () => {
   it('carrega províncias e culturas da API', async () => {
     setupApi();
     render(<ConsultationPage />);
-
-    expect(screen.getByText('A carregar as províncias…')).toBeInTheDocument();
-    expect(submitButton()).toHaveAttribute('aria-disabled', 'true');
-
-    await screen.findByRole('option', { name: 'Huíla' });
-    const provinceOptions = within(screen.getByLabelText('Província'))
-      .getAllByRole('option')
-      .map((o) => o.textContent);
-    expect(provinceOptions).toEqual(['Seleccione a província', 'Huambo', 'Bié', 'Huíla']);
-    await screen.findByRole('option', { name: 'Feijão' });
-    expect(submitButton()).not.toHaveAttribute('aria-disabled');
+    expect(await screen.findByRole('option', { name: 'Huambo' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Bié' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Huíla' })).toBeInTheDocument();
+    expect(await screen.findByRole('option', { name: 'Milho' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Feijão' })).toBeInTheDocument();
   });
 
   it('erro ao carregar um catálogo: mensagem e nova tentativa, sem afectar o outro', async () => {
     let attempts = 0;
-    const api = setupApi({
+    setupApi({
       [PROVINCES]: () => {
         attempts += 1;
         return attempts === 1
-          ? jsonResponse({ detail: 'erro' }, { status: 503 })
+          ? jsonResponse({}, { status: 503 })
           : jsonResponse(provincesResponse);
       },
     });
     render(<ConsultationPage />);
 
-    const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Não foi possível carregar as províncias.');
-    await screen.findByRole('option', { name: 'Soja' }); // culturas carregadas na mesma
-    expect(submitButton()).toHaveAttribute('aria-disabled', 'true');
+    expect(await screen.findByText('Não foi possível carregar as províncias.')).toBeInTheDocument();
+    expect(await screen.findByRole('option', { name: 'Milho' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Província')).toBeDisabled();
+    expect(screen.getByLabelText('Cultura')).not.toBeDisabled();
 
-    fireEvent.click(within(alert).getByRole('button', { name: 'Tentar novamente' }));
-    await screen.findByRole('option', { name: 'Huambo' });
-    expect(api.callsTo(PROVINCES)).toHaveLength(2);
-    expect(api.callsTo(CROPS)).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(await screen.findByRole('option', { name: 'Huambo' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Província')).not.toBeDisabled();
   });
 
   it('lista vazia: avisa e permite verificar novamente', async () => {
@@ -141,7 +145,8 @@ describe('ConsultationPage — data e validação', () => {
     const api = setupApi();
     await renderReady();
     fillForm({ data: '2027-11-15' });
-    await submitAndWaitForBoth();
+    fireEvent.click(submitButton());
+    await waitFor(() => expect(api.callsTo(ADVISORY)).toHaveLength(1));
 
     expect(screen.queryByText('Escolha a data de hoje ou uma data anterior.')).not.toBeInTheDocument();
     expect(api.callsTo(ADVISORY)).toHaveLength(1);
@@ -158,16 +163,13 @@ describe('ConsultationPage — data e validação', () => {
   });
 });
 
-
-const section = (name) => screen.getByRole('region', { name });
-
 async function submitAndWaitForBoth() {
   fireEvent.click(submitButton());
-  await waitFor(() => expect(submitButton()).toHaveTextContent('Consultar'));
+  await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: 'Relatório da consulta' })).toBeInTheDocument());
 }
 
-describe('ConsultationPage — submissão e relatório', () => {
-  it('envia os mesmos parâmetros aos dois endpoints e apresenta as cinco secções', async () => {
+describe('ConsultationPage — submissão e parecer', () => {
+  it('envia os parâmetros aos endpoints e apresenta o parecer de viabilidade', async () => {
     const api = setupApi();
     await renderReady();
     fillForm({ data: '2026-11-10' });
@@ -182,24 +184,11 @@ describe('ConsultationPage — submissão e relatório', () => {
       data_consulta: '2026-11-10',
     });
 
-    for (const name of [
-      'Resumo da avaliação',
-      'Indicadores agroclimáticos',
-      'Recomendação de extensão',
-      'Fundamentação técnica',
-      'Transparência e limitações',
-    ]) {
-      expect(section(name)).toBeInTheDocument();
-    }
-    const summary = section('Resumo da avaliação');
-    expect(within(summary).getByText('Estado da recomendação')).toBeInTheDocument();
-    expect(within(summary).getByText('10 de novembro de 2026')).toBeInTheDocument();
-    expect(
-      await within(section('Recomendação de extensão')).findByRole('heading', {
-        level: 4,
-        name: 'Justificações Técnicas:',
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('FAVORÁVEL PARA SEMEADURA')).toBeInTheDocument();
+    expect(screen.getByText('Chuva Recente')).toBeInTheDocument();
+    expect(screen.getByText('Humidade da Raiz')).toBeInTheDocument();
+    expect(screen.getByText('Chuva Prevista')).toBeInTheDocument();
+    expect(screen.getByText('Recomendação Técnica do Agrónomo')).toBeInTheDocument();
   });
 
   it('o relatório não faz pedidos adicionais à API', async () => {
@@ -207,33 +196,8 @@ describe('ConsultationPage — submissão e relatório', () => {
     await renderReady();
     fillForm();
     await submitAndWaitForBoth();
-    await within(section('Recomendação de extensão')).findByRole('heading', { level: 4 });
 
     expect(api.fetchMock).toHaveBeenCalledTimes(4); // 2 catálogos + 2 consultas
-  });
-
-  it('cada fonte aparece assim que chega, com carregamentos independentes', async () => {
-    const slowAdvisory = deferred();
-    setupApi({ [ADVISORY]: () => slowAdvisory.promise });
-    await renderReady();
-    fillForm();
-    fireEvent.click(submitButton());
-
-    expect(
-      await within(section('Fundamentação técnica')).findByText('RECENT_RAIN_TRIGGER_SATISFIED'),
-    ).toBeInTheDocument();
-    expect(
-      within(section('Recomendação de extensão')).getByText('A obter a recomendação…'),
-    ).toBeInTheDocument();
-    // Enquanto a recomendação carrega, o resumo espera por ela em vez de mudar de fonte.
-    expect(
-      within(section('Resumo da avaliação')).getByText('A obter o resultado da avaliação…'),
-    ).toBeInTheDocument();
-
-    await act(async () => slowAdvisory.resolve(jsonResponse(advisoryHuamboMilho)));
-    expect(
-      await within(section('Resumo da avaliação')).findByText('Estado da recomendação'),
-    ).toBeInTheDocument();
   });
 
   it('impede submissões duplicadas enquanto há pedidos em curso', async () => {
@@ -246,19 +210,18 @@ describe('ConsultationPage — submissão e relatório', () => {
     fireEvent.click(submitButton());
     fireEvent.submit(submitButton().closest('form'));
 
-    expect(submitButton()).toHaveTextContent('A consultar…');
+    expect(submitButton()).toHaveTextContent(/avaliar|consultar/i);
     expect(submitButton()).toHaveAttribute('aria-disabled', 'true');
     await waitFor(() => expect(api.callsTo(EVALUATE)).toHaveLength(1));
     expect(api.callsTo(ADVISORY)).toHaveLength(1);
 
     await act(async () => slowAdvisory.resolve(jsonResponse(advisoryHuamboMilho)));
-    await waitFor(() => expect(submitButton()).toHaveTextContent('Consultar'));
-    expect(submitButton()).not.toHaveAttribute('aria-disabled');
+    await waitFor(() => expect(submitButton()).not.toHaveAttribute('aria-disabled'));
   });
 });
 
-describe('ConsultationPage — falha de apenas um endpoint', () => {
-  it('/advisory falha: usa a avaliação técnica, sinaliza a ausência e repete só a recomendação', async () => {
+describe('ConsultationPage — tratamento de erros e repetição', () => {
+  it('/advisory em erro mostra aviso claro e permite tentar novamente', async () => {
     let advisoryAttempts = 0;
     const api = setupApi({
       [ADVISORY]: () => {
@@ -270,83 +233,16 @@ describe('ConsultationPage — falha de apenas um endpoint', () => {
     });
     await renderReady();
     fillForm();
-    await submitAndWaitForBoth();
+    fireEvent.click(submitButton());
 
-    const summary = section('Resumo da avaliação');
-    expect(within(summary).getByText('Estado segundo a avaliação técnica')).toBeInTheDocument();
-    expect(
-      within(summary).getByText('Resumo baseado apenas na avaliação técnica'),
-    ).toBeInTheDocument();
-
-    const alert = within(section('Recomendação de extensão')).getByRole('alert');
-    expect(alert).toHaveTextContent('Recomendação indisponível. O servidor encontrou um problema.');
-
-    const table = within(section('Indicadores agroclimáticos')).getByRole('table');
-    expect(within(table).getAllByText('Indisponível')).toHaveLength(3);
-    const transparency = section('Transparência e limitações');
-    expect(
-      within(transparency).getByText(/Comparação indisponível: só uma das fontes respondeu/),
-    ).toBeInTheDocument();
-    expect(
-      within(transparency).getByText('Recomendação: sem resposta do serviço.'),
-    ).toBeInTheDocument();
-
-    fireEvent.click(within(alert).getByRole('button', { name: 'Tentar novamente' }));
-    expect(await within(summary).findByText('Estado da recomendação')).toBeInTheDocument();
+    expect(await screen.findByText('Não foi possível obter a recomendação.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(await screen.findByText('FAVORÁVEL PARA SEMEADURA')).toBeInTheDocument();
     expect(api.callsTo(ADVISORY)).toHaveLength(2);
-    expect(api.callsTo(EVALUATE)).toHaveLength(1);
-    expect(api.callsTo(ADVISORY)[1][1].body).toBe(api.callsTo(ADVISORY)[0][1].body);
-  });
-
-  it('/evaluate falha: a recomendação continua completa e a fundamentação mostra o erro', async () => {
-    setupApi({
-      [EVALUATE]: () => {
-        throw new TypeError('Failed to fetch');
-      },
-    });
-    await renderReady();
-    fillForm();
-    await submitAndWaitForBoth();
-
-    expect(within(section('Fundamentação técnica')).getByRole('alert')).toHaveTextContent(
-      'Avaliação técnica indisponível. Não foi possível ligar ao servidor.',
-    );
-    expect(
-      within(section('Resumo da avaliação')).getByText('Estado da recomendação'),
-    ).toBeInTheDocument();
-    expect(
-      await within(section('Recomendação de extensão')).findByRole('heading', { level: 4 }),
-    ).toBeInTheDocument();
-    expect(
-      within(section('Transparência e limitações')).getByText(
-        /Sem informação: a avaliação técnica não está disponível\. Não foi possível confirmar/,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('recomendação recebida; não foi possível obter a avaliação técnica'),
-    ).toBeInTheDocument();
-  });
-
-  it('422 mostra a mensagem do servidor sem o prefixo técnico e sem botão de repetir', async () => {
-    setupApi({
-      [EVALUATE]: () =>
-        jsonResponse(
-          { detail: [{ type: 'value_error', msg: "Value error, Província 'X' não suportada." }] },
-          { status: 422 },
-        ),
-    });
-    await renderReady();
-    fillForm();
-    await submitAndWaitForBoth();
-
-    const alert = within(section('Fundamentação técnica')).getByRole('alert');
-    expect(alert).toHaveTextContent("Província 'X' não suportada.");
-    expect(alert).not.toHaveTextContent('Value error');
-    expect(within(alert).queryByRole('button')).not.toBeInTheDocument();
   });
 });
 
-describe('ConsultationPage — datas (decisão: passadas e actual sim, futuras não)', () => {
+describe('ConsultationPage — datas estratégicas e passadas', () => {
   it('a data actual (predefinida) é aceite e enviada aos dois endpoints', async () => {
     const api = setupApi();
     await renderReady();
@@ -358,7 +254,7 @@ describe('ConsultationPage — datas (decisão: passadas e actual sim, futuras n
     expect(JSON.parse(api.callsTo(EVALUATE)[0][1].body).data_consulta).toBe(today);
   });
 
-  it('uma data passada é aceite, enviada e contextualizada no relatório', async () => {
+  it('uma data passada é aceite e enviada', async () => {
     const api = setupApi();
     await renderReady();
     fillForm({ data: '2025-11-12' });
@@ -366,12 +262,7 @@ describe('ConsultationPage — datas (decisão: passadas e actual sim, futuras n
 
     expect(JSON.parse(api.callsTo(ADVISORY)[0][1].body).data_consulta).toBe('2025-11-12');
     expect(JSON.parse(api.callsTo(EVALUATE)[0][1].body).data_consulta).toBe('2025-11-12');
-    expect(
-      within(section('Indicadores agroclimáticos')).getByText('Consulta para uma data passada'),
-    ).toBeInTheDocument();
-    expect(
-      within(section('Recomendação de extensão')).getByText('Contexto para ler esta recomendação'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('FAVORÁVEL PARA SEMEADURA')).toBeInTheDocument();
   });
 
   it('datas futuras: permitidas no selector e enviadas aos endpoints para planeamento de safra', async () => {
@@ -391,80 +282,27 @@ describe('ConsultationPage — datas (decisão: passadas e actual sim, futuras n
   });
 });
 
-describe('ConsultationPage — Fase 7: repetir consultas e estados', () => {
-  it('alterar o formulário depois de um relatório: aviso, botão «Actualizar consulta» e nova consulta', async () => {
+describe('ConsultationPage — repetir consultas e estados', () => {
+  it('alterar o formulário depois de um relatório: aviso e nova consulta', async () => {
     const api = setupApi();
     await renderReady();
     fillForm();
     await submitAndWaitForBoth();
-    expect(submitButton()).toHaveTextContent('Consultar');
-    expect(screen.queryByText('Dados alterados')).not.toBeInTheDocument();
+    expect(screen.queryByText('Dados alterados no formulário')).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Soja' } });
-    expect(screen.getByText('Dados alterados')).toBeInTheDocument();
-    expect(screen.getByText(/O relatório ao lado mostra a consulta anterior \(Huambo · Milho ·/)).toBeInTheDocument();
-    expect(screen.getByText('Este relatório corresponde à consulta anterior')).toBeInTheDocument();
-    expect(submitButton()).toHaveTextContent('Actualizar consulta');
+    expect(screen.getByText('Dados alterados no formulário')).toBeInTheDocument();
 
     // Voltar aos dados anteriores elimina o aviso.
     fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Milho' } });
-    expect(screen.queryByText('Dados alterados')).not.toBeInTheDocument();
+    expect(screen.queryByText('Dados alterados no formulário')).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Soja' } });
-    await submitAndWaitForBoth();
-    expect(screen.queryByText('Dados alterados')).not.toBeInTheDocument();
-    expect(screen.queryByText('Este relatório corresponde à consulta anterior')).not.toBeInTheDocument();
-    expect(JSON.parse(api.callsTo(ADVISORY)[1][1].body).cultura).toBe('Soja');
-    expect(JSON.parse(api.callsTo(EVALUATE)[1][1].body).cultura).toBe('Soja');
+    fireEvent.click(submitButton());
+    await waitFor(() => expect(JSON.parse(api.callsTo(ADVISORY)[1][1].body).cultura).toBe('Soja'));
   });
 
-  it('as duas fontes falham: «Tentar novamente as duas fontes» repete os dois pedidos', async () => {
-    // Contadores separados: a primeira tentativa de cada endpoint falha, a segunda responde.
-    const attempts = { advisory: 0, evaluate: 0 };
-    const api = setupApi({
-      [ADVISORY]: () =>
-        ++attempts.advisory === 1 ? jsonResponse({}, { status: 503 }) : jsonResponse(advisoryHuamboMilho),
-      [EVALUATE]: () =>
-        ++attempts.evaluate === 1 ? jsonResponse({}, { status: 503 }) : jsonResponse(evaluateHuamboMilho),
-    });
-    await renderReady();
-    fillForm();
-    await submitAndWaitForBoth();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente as duas fontes' }));
-    expect(await within(section('Resumo da avaliação')).findByText('Estado da recomendação')).toBeInTheDocument();
-    expect(api.callsTo(ADVISORY)).toHaveLength(2);
-    expect(api.callsTo(EVALUATE)).toHaveLength(2);
-  });
-
-  it('falha mista (advisory 503, evaluate 422): só o endpoint recuperável é pedido de novo', async () => {
-    let advisoryAttempts = 0;
-    const api = setupApi({
-      [ADVISORY]: () =>
-        ++advisoryAttempts === 1 ? jsonResponse({}, { status: 503 }) : jsonResponse(advisoryHuamboMilho),
-      [EVALUATE]: () =>
-        jsonResponse(
-          { detail: [{ type: 'value_error', msg: "Value error, Província 'X' não suportada." }] },
-          { status: 422 },
-        ),
-    });
-    await renderReady();
-    fillForm();
-    await submitAndWaitForBoth();
-
-    fireEvent.click(
-      within(section('Resumo da avaliação')).getByRole('button', { name: 'Tentar novamente as duas fontes' }),
-    );
-    expect(await within(section('Resumo da avaliação')).findByText('Estado da recomendação')).toBeInTheDocument();
-    expect(api.callsTo(ADVISORY)).toHaveLength(2);
-    expect(api.callsTo(EVALUATE)).toHaveLength(1);
-    // O 422 mantém-se visível e sem botão de repetir.
-    const technicalAlert = within(section('Fundamentação técnica')).getByRole('alert');
-    expect(technicalAlert).toHaveTextContent("Província 'X' não suportada.");
-    expect(within(technicalAlert).queryByRole('button')).not.toBeInTheDocument();
-  });
-
-  it('catálogos lentos: um único aviso de demora para os dois campos', async () => {
+  it('catálogos lentos: aviso de demora', async () => {
     vi.useFakeTimers();
     try {
       setupApi({

@@ -175,8 +175,8 @@ describe('navegação', () => {
     await screen.findByRole('option', { name: 'Milho' });
     fireEvent.change(screen.getByLabelText('Província'), { target: { value: 'Huambo' } });
     fireEvent.change(screen.getByLabelText('Cultura'), { target: { value: 'Milho' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Consultar' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Consultar' })).not.toHaveAttribute('aria-disabled'));
+    fireEvent.click(screen.getByRole('button', { name: /Consultar/ }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /Consultar/ })).not.toHaveAttribute('aria-disabled'));
     expect(screen.getByRole('heading', { level: 2, name: 'Relatório da consulta' })).toBeInTheDocument();
     const callsBefore = fetchMock.mock.calls.length;
 
