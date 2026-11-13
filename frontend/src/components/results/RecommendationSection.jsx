@@ -1,17 +1,13 @@
-import { lazy, Suspense } from 'react';
 import { RESULT_SOURCES } from '../../config/api.js';
 import { formatIsoDateLong } from '../../utils/format.js';
 import { getFallbackStatus, isPastIsoDate } from '../../utils/report.js';
 import InlineNotice from '../ui/InlineNotice.jsx';
 import LoadingIndicator from '../ui/LoadingIndicator.jsx';
+import MarkdownContent from './MarkdownContent.jsx';
 import ReportSection from './ReportSection.jsx';
 import { REPORT_SECTIONS } from './reportStructure.js';
 import SourceError from './SourceError.jsx';
 import SourceLabel from './SourceLabel.jsx';
-
-// Carregado só quando há uma recomendação para mostrar: o renderizador de Markdown não pesa
-// na página inicial nem no primeiro carregamento da consulta (ligações lentas).
-const MarkdownContent = lazy(() => import('./MarkdownContent.jsx'));
 
 /**
  * Contexto a mostrar antes do texto, sem o alterar. O serviço pode escrever «período atual»
@@ -61,9 +57,7 @@ export default function RecommendationSection({ advisory, evaluate, params, toda
           </InlineNotice>
         ) : null}
         <div className="max-w-prose border-l-2 border-line-strong pl-5 sm:pl-7">
-          <Suspense fallback={<LoadingIndicator label="A preparar o texto da recomendação…" slowNotice={false} live={false} />}>
-            <MarkdownContent text={advisory.result.recommendationText} />
-          </Suspense>
+          <MarkdownContent text={advisory.result.recommendationText} />
         </div>
         <p className="mt-8 max-w-prose text-sm leading-relaxed text-ink-muted">
           Texto produzido pelo serviço de recomendação e apresentado sem alterações. A redacção

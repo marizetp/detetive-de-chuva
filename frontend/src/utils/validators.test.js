@@ -85,10 +85,10 @@ describe('validateConsultationParams — data (decisão de 2026-11-12)', () => {
     );
   });
 
-  it('recusa datas futuras', () => {
+  it('aceita datas futuras para planeamento estratégico', () => {
     expect(
-      validateConsultationParams({ ...base, data_consulta: '2026-11-13' }, { today }),
-    ).toEqual({ data_consulta: 'Escolha a data de hoje ou uma data anterior.' });
+      validateConsultationParams({ ...base, data_consulta: '2027-11-15' }, { today }),
+    ).toEqual({});
   });
 
   it('isFutureIsoDate compara datas YYYY-MM-DD', () => {

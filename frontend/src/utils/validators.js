@@ -46,10 +46,9 @@ export function isFutureIsoDate(isoDate, today) {
 
 /**
  * Valida os parâmetros da consulta.
- * - `requireDate`: o formulário exige data (decisão de 2026-11-12); a API trata-a como opcional.
- * - `today`: data local de referência (YYYY-MM-DD). Datas posteriores são sempre recusadas
- *   (decisão de 2026-11-12: só datas passadas ou a actual).
- * @param {{ provincia?: unknown, cultura?: unknown, data_consulta?: unknown }} params
+ * - `requireDate`: o formulário exige data; a API trata-a como opcional.
+ * - Suporta datas actuais e datas futuras para planeamento de safra e investimento.
+ * @param {{ provincia?: unknown, cultura?: unknown, data_consulta?: unknown, municipio?: unknown }} params
  * @param {{ requireDate?: boolean, today?: string }} [options]
  * @returns {Record<string, string>} vazio quando válido
  */
@@ -63,19 +62,14 @@ export function validateConsultationParams(
   if (!isNonEmptyString(provincia)) {
     errors.provincia = 'Seleccione uma província.';
   }
-  // A API aceita qualquer cultura sem validar (verificado em 2026-11-12). Exigimos uma escolha
-  // explícita; a lista válida vem de /api/v1/crops e é imposta pelo formulário.
   if (!isNonEmptyString(cultura)) {
     errors.cultura = 'Seleccione uma cultura.';
   }
-  // A API aceita datas inválidas sem aviso e usa a data actual (verificado em 2026-11-12).
   const hasDate = data_consulta !== undefined && data_consulta !== null && data_consulta !== '';
   if (!hasDate) {
     if (requireDate) errors.data_consulta = 'Indique a data da consulta.';
   } else if (!isValidIsoDate(data_consulta)) {
     errors.data_consulta = 'Indique uma data válida no formato AAAA-MM-DD.';
-  } else if (isFutureIsoDate(data_consulta, today)) {
-    errors.data_consulta = 'Escolha a data de hoje ou uma data anterior.';
   }
   return errors;
 }
@@ -91,5 +85,6 @@ export function buildConsultationPayload(params, options) {
 
   const payload = { provincia: params.provincia.trim(), cultura: params.cultura.trim() };
   if (isNonEmptyString(params.data_consulta)) payload.data_consulta = params.data_consulta;
+  if (isNonEmptyString(params.municipio)) payload.municipio = params.municipio.trim();
   return payload;
 }

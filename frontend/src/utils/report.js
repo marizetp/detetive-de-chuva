@@ -5,12 +5,13 @@ import { FIELD_LABELS, ISSUE_PROBLEM_LABELS } from '../config/fieldLabels.js';
 import { formatIsoDateLong } from './format.js';
 import { isValidIsoDate } from './validators.js';
 
-const CONSULTATION_FIELDS = ['provincia', 'cultura', 'data_consulta'];
+const CONSULTATION_FIELDS = ['provincia', 'municipio', 'cultura', 'data_consulta'];
 
-/** "Huambo · Milho · 12 de novembro de 2026" — identificação curta de uma consulta. */
+/** "Huambo (Caála) · Milho · 12 de novembro de 2026" — identificação curta de uma consulta. */
 export function describeConsultation(params) {
   if (!params) return '';
-  return [params.provincia, params.cultura, formatIsoDateLong(params.data_consulta)].join(' · ');
+  const location = params.municipio ? `${params.provincia} (${params.municipio})` : params.provincia;
+  return [location, params.cultura, formatIsoDateLong(params.data_consulta)].join(' · ');
 }
 
 /**

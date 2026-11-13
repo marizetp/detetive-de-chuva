@@ -52,8 +52,7 @@ export default function ConsultationPage() {
           Avaliar as condições para semear
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-ink-muted">
-          Indique onde, o quê e para que data. O pedido é enviado a dois serviços — a recomendação e
-          a avaliação técnica — e cada resposta é apresentada em separado.
+          Indique a província, o município (opcional), a cultura e a data pretendida — imediata ou de planeamento futuro de safra. Obtenha a recomendação agronómica e os indicadores climáticos de apoio à decisão.
         </p>
       </header>
 

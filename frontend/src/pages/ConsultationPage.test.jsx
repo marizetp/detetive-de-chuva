@@ -113,13 +113,13 @@ describe('ConsultationPage — catálogos', () => {
 });
 
 describe('ConsultationPage — data e validação', () => {
-  it('a data começa em hoje e as datas futuras estão desactivadas no selector', async () => {
+  it('a data começa em hoje e permite planeamento futuro', async () => {
     setupApi();
     await renderReady();
     const dateInput = screen.getByLabelText(/Data da consulta/);
     const today = getLocalIsoDate();
     expect(dateInput).toHaveValue(today);
-    expect(dateInput).toHaveAttribute('max', today);
+    expect(dateInput).not.toHaveAttribute('max');
   });
 
   it('campos em falta: mostra erros, foca o primeiro e não envia pedidos', async () => {
@@ -137,16 +137,15 @@ describe('ConsultationPage — data e validação', () => {
     expect(api.callsTo(EVALUATE)).toHaveLength(0);
   });
 
-  it('data futura escrita à mão é recusada', async () => {
+  it('data futura é aceite para planeamento estratégico', async () => {
     const api = setupApi();
     await renderReady();
-    const tomorrow = getLocalIsoDate(new Date(Date.now() + 36 * 60 * 60 * 1000));
-    fillForm({ data: tomorrow });
-    fireEvent.click(submitButton());
+    fillForm({ data: '2027-11-15' });
+    await submitAndWaitForBoth();
 
-    expect(screen.getByText('Escolha a data de hoje ou uma data anterior.')).toBeInTheDocument();
-    expect(document.activeElement).toBe(screen.getByLabelText(/Data da consulta/));
-    expect(api.callsTo(ADVISORY)).toHaveLength(0);
+    expect(screen.queryByText('Escolha a data de hoje ou uma data anterior.')).not.toBeInTheDocument();
+    expect(api.callsTo(ADVISORY)).toHaveLength(1);
+    expect(api.callsTo(EVALUATE)).toHaveLength(1);
   });
 
   it('os erros desaparecem à medida que os campos são corrigidos', async () => {
@@ -375,20 +374,20 @@ describe('ConsultationPage — datas (decisão: passadas e actual sim, futuras n
     ).toBeInTheDocument();
   });
 
-  it('datas futuras: desactivadas no selector e recusadas se escritas à mão (sem pedidos)', async () => {
+  it('datas futuras: permitidas no selector e enviadas aos endpoints para planeamento de safra', async () => {
     const api = setupApi();
     await renderReady();
     const dateInput = screen.getByLabelText(/Data da consulta/);
-    expect(dateInput).toHaveAttribute('max', getLocalIsoDate());
+    expect(dateInput).not.toHaveAttribute('max');
 
-    for (const daysAhead of [1, 3, 7, 30]) {
-      const future = getLocalIsoDate(new Date(Date.now() + (daysAhead * 24 + 12) * 60 * 60 * 1000));
-      fillForm({ data: future });
-      fireEvent.click(submitButton());
-      expect(screen.getByText('Escolha a data de hoje ou uma data anterior.')).toBeInTheDocument();
-    }
-    expect(api.callsTo(ADVISORY)).toHaveLength(0);
-    expect(api.callsTo(EVALUATE)).toHaveLength(0);
+    const future = '2027-07-15';
+    fillForm({ data: future });
+    await submitAndWaitForBoth();
+
+    expect(api.callsTo(ADVISORY)).toHaveLength(1);
+    expect(api.callsTo(EVALUATE)).toHaveLength(1);
+    const [advisoryCall] = api.callsTo(ADVISORY);
+    expect(JSON.parse(advisoryCall[1].body)).toMatchObject({ data_consulta: future });
   });
 });
 

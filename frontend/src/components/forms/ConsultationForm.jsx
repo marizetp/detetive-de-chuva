@@ -1,12 +1,16 @@
 import { useRef, useState } from 'react';
+import { MUNICIPALITIES_BY_PROVINCE } from '../../data/municipalities.js';
 import { CONSULTATION_ANCHORS } from '../../routing/routes.js';
 import { describeConsultation } from '../../utils/report.js';
 import { ConsultationInputError, validateConsultationParams } from '../../utils/validators.js';
 import Button from '../ui/Button.jsx';
+import { ChevronDownIcon } from '../ui/icons.jsx';
 import InlineNotice from '../ui/InlineNotice.jsx';
 import LoadingIndicator from '../ui/LoadingIndicator.jsx';
 import CatalogSelectField from './CatalogSelectField.jsx';
 import DateField from './DateField.jsx';
+import FieldShell from './FieldShell.jsx';
+import { CONTROL_CLASSES } from './fieldStyles.js';
 
 const CONSULTATION_FORM_ID = CONSULTATION_ANCHORS.form;
 const FIELD_ORDER = ['provincia', 'cultura', 'data_consulta'];
@@ -17,9 +21,7 @@ function isOptionAvailable(catalog, value) {
 }
 
 /**
- * Formulário da consulta. Valida com as regras partilhadas (utils/validators.js) e confirma
- * que a província e a cultura pertencem às listas devolvidas pela API.
- * Nomes de campos = nomes da API (`provincia`, `cultura`, `data_consulta`).
+ * Formulário da consulta com suporte a planeamento estratégico e selecção municipal.
  */
 export default function ConsultationForm({
   provinces,
@@ -31,7 +33,7 @@ export default function ConsultationForm({
   lastSubmitted = null,
   isStale = false,
 }) {
-  const [values, setValues] = useState({ provincia: '', cultura: '', data_consulta: today });
+  const [values, setValues] = useState({ provincia: '', municipio: '', cultura: '', data_consulta: today });
   const [errors, setErrors] = useState({});
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
@@ -55,10 +57,14 @@ export default function ConsultationForm({
   };
 
   const updateField = (name, value) => {
-    const next = { ...values, [name]: value };
+    let next;
+    if (name === 'provincia') {
+      next = { ...values, provincia: value, municipio: '' };
+    } else {
+      next = { ...values, [name]: value };
+    }
     setValues(next);
     onValuesChange?.(next);
-    // Depois da primeira tentativa, os erros acompanham as correcções em tempo real.
     if (hasAttemptedSubmit) setErrors(validate(next));
   };
 
@@ -82,7 +88,6 @@ export default function ConsultationForm({
     try {
       onSubmit({ ...values });
     } catch (error) {
-      // O serviço valida de novo; se recusar, mostramos os mesmos erros por campo.
       if (!(error instanceof ConsultationInputError)) throw error;
       setErrors(error.fieldErrors);
       focusFirstInvalid(error.fieldErrors);
@@ -102,6 +107,8 @@ export default function ConsultationForm({
   if (isPending) submitLabel = 'A consultar…';
   else if (isStale) submitLabel = 'Actualizar consulta';
 
+  const availableMunicipalities = values.provincia ? MUNICIPALITIES_BY_PROVINCE[values.provincia] ?? [] : [];
+
   return (
     <form
       id={CONSULTATION_FORM_ID}
@@ -112,9 +119,8 @@ export default function ConsultationForm({
       <h2 id="consulta-formulario-titulo" className="text-2xl leading-snug font-semibold text-ink">
         Dados da consulta
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-ink-muted">Todos os campos são obrigatórios.</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-muted">Campos com província, cultura e data são obrigatórios.</p>
 
-      {/* Um único aviso de carregamento (e de demora) para os dois catálogos. */}
       {loadingCatalogs.length > 0 ? (
         <div className="mt-6">
           <LoadingIndicator label={`A carregar ${loadingCatalogs.join(' e ')} do serviço…`} />
@@ -134,6 +140,31 @@ export default function ConsultationForm({
           error={errors.provincia}
           inputRef={provinciaRef}
         />
+        {availableMunicipalities.length > 0 ? (
+          <FieldShell
+            id="municipio"
+            label="Município"
+            hint="Opcional. Permite maior precisão geográfica da previsão."
+          >
+            <div className="relative">
+              <select
+                id="municipio"
+                name="municipio"
+                value={values.municipio || ''}
+                onChange={(event) => updateField('municipio', event.target.value)}
+                className={`${CONTROL_CLASSES} appearance-none pr-11`}
+              >
+                <option value="">Sede provincial / Toda a província</option>
+                {availableMunicipalities.map((item) => (
+                  <option key={item.id} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-accent" />
+            </div>
+          </FieldShell>
+        ) : null}
         <CatalogSelectField
           id="cultura"
           label="Cultura"
@@ -149,9 +180,8 @@ export default function ConsultationForm({
         <DateField
           id="data_consulta"
           label="Data da consulta"
-          hint="Hoje ou uma data anterior."
+          hint="Hoje ou qualquer data futura de planeamento de safra."
           value={values.data_consulta}
-          max={today}
           onChange={(value) => updateField('data_consulta', value)}
           error={errors.data_consulta}
           inputRef={dataRef}

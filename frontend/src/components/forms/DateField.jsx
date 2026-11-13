@@ -2,8 +2,7 @@ import FieldShell from './FieldShell.jsx';
 import { CONTROL_CLASSES, fieldDescriptionIds } from './fieldStyles.js';
 
 /**
- * Data da consulta. `max` desactiva datas futuras no selector nativo; como alguns navegadores
- * permitem escrever a data à mão, a validação do formulário repete a verificação.
+ * Data da consulta. Suporta datas imediatas e datas futuras de planeamento de safra.
  */
 export default function DateField({ id, label, hint, value, max, onChange, error, inputRef }) {
   return (
@@ -14,7 +13,7 @@ export default function DateField({ id, label, hint, value, max, onChange, error
         name={id}
         type="date"
         value={value}
-        max={max}
+        max={max || undefined}
         onChange={(event) => onChange(event.target.value)}
         required
         aria-invalid={error ? true : undefined}
