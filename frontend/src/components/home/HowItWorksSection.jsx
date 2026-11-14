@@ -36,7 +36,12 @@ export default function HowItWorksSection() {
 
         <ol className="mt-14 grid gap-12 md:grid-cols-3 md:gap-10">
           {STEPS.map((step, index) => (
-            <li key={step.title} className="border-t-aurora pt-6">
+            <li
+              key={step.title}
+              className="border-t-aurora pt-6"
+              data-reveal
+              data-reveal-delay={String(Math.min(index + 1, 6))}
+            >
               <span
                 className="block font-display text-5xl leading-none text-label tabular-nums"
                 aria-hidden="true"
@@ -66,7 +71,7 @@ export default function HowItWorksSection() {
           ))}
         </ol>
 
-        <div className="mt-16 flex flex-col items-start gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <div data-reveal className="mt-16 flex flex-col items-start gap-5 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-md font-display text-xl leading-snug text-ink">
             Pronto para avaliar as condições da sua zona?
           </p>

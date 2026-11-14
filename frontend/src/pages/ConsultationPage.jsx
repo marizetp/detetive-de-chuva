@@ -47,18 +47,24 @@ export default function ConsultationPage() {
   return (
     <Container className="py-14 lg:py-20">
       <header className="max-w-3xl">
-        <Eyebrow className="font-display">Consulta agrícola</Eyebrow>
-        <h1 className="mt-5 text-4xl leading-[1.08] font-semibold tracking-tight text-ink sm:text-5xl">
+        <Eyebrow className="font-display" data-reveal>
+          Consulta agrícola
+        </Eyebrow>
+        <h1 data-reveal data-reveal-delay="1" className="mt-5 text-4xl leading-[1.08] font-semibold tracking-tight text-ink sm:text-5xl">
           Avaliar as condições para semear
         </h1>
-        <p className="mt-5 text-lg leading-relaxed text-ink-muted">
+        <p className="mt-5 text-lg leading-relaxed text-ink-muted" data-reveal data-reveal-delay="2">
           Indique a província, o município (opcional), a cultura e a data pretendida — imediata ou de planeamento futuro de safra. Obtenha a recomendação agronómica e os indicadores climáticos de apoio à decisão.
         </p>
       </header>
 
       <div className="mt-12 grid gap-14 lg:mt-16 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5 xl:col-span-4">
-          <div className="rounded-2xl bg-surface px-5 py-7 sm:px-7 lg:sticky lg:top-8">
+          <div
+            className="rounded-2xl bg-surface px-5 py-7 sm:px-7 lg:sticky lg:top-8"
+            data-reveal
+            data-reveal-delay="3"
+          >
             <ConsultationForm
               provinces={provinces}
               crops={crops}

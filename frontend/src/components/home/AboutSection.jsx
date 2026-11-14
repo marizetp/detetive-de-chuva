@@ -16,7 +16,7 @@ export default function AboutSection() {
         />
 
         <div className="lg:col-span-7">
-          <div className="max-w-prose space-y-5 text-lg leading-relaxed text-ink-muted">
+          <div className="max-w-prose space-y-5 text-lg leading-relaxed text-ink-muted" data-reveal data-reveal-delay="1">
             <p>
               O calendário agrícola tradicional orienta a sementeira no Planalto Central há
               gerações. O Detetive da Chuva parte de uma pergunta simples: as condições deste
@@ -29,12 +29,17 @@ export default function AboutSection() {
             </p>
           </div>
 
-          <h3 className="mt-14 type-label font-display text-label">
+          <h3 className="mt-14 type-label font-display text-label" data-reveal>
             Indicadores considerados
           </h3>
           <dl className="mt-5 divide-y divide-line border-y border-line">
-            {METRIC_DEFINITIONS.map((metric) => (
-              <div key={metric.key} className="grid gap-2 py-5 sm:grid-cols-12 sm:gap-6">
+            {METRIC_DEFINITIONS.map((metric, index) => (
+              <div
+                key={metric.key}
+                className="grid gap-2 py-5 sm:grid-cols-12 sm:gap-6"
+                data-reveal
+                data-reveal-delay={String(Math.min(index + 1, 6))}
+              >
                 <dt className="flex items-baseline justify-between gap-4 sm:col-span-5 sm:block">
                   <span className="font-display text-xl leading-snug text-ink">
                     {metric.label}

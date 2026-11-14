@@ -8,20 +8,20 @@ const BASE =
 const VARIANTS = {
   /**
    * Acção principal: pílula com o gradiente de acção Aurora Blue e texto branco puro (≥ 4,58:1 em
-   * toda a extensão); hover e active escurecem o mesmo gradiente (5,43:1 e 6,49:1).
+   * toda a extensão); hover e active escurecem o mesmo gradiente (5,43:1 e 6,49:1), que entra por
+   * opacidade (`btn-aurora`, styles/motion.css), com elevação e pressão (`btn-lift`).
    * Indisponível: sem gradiente (`bg-none`, porque o fundo é background-image), contorno Steel Blue
    * e texto ink-subtle (≥ 5,7:1). O contorno transparente evita mudança de tamanho.
    */
   primary:
-    'rounded-full border border-transparent bg-action text-action-ink hover:bg-action-hover ' +
-    'active:bg-action-active aria-disabled:border-line-strong aria-disabled:bg-none ' +
-    'aria-disabled:text-ink-subtle aria-disabled:hover:bg-none aria-disabled:active:bg-none',
+    'btn-lift btn-aurora rounded-full border border-transparent bg-action text-action-ink ' +
+    'aria-disabled:border-line-strong aria-disabled:bg-none aria-disabled:text-ink-subtle',
   /**
    * Acção secundária com contorno Steel Blue (≥ 4,1:1), para acções locais (ex.: tentar novamente);
    * ao passar, contorno Aurora text (≥ 6,3:1). Não compete com o gradiente do CTA.
    */
   outline:
-    'rounded-full border border-line-strong text-ink hover:border-interactive aria-disabled:opacity-60',
+    'btn-lift rounded-full border border-line-strong text-ink hover:border-interactive aria-disabled:opacity-60',
   /** Acção secundária: texto sublinhado, sem caixa; cyan ao passar, como a navegação. */
   text:
     'text-ink underline decoration-line-strong decoration-2 underline-offset-[6px] ' +

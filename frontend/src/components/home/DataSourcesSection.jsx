@@ -41,12 +41,17 @@ export default function DataSourcesSection() {
 
         <div className="mt-14 grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
-            <h3 className="type-label font-display text-label">
+            <h3 className="type-label font-display text-label" data-reveal>
               Fontes de dados
             </h3>
             <ul className="mt-5 divide-y divide-line border-y border-line">
-              {SOURCES.map((source) => (
-                <li key={source.title} className="py-7">
+              {SOURCES.map((source, index) => (
+                <li
+                  key={source.title}
+                  className="py-7"
+                  data-reveal
+                  data-reveal-delay={String(Math.min(index + 1, 6))}
+                >
                   <Tag tone={source.status}>{source.statusLabel}</Tag>
                   <h4 className="mt-4 font-display text-2xl leading-snug text-ink">
                     {source.title}
@@ -61,12 +66,18 @@ export default function DataSourcesSection() {
             <h3
               id="natureza-titulo"
               className="type-label font-display text-label"
+              data-reveal
             >
               Natureza da plataforma
             </h3>
             <ul className="mt-5 space-y-5">
-              {PLATFORM_NATURE.map((item) => (
-                <li key={item} className="flex gap-4 leading-relaxed text-ink-muted">
+              {PLATFORM_NATURE.map((item, index) => (
+                <li
+                  key={item}
+                  className="flex gap-4 leading-relaxed text-ink-muted"
+                  data-reveal
+                  data-reveal-delay={String(Math.min(index + 1, 6))}
+                >
                   <span className="mt-3 h-px w-5 shrink-0 bg-aurora" aria-hidden="true" />
                   <span>{item}</span>
                 </li>

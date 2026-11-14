@@ -3,6 +3,7 @@ import SiteFooter from './components/layout/SiteFooter.jsx';
 import SiteHeader from './components/layout/SiteHeader.jsx';
 import SkipLink from './components/layout/SkipLink.jsx';
 import { useCurrentLocation } from './hooks/useCurrentLocation.js';
+import { useRevealMotion } from './hooks/useRevealMotion.js';
 import { useRouteFocus } from './hooks/useRouteFocus.js';
 import ConsultationPage from './pages/ConsultationPage.jsx';
 import HomePage from './pages/HomePage.jsx';
@@ -21,6 +22,7 @@ export default function App() {
   const location = useCurrentLocation();
   const mainRef = useRef(null);
   useRouteFocus(location, mainRef);
+  useRevealMotion();
 
   const Page = PAGES[resolveRouteId(location.pathname)];
 

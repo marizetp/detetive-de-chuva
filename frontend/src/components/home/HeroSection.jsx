@@ -10,35 +10,49 @@ export default function HeroSection() {
         <div className="lg:col-span-7">
           <h1
             id="hero-title"
+            data-reveal
             className="text-5xl leading-[0.98] font-semibold tracking-tight text-ink sm:text-6xl lg:text-7xl"
           >
             Detetive da Chuva
           </h1>
 
-          <p className="mt-8 max-w-xl border-l-aurora pl-5 font-display text-2xl leading-snug font-medium text-ink sm:text-3xl">
-            O calendário agrícola de sempre ainda é fiável?
+          <p
+            className="motion-question mt-8 max-w-xl border-l-aurora pl-5 font-display text-2xl leading-snug font-medium text-ink sm:text-3xl"
+            data-reveal
+            data-reveal-delay="2"
+          >
+            <span className="motion-question-text">O calendário agrícola de sempre ainda é fiável?</span>
           </p>
 
-          <p className="mt-7 max-w-lg text-lg leading-relaxed text-ink-muted">
+          <p className="mt-7 max-w-lg text-lg leading-relaxed text-ink-muted" data-reveal data-reveal-delay="4">
             Uma plataforma de apoio à decisão agrícola que apresenta os indicadores agroclimáticos
             disponibilizados pelo sistema, como a chuva e a humidade do solo, para ajudar a decidir
             quando semear.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3">
-            <ButtonLink to={ROUTES.consultation}>Iniciar consulta agrícola</ButtonLink>
+            <ButtonLink to={ROUTES.consultation} data-reveal data-reveal-delay="5">
+              Iniciar consulta agrícola
+            </ButtonLink>
             <ButtonLink
               to={`${ROUTES.home}#${SECTION_IDS.howItWorks}`}
               variant="text"
               withArrow={false}
+              data-reveal
+              data-reveal-delay="6"
             >
               Como funciona
             </ButtonLink>
           </div>
         </div>
 
-        <figure className="mx-auto w-full max-w-sm sm:max-w-md lg:col-span-5 lg:max-w-none">
-          <PlanaltoIllustration className="h-auto w-full" />
+        <figure
+          className="mx-auto w-full max-w-sm sm:max-w-md lg:col-span-5 lg:max-w-none"
+          data-reveal="scale"
+          data-reveal-delay="2"
+          data-inview-scope
+        >
+          <PlanaltoIllustration className="motion-float h-auto w-full" />
         </figure>
       </Container>
     </section>

@@ -34,11 +34,20 @@ export default function ResultsArea({
   if (!submittedParams) {
     return (
       <section aria-labelledby="resultados-titulo">
-        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
-        <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
+        <Eyebrow className="font-display" data-reveal>
+          Resultado da Avaliação
+        </Eyebrow>
+        <h2
+          id="resultados-titulo"
+          ref={headingRef}
+          tabIndex={-1}
+          className={HEADING}
+          data-reveal
+          data-reveal-delay="1"
+        >
           Ainda sem consulta
         </h2>
-        <p className="mt-4 max-w-prose text-lg leading-relaxed text-ink-muted">
+        <p className="mt-4 max-w-prose text-lg leading-relaxed text-ink-muted" data-reveal data-reveal-delay="2">
           Preencha a província, a cultura e a data pretendida, e clique em «Consultar Viabilidade».
           O parecer agronómico e os indicadores de apoio à decisão serão apresentados aqui.
         </p>
@@ -50,11 +59,20 @@ export default function ResultsArea({
   if (advisory.status === 'loading') {
     return (
       <section aria-labelledby="resultados-titulo">
-        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
-        <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
+        <Eyebrow className="font-display" data-reveal>
+          Resultado da Avaliação
+        </Eyebrow>
+        <h2
+          id="resultados-titulo"
+          ref={headingRef}
+          tabIndex={-1}
+          className={HEADING}
+          data-reveal
+          data-reveal-delay="1"
+        >
           A avaliar viabilidade…
         </h2>
-        <div className="mt-8 rounded-2xl border border-line bg-surface p-10 text-center">
+        <div className="mt-8 rounded-2xl border border-line bg-surface p-10 text-center" data-reveal="fade" data-reveal-delay="2">
           <LoadingIndicator label="A consultar dados climatológicos de 25 anos da NASA e a gerar parecer agronómico…" />
         </div>
       </section>
@@ -65,8 +83,17 @@ export default function ResultsArea({
   if (advisory.status === 'error') {
     return (
       <section aria-labelledby="resultados-titulo">
-        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
-        <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
+        <Eyebrow className="font-display" data-reveal>
+          Resultado da Avaliação
+        </Eyebrow>
+        <h2
+          id="resultados-titulo"
+          ref={headingRef}
+          tabIndex={-1}
+          className={HEADING}
+          data-reveal
+          data-reveal-delay="1"
+        >
           Erro na consulta
         </h2>
         {/* Falha técnica: aviso de erro (filete e triângulo vermelhos, texto ink), distinto do
@@ -142,11 +169,20 @@ export default function ResultsArea({
   return (
     <section aria-labelledby="resultados-titulo" className="space-y-8">
       <div>
-        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
-        <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
+        <Eyebrow className="font-display" data-reveal>
+          Resultado da Avaliação
+        </Eyebrow>
+        <h2
+          id="resultados-titulo"
+          ref={headingRef}
+          tabIndex={-1}
+          className={HEADING}
+          data-reveal
+          data-reveal-delay="1"
+        >
           Relatório da consulta
         </h2>
-        <div className="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+        <div className="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-2" data-reveal data-reveal-delay="2">
           <p className="text-base font-medium text-ink-muted">
             {describeConsultation(submittedParams)}
           </p>
@@ -166,7 +202,11 @@ export default function ResultsArea({
       </div>
 
       {/* 1. VEREDITO EM DESTAQUE (HERO CARD) */}
-      <div className={`rounded-2xl border-2 bg-surface ${statusColors.rule} p-6 sm:p-8`}>
+      <div
+        className={`rounded-2xl border-2 bg-surface ${statusColors.rule} p-6 sm:p-8`}
+        data-reveal
+        data-reveal-delay="3"
+      >
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-3">
             <span className={`inline-flex items-center gap-2 font-display text-sm sm:text-base font-bold uppercase tracking-wide ${statusColors.text}`}>
@@ -188,7 +228,7 @@ export default function ResultsArea({
             </p>
             <div className="mt-2 h-2 w-full rounded-full bg-surface overflow-hidden">
               <div
-                className={`h-full ${statusColors.bar} transition-all duration-500`}
+                className={`motion-fill h-full ${statusColors.bar} transition-all duration-500`}
                 style={{ width: `${confidenceScore ?? 0}%` }}
               />
             </div>
@@ -198,12 +238,12 @@ export default function ResultsArea({
 
       {/* 2. OS 3 CARTÕES DE INDICADORES SIMPLES */}
       <div>
-        <h3 className="font-display text-lg font-semibold text-ink sm:text-xl">
+        <h3 className="font-display text-lg font-semibold text-ink sm:text-xl" data-reveal>
           Indicadores Agroclimáticos Chave
         </h3>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* Card 1: Chuva Recente */}
-          <div className="rounded-xl border border-line bg-surface p-5">
+          <div className="rounded-xl border border-line bg-surface p-5" data-reveal data-reveal-delay="1">
             <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
               <RainIcon className="size-5 shrink-0 text-label" />
               <span>Chuva Recente</span>
@@ -217,7 +257,7 @@ export default function ResultsArea({
           </div>
 
           {/* Card 2: Humidade da Raiz */}
-          <div className="rounded-xl border border-line bg-surface p-5">
+          <div className="rounded-xl border border-line bg-surface p-5" data-reveal data-reveal-delay="2">
             <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
               <DropletIcon className="size-5 shrink-0 text-label" />
               <span>Humidade da Raiz</span>
@@ -231,7 +271,7 @@ export default function ResultsArea({
           </div>
 
           {/* Card 3: Chuva Prevista */}
-          <div className="rounded-xl border border-line bg-surface p-5">
+          <div className="rounded-xl border border-line bg-surface p-5" data-reveal data-reveal-delay="3">
             <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
               <ForecastIcon className="size-5 shrink-0 text-label" />
               <span>Chuva Prevista</span>
@@ -248,7 +288,7 @@ export default function ResultsArea({
 
       {/* 3. CARTA DO AGRÓNOMO (RECOMENDAÇÃO PRÁTICA) */}
       {result?.recommendationText ? (
-        <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
+        <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8" data-reveal>
           <div className="flex items-center gap-3 border-b border-line pb-4">
             <SproutIcon className="size-6 shrink-0 text-label" />
             <div>
@@ -269,7 +309,7 @@ export default function ResultsArea({
 
       {/* 4. DETALHES TÉCNICOS OPCIONAIS (EXPANSÍVEL E DISCRETO) */}
       {(evaluate?.result?.triggers?.length > 0 || evaluate?.result?.justifications?.length > 0) ? (
-        <details className="rounded-xl border border-line bg-surface/30 p-4 text-xs text-ink-muted">
+        <details className="rounded-xl border border-line bg-surface/30 p-4 text-xs text-ink-muted" data-reveal="fade">
           <summary className="cursor-pointer font-medium text-ink-subtle hover:text-ink">
             Ver detalhes e verificações agronómicas adicionais do modelo
           </summary>

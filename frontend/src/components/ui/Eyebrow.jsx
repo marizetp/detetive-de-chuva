@@ -13,10 +13,11 @@ const TONES = {
  * os subtítulos que usam Montserrat (ver CLAUDE.md §7). `index` (ex.: "01") dá o ritmo de
  * "capítulo" às secções.
  */
-export default function Eyebrow({ index, tone = 'onCanvas', children, className = '' }) {
+export default function Eyebrow({ index, tone = 'onCanvas', children, className = '', ...rest }) {
   return (
     <p
       className={`flex items-center gap-3 type-label ${TONES[tone] ?? TONES.onCanvas} ${className}`}
+      {...rest}
     >
       {index ? (
         <>

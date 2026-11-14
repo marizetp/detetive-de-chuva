@@ -145,16 +145,17 @@
  * Para os desactivar (botão indisponível) usar `bg-none`: estes utilitários definem
  * background-image, não background-color.
  */
+/* Os valores vivem em variáveis (--gradient-*, em @layer base), partilhadas com motion.css. */
 @utility bg-action {
-  background-image: linear-gradient(110deg, #5b3bff, #2b6afd, #097f9f);
+  background-image: var(--gradient-action);
 }
 
 @utility bg-action-hover {
-  background-image: linear-gradient(110deg, #5228f1, #1f5def, #017390);
+  background-image: var(--gradient-action-hover);
 }
 
 @utility bg-action-active {
-  background-image: linear-gradient(110deg, #4a0be2, #134fe1, #016681);
+  background-image: var(--gradient-action-active);
 }
 
 /*
@@ -165,55 +166,28 @@
  *   indicator-aurora barra de 2 px sob um texto (ex.: página actual, a par de outra pista)
  */
 @utility bg-aurora {
-  background-image: linear-gradient(
-    110deg,
-    var(--color-aurora-violet),
-    var(--color-aurora-blue),
-    var(--color-aurora-cyan)
-  );
+  background-image: var(--gradient-aurora);
 }
 
 @utility bg-aurora-y {
-  background-image: linear-gradient(
-    180deg,
-    var(--color-aurora-violet),
-    var(--color-aurora-blue),
-    var(--color-aurora-cyan)
-  );
+  background-image: var(--gradient-aurora-y);
 }
 
 /* Filetes em gradiente (border-image: não respeita cantos arredondados — só em filetes rectos). */
 @utility border-l-aurora {
   border-left-width: 2px;
   border-left-style: solid;
-  border-image: linear-gradient(
-      180deg,
-      var(--color-aurora-violet),
-      var(--color-aurora-blue),
-      var(--color-aurora-cyan)
-    )
-    1;
+  border-image: var(--gradient-aurora-y) 1;
 }
 
 @utility border-t-aurora {
   border-top-width: 2px;
   border-top-style: solid;
-  border-image: linear-gradient(
-      110deg,
-      var(--color-aurora-violet),
-      var(--color-aurora-blue),
-      var(--color-aurora-cyan)
-    )
-    1;
+  border-image: var(--gradient-aurora) 1;
 }
 
 @utility indicator-aurora {
-  background-image: linear-gradient(
-    110deg,
-    var(--color-aurora-violet),
-    var(--color-aurora-blue),
-    var(--color-aurora-cyan)
-  );
+  background-image: var(--gradient-aurora);
   background-size: 100% 2px;
   background-position: 0 100%;
   background-repeat: no-repeat;
@@ -221,6 +195,25 @@
 }
 
 @layer base {
+  /* Gradientes Aurora Blue — fonte única (utilitários acima e motion.css). */
+  :root {
+    --gradient-action: linear-gradient(110deg, #5b3bff, #2b6afd, #097f9f);
+    --gradient-action-hover: linear-gradient(110deg, #5228f1, #1f5def, #017390);
+    --gradient-action-active: linear-gradient(110deg, #4a0be2, #134fe1, #016681);
+    --gradient-aurora: linear-gradient(
+      110deg,
+      var(--color-aurora-violet),
+      var(--color-aurora-blue),
+      var(--color-aurora-cyan)
+    );
+    --gradient-aurora-y: linear-gradient(
+      180deg,
+      var(--color-aurora-violet),
+      var(--color-aurora-blue),
+      var(--color-aurora-cyan)
+    );
+  }
+
   html {
     background-color: var(--color-canvas);
     color: var(--color-ink);
