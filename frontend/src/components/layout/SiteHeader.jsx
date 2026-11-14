@@ -6,10 +6,11 @@ import ButtonLink from '../ui/ButtonLink.jsx';
 import Container from '../ui/Container.jsx';
 import { CloseIcon, MenuIcon } from '../ui/icons.jsx';
 
+// Página actual: texto ink (mais claro que os restantes, ink-muted) + barra Aurora decorativa.
+// A barra nunca é a única pista: a mudança de cor do texto e aria-current também a indicam.
 const NAV_LINK =
-  'rounded-sm text-sm font-medium text-ink-muted transition-colors hover:text-accent ' +
-  'aria-[current=page]:text-accent aria-[current=page]:underline aria-[current=page]:decoration-2 ' +
-  'aria-[current=page]:underline-offset-8';
+  'rounded-sm text-sm font-medium text-ink-muted transition-colors hover:text-interactive ' +
+  'aria-[current=page]:text-ink aria-[current=page]:indicator-aurora';
 
 /** Só ligações para páginas (não âncoras) recebem aria-current="page". */
 function isCurrentPage(to, currentPath) {
@@ -94,7 +95,7 @@ export default function SiteHeader({ currentPath }) {
                 <AppLink
                   to={item.to}
                   onClick={closeMenu}
-                  className="flex min-h-12 items-center text-base font-medium text-ink aria-[current=page]:text-accent"
+                  className="flex min-h-12 items-center text-base font-medium text-ink aria-[current=page]:text-interactive"
                   aria-current={isCurrentPage(item.to, currentPath) ? 'page' : undefined}
                 >
                   {item.label}

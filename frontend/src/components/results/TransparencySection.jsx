@@ -6,7 +6,7 @@ import DivergenceNotice from './DivergenceNotice.jsx';
 import ReportSection from './ReportSection.jsx';
 import { REPORT_SECTIONS, SOURCE_META } from './reportStructure.js';
 
-const SUBHEADING = 'font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase';
+const SUBHEADING = 'type-label text-label';
 const BODY = 'max-w-prose leading-relaxed text-ink-muted';
 
 const LIMITATIONS = [
@@ -136,7 +136,7 @@ function Completeness({ advisory, evaluate }) {
     <ul className="max-w-prose space-y-2.5">
       {items.map((item) => (
         <li key={item.key} className="flex gap-4 leading-relaxed text-ink-muted">
-          <span className="mt-3 h-px w-5 shrink-0 bg-caution" aria-hidden="true" />
+          <span className="mt-3 h-px w-5 shrink-0 bg-line-strong" aria-hidden="true" />
           <span>{item.text}</span>
         </li>
       ))}
@@ -176,7 +176,7 @@ export default function TransparencySection({ params, advisory, evaluate, today,
           <ul className="max-w-prose space-y-2.5">
             {LIMITATIONS.map((limitation) => (
               <li key={limitation} className="flex gap-4 leading-relaxed text-ink-muted">
-                <span className="mt-3 h-px w-5 shrink-0 bg-accent" aria-hidden="true" />
+                <span className="mt-3 h-px w-5 shrink-0 bg-aurora" aria-hidden="true" />
                 <span>{limitation}</span>
               </li>
             ))}

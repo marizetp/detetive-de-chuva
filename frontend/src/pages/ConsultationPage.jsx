@@ -47,7 +47,7 @@ export default function ConsultationPage() {
   return (
     <Container className="py-14 lg:py-20">
       <header className="max-w-3xl">
-        <Eyebrow>Consulta agrícola</Eyebrow>
+        <Eyebrow className="font-display">Consulta agrícola</Eyebrow>
         <h1 className="mt-5 text-4xl leading-[1.08] font-semibold tracking-tight text-ink sm:text-5xl">
           Avaliar as condições para semear
         </h1>

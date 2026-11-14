@@ -12,7 +12,7 @@ export default function ReportSection({ section, source, children }) {
       className="scroll-mt-6 border-t border-line pt-8"
     >
       <header className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-        <span className="font-mono text-sm text-accent tabular-nums" aria-hidden="true">
+        <span className="type-label text-label tabular-nums" aria-hidden="true">
           {section.index}
         </span>
         <h3 id={headingId} className="text-2xl leading-snug font-semibold text-ink sm:text-[1.75rem]">

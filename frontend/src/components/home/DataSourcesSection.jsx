@@ -16,7 +16,6 @@ const SOURCES = [
     status: 'pending',
     statusLabel: 'Em preparação',
     title: 'Tendências agroclimáticas históricas',
-    detail: 'NASA POWER · reanálise MERRA-2',
     text: 'Análise de tendências de longo prazo a partir de dados de reanálise — um produto de modelo, não uma medição directa. Ainda não está disponível na plataforma.',
   },
 ];
@@ -42,7 +41,7 @@ export default function DataSourcesSection() {
 
         <div className="mt-14 grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
-            <h3 className="font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase">
+            <h3 className="type-label font-display text-label">
               Fontes de dados
             </h3>
             <ul className="mt-5 divide-y divide-line border-y border-line">
@@ -52,9 +51,6 @@ export default function DataSourcesSection() {
                   <h4 className="mt-4 font-display text-2xl leading-snug text-ink">
                     {source.title}
                   </h4>
-                  {source.detail ? (
-                    <p className="mt-1 font-mono text-sm text-accent">{source.detail}</p>
-                  ) : null}
                   <p className="mt-3 max-w-prose leading-relaxed text-ink-muted">{source.text}</p>
                 </li>
               ))}
@@ -64,14 +60,14 @@ export default function DataSourcesSection() {
           <aside className="lg:col-span-5" aria-labelledby="natureza-titulo">
             <h3
               id="natureza-titulo"
-              className="font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase"
+              className="type-label font-display text-label"
             >
               Natureza da plataforma
             </h3>
             <ul className="mt-5 space-y-5">
               {PLATFORM_NATURE.map((item) => (
                 <li key={item} className="flex gap-4 leading-relaxed text-ink-muted">
-                  <span className="mt-3 h-px w-5 shrink-0 bg-accent" aria-hidden="true" />
+                  <span className="mt-3 h-px w-5 shrink-0 bg-aurora" aria-hidden="true" />
                   <span>{item}</span>
                 </li>
               ))}

@@ -15,7 +15,7 @@ export default function HeroSection() {
             Detetive da Chuva
           </h1>
 
-          <p className="mt-8 max-w-xl border-l-2 border-accent pl-5 font-display text-2xl leading-snug font-medium text-ink sm:text-3xl">
+          <p className="mt-8 max-w-xl border-l-aurora pl-5 font-display text-2xl leading-snug font-medium text-ink sm:text-3xl">
             O calendário agrícola de sempre ainda é fiável?
           </p>
 

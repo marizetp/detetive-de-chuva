@@ -161,7 +161,7 @@ export default function ConsultationForm({
                   </option>
                 ))}
               </select>
-              <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-accent" />
+              <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-label" />
             </div>
           </FieldShell>
         ) : null}

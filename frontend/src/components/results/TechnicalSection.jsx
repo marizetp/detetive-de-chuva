@@ -5,7 +5,7 @@ import { REPORT_SECTIONS } from './reportStructure.js';
 import SourceError from './SourceError.jsx';
 import SourceLabel from './SourceLabel.jsx';
 
-const SUBHEADING = 'font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase';
+const SUBHEADING = 'type-label text-label';
 const EMPTY_TEXT = 'text-ink-muted';
 
 function Triggers({ triggers }) {
@@ -45,7 +45,7 @@ function Justifications({ justifications }) {
     <ul className="max-w-prose space-y-3">
       {justifications.map((justification, index) => (
         <li key={`${index}-${justification}`} className="flex gap-4 leading-relaxed">
-          <span className="mt-3 h-px w-5 shrink-0 bg-accent" aria-hidden="true" />
+          <span className="mt-3 h-px w-5 shrink-0 bg-aurora" aria-hidden="true" />
           <span>{justification}</span>
         </li>
       ))}

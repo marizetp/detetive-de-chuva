@@ -56,7 +56,7 @@ export default function RecommendationSection({ advisory, evaluate, params, toda
             ))}
           </InlineNotice>
         ) : null}
-        <div className="max-w-prose border-l-2 border-line-strong pl-5 sm:pl-7">
+        <div className="max-w-prose border-l-aurora pl-5 sm:pl-7">
           <MarkdownContent text={advisory.result.recommendationText} />
         </div>
         <p className="mt-8 max-w-prose text-sm leading-relaxed text-ink-muted">

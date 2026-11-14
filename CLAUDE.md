@@ -83,40 +83,84 @@ Rules:
 
 ## 7. Design direction
 
-Approved visual identity (2026-11-12): **NASA Earth Science — Dark Technology**.
+Approved visual identity: **NASA Earth Science — Dark Technology** (2026-11-12), with **Aurora Blue** as the highlight colour (2026-11-14, supersedes the earlier colour roles of the same day). Gradients are part of the identity, but only the Aurora gradients below.
 
-Palette:
-- Space Black: `#080F1E`
-- Mission Navy: `#0B1D35`
-- NASA Blue: `#0B3D91`
-- Telemetry Cyan: `#00A6D6`
-- NASA Red: `#FC3D21`
-- Orbital White: `#EAF2F8`
-- Steel Blue: `#647F9B`
+Aurora Blue:
+- Decorative gradient, 110° (180° for narrow vertical elements): `#5B3BFF → #2D6CFF → #20CFFF`. **Ornament only** — it drops to 2.83:1 on Mission Navy, so it is never the only cue for information or interaction (e.g. the current-page bar is paired with a text colour change).
+- Action gradient (primary buttons), 110°: `#5B3BFF → #2B6AFD → #097F9F` — same hues (OKLCH), lower lightness, so **pure white text** (`#FFFFFF`) stays ≥ 4.5:1 along the whole button. Hover `#5228F1 → #1F5DEF → #017390`; active `#4A0BE2 → #134FE1 → #016681`.
+- Aurora text `#6F9BFD` (solid, derived from the Aurora blue): eyebrows and Space Mono labels, units, icons, chevrons, list markers, link/navigation/field hover and the focus ring. Never use the gradient on small text.
+- Selection background `#2B6AFD` with white text.
+
+Base palette and roles:
+- Space Black `#080F1E` — page background.
+- Mission Navy `#0B1D35` — surfaces, cards, panels, footer.
+- Orbital White `#EAF2F8` — main text and headings (not on the action gradient: 4.05:1).
+- Steel Blue `#647F9B` — functional outlines (fields, secondary and unavailable buttons, pending tag), informational notices, neutral status.
+- NASA Red `#FC3D21` — technical errors and the «Desfavorável» status (rule, icon, text). Never on buttons.
+- Telemetry Cyan `#00A6D6` — **reserved for the logo drop and the hero illustration** (`brand`); not a generic highlight.
+- NASA Blue `#0B3D91` — only in the hero illustration (hills).
+
+Status presentation (results report): dark surface card with a 2 px outline; icon, label, outline and confidence bar in the status colour — never filled. Status colours are exclusive to results and their notices; never used on buttons.
+- Favorável: green `#22A06B`.
+- Aguardar: orange `#E58A32`.
+- Desfavorável: NASA Red `#FC3D21`.
+- Unrecognised value: dashed Steel Blue outline, neutral icon, `ink-muted` text, «Estado não reconhecido» plus the received value.
+- Missing value: same neutral presentation with «Estado indisponível». Never assume a status.
+- Technical errors (service failure) use `InlineNotice` tone `error` (red rule and triangle, `ink` text), clearly distinct from an unfavourable result.
 
 Typography:
 - Inter: interface and body content.
-- Space Grotesk: headings.
-- JetBrains Mono: metadata and technical information (codes, endpoints, units, figure captions).
-- Delivery (decided 2026-11-12): self-hosted with Fontsource variable packages (`@fontsource-variable/inter`, `@fontsource-variable/space-grotesk`, `@fontsource-variable/jetbrains-mono`, all SIL Open Font License 1.1), imported in `frontend/src/styles/index.css`. No third-party font requests.
+- Montserrat: headings, card titles, indicator names, highlighted numeric values, brand name (token `--font-display`).
+- Space Mono: technical labels, metadata and code, through the single token `--font-mono` (also applied to every `<code>`/`<pre>` by Tailwind's preflight). Two centralised utilities in `index.css`:
+  - `type-label` — short uppercase label style: Space Mono, 12 px, weight 400, uppercase, tracking 0.08em, line-height 1.4. Used for eyebrows and technical labels (e.g. «Erro 404», report section numbers).
+  - `type-meta` — mixed-case metadata (e.g. the «Disponível» / «Em preparação» status tags): Space Mono, 13 px, weight 400, line-height 1.5.
+  Never for paragraphs or long text.
+- Montserrat exception for eight section subtitles (2026-11-14): they keep `type-label` (same size, weight, line-height, tracking, uppercase and Aurora text colour) plus `font-display`, which changes only the font family (it comes after `type-label` in the compiled CSS):
+  - Homepage: «Indicadores considerados» (`AboutSection.jsx`), «Fontes de dados» and «Natureza da plataforma» (`DataSourcesSection.jsx`).
+  - Footer: «Navegar» and «Dados» (`FOOTER_HEADING` in `SiteFooter.jsx`).
+  - Consultation page: «Consulta agrícola» (`ConsultationPage.jsx`, via the `className` prop of `Eyebrow`).
+  - Results: «Resultado da avaliação» (the four `Eyebrow` variants) and «Nível de confiança» (`ResultsArea.jsx`).
+  Every other `type-label`/`type-meta` element, technical label, metadata item, `<code>` and `<pre>` stays in Space Mono. Do not change `--font-mono` or `type-label` globally to extend this exception; add `font-display` per element.
+- Units (`mm`, `%`) sit in their own `<span>` coloured with Aurora text and keep the font of their context: Inter on the homepage, Montserrat inside the highlighted result values. Highlighted values stay in Montserrat.
+- Delivery (revised 2026-11-14 — Space Mono replaces Bebas Neue, which had replaced Space Grotesk and JetBrains Mono the same day): self-hosted with Fontsource (`@fontsource-variable/inter`, `@fontsource-variable/montserrat`, `@fontsource/space-mono` 400 and 700 — static, no variable version exists; all SIL Open Font License 1.1), imported in `frontend/src/styles/index.css`. No third-party font requests. Do not add OpenType features without checking they exist in the Fontsource files (the Fontsource Inter subset has no `cv`/`ss` features).
 
-Measured WCAG 2.1 contrast (verify again for any new pairing):
-- On Space Black: Orbital White 16.9:1, Telemetry Cyan 6.8:1, NASA Red 5.3:1, Steel Blue 4.6:1 — suitable for text. NASA Blue 1.9:1 and Mission Navy 1.1:1 — **not** suitable for text or meaningful graphics.
-- On Mission Navy: Orbital White 14.9:1, Telemetry Cyan 6.0:1, NASA Red 4.7:1 — text; Steel Blue 4.1:1 — large text and graphics only.
-- On Orbital White: Space Black 16.9:1, Mission Navy 14.9:1, NASA Blue 8.9:1 — text; Steel Blue 3.7:1 and NASA Red 3.2:1 — large text and graphics only; Telemetry Cyan 2.5:1 — **not** suitable.
+Measured WCAG 2.2 contrast (verify again for any new pairing):
+- Action gradient with white text: minimum 4.58:1 sampled at 201 points along the button (hover 5.43:1, active 6.49:1). The original Aurora under white text falls to 1.84:1 at `#20CFFF` and Orbital White to 4.05:1 at the blue stop — **not** suitable for buttons.
+- Aurora text `#6F9BFD`: 7.1:1 on Space Black, 6.3:1 on Mission Navy — text, focus ring (≥ 3:1) and icons.
+- Decorative gradient vs Space Black ≥ 3.2:1; vs Mission Navy 2.83:1 at the violet start — ornament only.
+- On Space Black: Orbital White 16.9:1, NASA Red 5.3:1, green 5.8:1, orange 7.3:1, Steel Blue 4.6:1. On Mission Navy: Orbital White 14.9:1, `ink-subtle` 5.7:1, green 5.1:1, orange 6.5:1, NASA Red 4.7:1 (narrow margin); Steel Blue 4.1:1 — graphics only.
+- Disabled primary button: no gradient (`bg-none`), Steel Blue outline, `ink-subtle` text (≥ 5.7:1).
+- The focus ring keeps a 3 px offset: next to the gradient it would be only 1.7–2.2:1.
 - Status must never rely on colour alone (see design principles below).
 
 Brand and affiliation:
 - The project is **not an official NASA service**; keep the existing disclaimer visible.
 - Never use the NASA logo (insignia or logotype), seals, mission patches or any element that suggests NASA endorsement. The identity uses colours and typography only.
 
-Implementation (migrated 2026-11-12, Phase 6.1.5): design tokens live only in `frontend/src/styles/index.css`, in two layers — the palette above and semantic tokens (`canvas`, `surface`, `raised`, `ink`, `ink-muted`, `ink-subtle`, `accent`, `danger`, `caution`, `line`, `line-strong`). Components must use the semantic tokens, not palette names or arbitrary colour values. `docs/frontend.md` §5 summarises the mapping.
+Implementation (revised 2026-11-14): design tokens live only in `frontend/src/styles/index.css` (`@theme`), in two layers — the palette above and semantic tokens grouped by function:
+- Identity: `brand` (logo drop only).
+- Surfaces and lines: `canvas`, `surface`, `line`, `line-strong`, `selection`.
+- Text: `ink`, `ink-muted`, `ink-subtle`, `label` (Aurora text).
+- Action and interaction: `action-ink` (white), `interactive`, `focus` (Aurora text).
+- Status: `status-favorable`, `status-wait`, `status-unfavorable`.
+- Feedback: `danger`, `info`.
+
+Gradient utilities (also in `index.css`): `bg-action`, `bg-action-hover`, `bg-action-active` (buttons and the «Disponível» tag); `bg-aurora`, `bg-aurora-y`, `border-l-aurora`, `border-t-aurora`, `indicator-aurora` (decorative). They set `background-image`/`border-image`, so the unavailable button uses `bg-none`, and `border-image` is only for straight rules (it ignores rounded corners).
+
+Rules:
+- Components must use the semantic tokens, not palette names or arbitrary colour values. The only exception is `PlanaltoIllustration.jsx`, which maps palette colours by role.
+- Tailwind's default palette is disabled (`--color-*: initial`), so classes such as `bg-emerald-500` or `text-white` generate no CSS.
+- Status colours are centralised in `frontend/src/components/results/statusTone.js` (per `tone` from `config/status.js`).
+- Opacity modifiers are allowed only where they have a visual role (disabled states, subdued underlines, the discreet details panel); never to approximate a colour on a fixed background.
+- Icons are inline SVG line icons in `frontend/src/components/ui/icons.jsx` (`currentColor`, no icon library). No emoji in the interface.
+
+`docs/frontend.md` §5 summarises the mapping.
 
 Design principles:
 - Editorial, natural, scientific, calm, and contemporary.
 - Clear hierarchy and generous whitespace.
 - Photography may support the landing page, but must not obscure usability or performance.
-- Avoid generic enterprise dashboards, excessive cards, exaggerated gradients, and glassmorphism.
+- Avoid generic enterprise dashboards, excessive cards and glassmorphism. Gradients: only the approved Aurora Blue ones, in their defined roles.
 - Use text and icons in addition to colour to communicate status.
 - Maintain readable contrast, keyboard accessibility, visible focus states, and responsive layouts.
 - The interface should work on mobile and desktop, including constrained screen widths.
@@ -181,6 +225,18 @@ Do not build the entire application in one unreviewed operation.
 - **Known limitation:** if the device clock or time zone is wrong, validation may wrongly reject today's date or accept a date that is already in the future for the server (typically a one-day offset).
 
 **2026-11-12 — Confidence score display:** show `score_confianca` as `N/100` (e.g. `95/100`), never as a percentage, always with the caption that it is a system score (0–100), not a probability or a guarantee. Formatting lives in `formatConfidenceScore` (`frontend/src/utils/format.js`).
+
+**2026-11-14 (later) — Aurora Blue adopted as the highlight colour** (decided by the project owner; supersedes the colour roles below, except the neutral missing/unrecognised status rule and the disabled Tailwind palette)
+- Primary buttons use the Aurora action gradient with pure white text; labels, units, icons, hover and focus use Aurora text `#6F9BFD`; decorative rules use the Aurora gradient (ornament only).
+- Telemetry Cyan `#00A6D6` is reserved for the logo drop and the hero illustration.
+- Report statuses: Favorável green `#22A06B`, Aguardar orange `#E58A32`, Desfavorável NASA Red — exclusive to results; tests in `statusTone.test.js` and `ResultsArea.test.jsx`.
+- The visible line «NASA POWER · reanálise MERRA-2» was removed from «Fontes de dados»; the provenance remains in the footer and in the documentation.
+
+**2026-11-14 — Colour roles revised** (superseded by the Aurora Blue decision above; implemented in four phases)
+- Primary actions in filled NASA Red with Space Black text. Labels in Steel Blue. Cyan restricted to brand, illustration, interaction (hover/focus) and the «Favorável» status.
+- Report statuses use only the official palette (no green/amber), as outlined cards with icon and text (see §7).
+- Missing and unrecognised statuses are presented neutrally («Estado indisponível» / «Estado não reconhecido»). The report never assumes `AGUARDAR` or `FAVORAVEL`; both cases are covered by tests in `ResultsArea.test.jsx`.
+- Tailwind's default colour palette is disabled.
 
 ## 12. Known pending decisions
 

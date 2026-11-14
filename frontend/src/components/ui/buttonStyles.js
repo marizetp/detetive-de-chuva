@@ -3,19 +3,29 @@
 const BASE =
   'inline-flex items-center gap-2.5 font-semibold transition-colors duration-200 ' +
   'motion-safe:[&_svg]:transition-transform motion-safe:hover:[&_svg]:translate-x-0.5 ' +
-  'aria-disabled:cursor-not-allowed aria-disabled:opacity-60';
+  'aria-disabled:cursor-not-allowed';
 
 const VARIANTS = {
-  /** Acção principal: pílula Telemetry Cyan com texto Space Black (6,8:1); Orbital White ao passar. */
+  /**
+   * Acção principal: pílula com o gradiente de acção Aurora Blue e texto branco puro (≥ 4,58:1 em
+   * toda a extensão); hover e active escurecem o mesmo gradiente (5,43:1 e 6,49:1).
+   * Indisponível: sem gradiente (`bg-none`, porque o fundo é background-image), contorno Steel Blue
+   * e texto ink-subtle (≥ 5,7:1). O contorno transparente evita mudança de tamanho.
+   */
   primary:
-    'rounded-full bg-accent text-canvas hover:bg-ink active:bg-ink aria-disabled:hover:bg-accent',
-  /** Acção principal alternativa: pílula Orbital White com texto Space Black (16,9:1). */
-  inverse: 'rounded-full bg-ink text-canvas hover:bg-accent',
-  /** Acção secundária com contorno, para acções locais (ex.: tentar novamente). */
-  outline: 'rounded-full border border-accent text-accent hover:bg-accent/10',
-  /** Acção secundária: texto sublinhado, sem caixa. */
+    'rounded-full border border-transparent bg-action text-action-ink hover:bg-action-hover ' +
+    'active:bg-action-active aria-disabled:border-line-strong aria-disabled:bg-none ' +
+    'aria-disabled:text-ink-subtle aria-disabled:hover:bg-none aria-disabled:active:bg-none',
+  /**
+   * Acção secundária com contorno Steel Blue (≥ 4,1:1), para acções locais (ex.: tentar novamente);
+   * ao passar, contorno Aurora text (≥ 6,3:1). Não compete com o gradiente do CTA.
+   */
+  outline:
+    'rounded-full border border-line-strong text-ink hover:border-interactive aria-disabled:opacity-60',
+  /** Acção secundária: texto sublinhado, sem caixa; cyan ao passar, como a navegação. */
   text:
-    'text-accent underline decoration-accent/40 decoration-2 underline-offset-[6px] hover:decoration-accent',
+    'text-ink underline decoration-line-strong decoration-2 underline-offset-[6px] ' +
+    'hover:text-interactive hover:decoration-interactive aria-disabled:opacity-60',
 };
 
 /** Alvos de toque: 48 px (md) e 40 px (sm, só em barras compactas com alternativa maior). */

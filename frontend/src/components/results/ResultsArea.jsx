@@ -1,12 +1,15 @@
 import { RESULT_SOURCES } from '../../config/api.js';
+import { MISSING_STATUS, UNKNOWN_STATUS } from '../../config/status.js';
 import { CONSULTATION_ANCHORS, ROUTES } from '../../routing/routes.js';
 import { describeConsultation } from '../../utils/report.js';
 import AppLink from '../ui/AppLink.jsx';
 import Button from '../ui/Button.jsx';
 import Eyebrow from '../ui/Eyebrow.jsx';
+import { DropletIcon, ForecastIcon, RainIcon, RetryIcon, SproutIcon, StatusIcon } from '../ui/icons.jsx';
 import InlineNotice from '../ui/InlineNotice.jsx';
 import LoadingIndicator from '../ui/LoadingIndicator.jsx';
 import MarkdownContent from './MarkdownContent.jsx';
+import { statusToneStyles } from './statusTone.js';
 
 const HEADING = 'mt-3 text-3xl leading-tight font-semibold text-ink sm:text-4xl';
 
@@ -31,7 +34,7 @@ export default function ResultsArea({
   if (!submittedParams) {
     return (
       <section aria-labelledby="resultados-titulo">
-        <Eyebrow>Resultado da Avaliação</Eyebrow>
+        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
         <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
           Ainda sem consulta
         </h2>
@@ -47,7 +50,7 @@ export default function ResultsArea({
   if (advisory.status === 'loading') {
     return (
       <section aria-labelledby="resultados-titulo">
-        <Eyebrow>Resultado da Avaliação</Eyebrow>
+        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
         <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
           A avaliar viabilidade…
         </h2>
@@ -62,27 +65,33 @@ export default function ResultsArea({
   if (advisory.status === 'error') {
     return (
       <section aria-labelledby="resultados-titulo">
-        <Eyebrow>Resultado da Avaliação</Eyebrow>
+        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
         <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
           Erro na consulta
         </h2>
-        <div className="mt-8 rounded-2xl border border-danger/40 bg-surface p-8 text-center">
-          <p className="text-lg font-semibold text-danger">Não foi possível obter a recomendação.</p>
-          <p className="mt-2 text-sm text-ink-muted">
-            O servidor demorou a responder ou ocorreu uma falha de ligação.
-          </p>
-          <div className="mt-6 flex justify-center">
-            <Button onClick={() => onRetry(RESULT_SOURCES.advisory)}>
-              Tentar novamente
+        {/* Falha técnica: aviso de erro (filete e triângulo vermelhos, texto ink), distinto do
+            cartão de veredito usado para um resultado desfavorável. */}
+        <InlineNotice
+          tone="error"
+          role="alert"
+          title="Não foi possível obter a recomendação."
+          className="mt-8"
+          action={
+            <Button variant="outline" size="sm" onClick={() => onRetry(RESULT_SOURCES.advisory)}>
+              <RetryIcon className="size-4" />
+              <span>Tentar novamente</span>
             </Button>
-          </div>
-        </div>
+          }
+        >
+          O servidor demorou a responder ou ocorreu uma falha de ligação.
+        </InlineNotice>
       </section>
     );
   }
 
   const result = advisory.result;
-  const statusRaw = result?.status?.code ?? 'AGUARDAR';
+  // `null` quando o serviço não enviou estado (mapStatus → MISSING_STATUS); nunca se assume um.
+  const statusRaw = result?.status?.code ?? null;
   const confidenceScore = result?.confidenceScore ?? 85;
   const metrics = result?.metrics ?? [];
 
@@ -90,40 +99,50 @@ export default function ResultsArea({
   const rootMoisture = getMetricValue(metrics, 'humidade_solo_raiz');
   const forecastRain = getMetricValue(metrics, 'previsao_7dias_mm');
 
-  // Configuração visual do Veredito Hero
-  let statusTheme = {
-    cardBg: 'bg-emerald-950/40 border-emerald-500/80',
-    badgeBg: 'bg-emerald-500 text-slate-950',
-    icon: '✓',
-    title: 'FAVORÁVEL PARA SEMEADURA',
-    description: 'As condições climáticas e as reservas de humidade do solo são adequadas para o desenvolvimento da cultura neste período.',
-    progressColor: 'bg-emerald-400',
-  };
+  // Configuração visual do Veredito Hero. As cores vêm de statusTone.js (por `tone`, como em
+  // config/status.js). Estado ausente e estado não reconhecido nunca herdam o aspecto de outro
+  // estado: recebem a apresentação neutra (contorno tracejado, ícone neutro, texto ink-muted),
+  // sem classificação inventada (CLAUDE.md §5–6).
+  //  - ausente: o serviço não enviou estado → MISSING_STATUS («Estado indisponível»);
+  //  - não reconhecido: enviou um valor fora dos três documentados → UNKNOWN_STATUS, com o valor.
+  let statusTheme =
+    statusRaw === null
+      ? {
+          tone: 'neutral',
+          title: MISSING_STATUS.label.toUpperCase(),
+          description: 'O serviço não enviou o estado desta avaliação. Nenhuma classificação é assumida.',
+        }
+      : {
+          tone: 'neutral',
+          title: UNKNOWN_STATUS.label.toUpperCase(),
+          description: `O serviço devolveu um estado que a plataforma não reconhece («${statusRaw}»). É apresentado sem interpretação.`,
+        };
 
-  if (statusRaw === 'AGUARDAR') {
+  if (statusRaw === 'FAVORAVEL') {
     statusTheme = {
-      cardBg: 'bg-amber-950/40 border-amber-500/80',
-      badgeBg: 'bg-amber-500 text-slate-950',
-      icon: '⏱',
+      tone: 'positive',
+      title: 'FAVORÁVEL PARA SEMEADURA',
+      description: 'As condições climáticas e as reservas de humidade do solo são adequadas para o desenvolvimento da cultura neste período.',
+    };
+  } else if (statusRaw === 'AGUARDAR') {
+    statusTheme = {
+      tone: 'caution',
       title: 'AGUARDAR MELHORES CONDIÇÕES',
       description: 'Transição ou humidade ainda incipiente na raiz. Recomenda-se cautela antes de semear para proteger sementes e capital.',
-      progressColor: 'bg-amber-400',
     };
   } else if (statusRaw === 'DESFAVORAVEL') {
     statusTheme = {
-      cardBg: 'bg-rose-950/40 border-rose-500/80',
-      badgeBg: 'bg-rose-500 text-white',
-      icon: '✕',
+      tone: 'warning',
       title: 'NÃO RECOMENDADO / DESFAVORÁVEL',
       description: 'Risco elevado de perda do investimento e insumos. Período de estiagem ou condições hídricas insuficientes.',
-      progressColor: 'bg-rose-400',
     };
   }
+  const statusColors = statusToneStyles(statusTheme.tone);
 
   return (
     <section aria-labelledby="resultados-titulo" className="space-y-8">
       <div>
-        <Eyebrow>Resultado da Avaliação</Eyebrow>
+        <Eyebrow className="font-display">Resultado da Avaliação</Eyebrow>
         <h2 id="resultados-titulo" ref={headingRef} tabIndex={-1} className={HEADING}>
           Relatório da consulta
         </h2>
@@ -133,7 +152,7 @@ export default function ResultsArea({
           </p>
           <AppLink
             to={`${ROUTES.consultation}#${CONSULTATION_ANCHORS.form}`}
-            className="inline-flex min-h-11 items-center rounded-sm text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
+            className="inline-flex min-h-11 items-center rounded-sm text-sm font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:text-interactive hover:decoration-interactive"
           >
             Alterar dados da consulta
           </AppLink>
@@ -147,11 +166,11 @@ export default function ResultsArea({
       </div>
 
       {/* 1. VEREDITO EM DESTAQUE (HERO CARD) */}
-      <div className={`rounded-2xl border-2 ${statusTheme.cardBg} p-6 sm:p-8 shadow-xl transition-all`}>
+      <div className={`rounded-2xl border-2 bg-surface ${statusColors.rule} p-6 sm:p-8`}>
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-3">
-            <span className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-display text-sm sm:text-base font-bold uppercase tracking-wide ${statusTheme.badgeBg}`}>
-              <span aria-hidden="true">{statusTheme.icon}</span>
+            <span className={`inline-flex items-center gap-2 font-display text-sm sm:text-base font-bold uppercase tracking-wide ${statusColors.text}`}>
+              <StatusIcon tone={statusTheme.tone} className={`size-5 shrink-0 sm:size-6 ${statusColors.icon}`} />
               <span>{statusTheme.title}</span>
             </span>
             <p className="text-base sm:text-lg leading-relaxed text-ink">
@@ -160,16 +179,16 @@ export default function ResultsArea({
           </div>
 
           {/* Nível de Confiança */}
-          <div className="shrink-0 rounded-xl bg-canvas/60 border border-line p-4 text-center md:min-w-[180px]">
-            <p className="font-mono text-xs font-semibold uppercase tracking-wider text-ink-muted">
+          <div className="shrink-0 rounded-xl bg-canvas border border-line p-4 text-center md:min-w-[180px]">
+            <p className="type-label font-display text-label">
               Nível de Confiança
             </p>
-            <p className="mt-1 font-display text-4xl font-extrabold text-ink tabular-nums">
+            <p className="mt-1 font-display text-4xl font-bold text-ink tabular-nums">
               {confidenceScore !== null ? `${confidenceScore}%` : '—'}
             </p>
             <div className="mt-2 h-2 w-full rounded-full bg-surface overflow-hidden">
               <div
-                className={`h-full ${statusTheme.progressColor} transition-all duration-500`}
+                className={`h-full ${statusColors.bar} transition-all duration-500`}
                 style={{ width: `${confidenceScore ?? 0}%` }}
               />
             </div>
@@ -184,13 +203,13 @@ export default function ResultsArea({
         </h3>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* Card 1: Chuva Recente */}
-          <div className="rounded-xl border border-line bg-surface/90 p-5 shadow-sm hover:border-accent/60 transition-colors">
-            <div className="flex items-center gap-2.5 text-sm font-semibold text-accent">
-              <span className="text-2xl" aria-hidden="true">🌧️</span>
+          <div className="rounded-xl border border-line bg-surface p-5">
+            <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
+              <RainIcon className="size-5 shrink-0 text-label" />
               <span>Chuva Recente</span>
             </div>
             <div className="mt-3 font-display text-3xl font-bold text-ink tabular-nums">
-              {rainRecent !== null ? `${rainRecent} mm` : '—'}
+              {rainRecent !== null ? (<>{rainRecent}<span className="text-label"> mm</span></>) : '—'}
             </div>
             <p className="mt-1 text-xs text-ink-muted">
               Precipitação recente ou média histórica da época
@@ -198,13 +217,13 @@ export default function ResultsArea({
           </div>
 
           {/* Card 2: Humidade da Raiz */}
-          <div className="rounded-xl border border-line bg-surface/90 p-5 shadow-sm hover:border-accent/60 transition-colors">
-            <div className="flex items-center gap-2.5 text-sm font-semibold text-accent">
-              <span className="text-2xl" aria-hidden="true">💧</span>
+          <div className="rounded-xl border border-line bg-surface p-5">
+            <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
+              <DropletIcon className="size-5 shrink-0 text-label" />
               <span>Humidade da Raiz</span>
             </div>
             <div className="mt-3 font-display text-3xl font-bold text-ink tabular-nums">
-              {rootMoisture !== null ? `${(rootMoisture * 100).toFixed(0)}%` : '—'}
+              {rootMoisture !== null ? (<>{(rootMoisture * 100).toFixed(0)}<span className="text-label">%</span></>) : '—'}
             </div>
             <p className="mt-1 text-xs text-ink-muted">
               Água disponível na zona radicular do solo
@@ -212,13 +231,13 @@ export default function ResultsArea({
           </div>
 
           {/* Card 3: Chuva Prevista */}
-          <div className="rounded-xl border border-line bg-surface/90 p-5 shadow-sm hover:border-accent/60 transition-colors">
-            <div className="flex items-center gap-2.5 text-sm font-semibold text-accent">
-              <span className="text-2xl" aria-hidden="true">🌤️</span>
+          <div className="rounded-xl border border-line bg-surface p-5">
+            <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
+              <ForecastIcon className="size-5 shrink-0 text-label" />
               <span>Chuva Prevista</span>
             </div>
             <div className="mt-3 font-display text-3xl font-bold text-ink tabular-nums">
-              {forecastRain !== null ? `${forecastRain} mm` : '—'}
+              {forecastRain !== null ? (<>{forecastRain}<span className="text-label"> mm</span></>) : '—'}
             </div>
             <p className="mt-1 text-xs text-ink-muted">
               Expectativa para os próximos 7 dias
@@ -229,9 +248,9 @@ export default function ResultsArea({
 
       {/* 3. CARTA DO AGRÓNOMO (RECOMENDAÇÃO PRÁTICA) */}
       {result?.recommendationText ? (
-        <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8 shadow-md">
+        <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
           <div className="flex items-center gap-3 border-b border-line pb-4">
-            <span className="text-2xl" aria-hidden="true">🌱</span>
+            <SproutIcon className="size-6 shrink-0 text-label" />
             <div>
               <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">
                 Recomendação Técnica do Agrónomo
@@ -250,7 +269,7 @@ export default function ResultsArea({
 
       {/* 4. DETALHES TÉCNICOS OPCIONAIS (EXPANSÍVEL E DISCRETO) */}
       {(evaluate?.result?.triggers?.length > 0 || evaluate?.result?.justifications?.length > 0) ? (
-        <details className="rounded-xl border border-line/40 bg-surface/30 p-4 text-xs text-ink-muted">
+        <details className="rounded-xl border border-line bg-surface/30 p-4 text-xs text-ink-muted">
           <summary className="cursor-pointer font-medium text-ink-subtle hover:text-ink">
             Ver detalhes e verificações agronómicas adicionais do modelo
           </summary>

@@ -4,9 +4,9 @@ import BrandMark from '../ui/BrandMark.jsx';
 import Container from '../ui/Container.jsx';
 
 const FOOTER_LINK =
-  'inline-block rounded-sm py-1 text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-accent hover:decoration-accent';
+  'inline-block rounded-sm py-1 text-ink-muted underline decoration-ink/30 underline-offset-4 hover:text-interactive hover:decoration-interactive';
 
-const FOOTER_HEADING = 'font-mono text-xs font-medium tracking-[0.14em] text-ink-subtle uppercase';
+const FOOTER_HEADING = 'type-label font-display text-label';
 
 export default function SiteFooter() {
   return (

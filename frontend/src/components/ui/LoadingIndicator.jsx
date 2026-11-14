@@ -25,7 +25,7 @@ export default function LoadingIndicator({
         {DROP_DELAYS_MS.map((delay) => (
           <span
             key={delay}
-            className="block h-3 w-1.5 rounded-full bg-accent motion-safe:animate-pulse"
+            className="block h-3 w-1.5 rounded-full bg-aurora-y motion-safe:animate-pulse"
             style={{ animationDelay: `${delay}ms` }}
           />
         ))}

@@ -23,9 +23,10 @@ e comunicando incerteza (o nível de confiança não é uma probabilidade nem um
 |---|---|
 | UI | React 19 (JavaScript, sem TypeScript) |
 | Build / dev server | Vite 8 |
-| Estilos | Tailwind CSS 4 (tokens em `frontend/src/styles/index.css`) |
+| Estilos | Tailwind CSS 4, com a paleta por omissão desactivada: só existem os tokens do projecto, em `frontend/src/styles/index.css` |
+| Identidade visual | NASA Earth Science — Dark Technology com destaque Aurora Blue: fundos Space Black e Mission Navy, botões com o gradiente Aurora (violeta → azul → cyan) e texto branco, rótulos e interacções em `#6F9BFD`, estados do relatório em verde, laranja e vermelho; o cyan original fica só na gota do logótipo e na ilustração (ver `CLAUDE.md` §7). Não é um serviço oficial da NASA |
 | Markdown seguro | `react-markdown` (HTML ignorado) |
-| Tipografia | Fontsource, alojamento próprio (Inter, Space Grotesk, JetBrains Mono) |
+| Tipografia | Fontsource, alojamento próprio (Inter, Montserrat, Space Mono) |
 | Testes | Vitest + Testing Library + jsdom |
 | Lint | ESLint 10 |
 | HTTP | `fetch` nativo (sem bibliotecas) |

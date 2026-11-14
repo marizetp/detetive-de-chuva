@@ -36,9 +36,9 @@ export default function HowItWorksSection() {
 
         <ol className="mt-14 grid gap-12 md:grid-cols-3 md:gap-10">
           {STEPS.map((step, index) => (
-            <li key={step.title} className="border-t-2 border-line-strong pt-6">
+            <li key={step.title} className="border-t-aurora pt-6">
               <span
-                className="block font-display text-5xl leading-none text-line-strong tabular-nums"
+                className="block font-display text-5xl leading-none text-label tabular-nums"
                 aria-hidden="true"
               >
                 {index + 1}

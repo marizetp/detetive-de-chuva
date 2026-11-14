@@ -53,25 +53,33 @@ const COMPONENTS = {
   p: ({ children }) => <p className="mt-4 leading-relaxed first:mt-0">{children}</p>,
   strong: ({ children }) => <strong className="font-semibold text-ink">{children}</strong>,
   em: ({ children }) => <em>{children}</em>,
-  ul: ({ children }) => <ul className="mt-4 list-disc space-y-2.5 pl-6 marker:text-accent">{children}</ul>,
+  ul: ({ children }) => <ul className="mt-4 list-disc space-y-2.5 pl-6 marker:text-label">{children}</ul>,
   ol: ({ children, start }) => (
-    <ol start={start} className="mt-4 list-decimal space-y-2.5 pl-6 marker:font-semibold marker:text-accent">
+    <ol start={start} className="mt-4 list-decimal space-y-2.5 pl-6 marker:font-semibold marker:text-label">
       {children}
     </ol>
   ),
   li: ({ children }) => <li className="pl-1 leading-relaxed">{children}</li>,
   hr: () => <hr className="my-8 border-line" />,
   blockquote: ({ children }) => (
-    <blockquote className="mt-4 border-l-2 border-accent pl-4 text-ink-muted">{children}</blockquote>
+    <blockquote className="mt-4 border-l-aurora pl-4 text-ink-muted">{children}</blockquote>
   ),
-  code: ({ children }) => <code className="rounded bg-surface px-1 font-mono text-sm">{children}</code>,
-  pre: ({ children }) => <pre className="mt-4 overflow-x-auto text-sm">{children}</pre>,
+  // Código em canvas com contorno `line`: distingue-se do cartão (surface) onde o texto aparece.
+  code: ({ children }) => (
+    <code className="rounded border border-line bg-canvas px-1 font-mono text-sm text-ink">{children}</code>
+  ),
+  // Bloco de código: a caixa fica no <pre>; o <code> interior não repete contorno nem fundo.
+  pre: ({ children }) => (
+    <pre className="mt-4 overflow-x-auto rounded-lg border border-line bg-canvas p-4 text-sm text-ink [&_code]:border-0 [&_code]:bg-transparent [&_code]:p-0">
+      {children}
+    </pre>
+  ),
   a: ({ href, children }) => (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
+      className="text-ink underline decoration-line-strong underline-offset-4 hover:text-interactive hover:decoration-interactive"
     >
       {children}
     </a>

@@ -4,7 +4,7 @@
 
 export const CONTROL_CLASSES =
   'block min-h-12 w-full rounded-lg border border-line-strong bg-canvas px-4 py-2.5 text-base ' +
-  'text-ink [color-scheme:dark] transition-colors hover:border-accent ' +
+  'text-ink [color-scheme:dark] transition-colors hover:border-interactive ' +
   'aria-invalid:border-2 aria-invalid:border-danger ' +
   'disabled:cursor-not-allowed disabled:border-line disabled:bg-canvas/60 disabled:text-ink-subtle';
 

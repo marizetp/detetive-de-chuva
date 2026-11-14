@@ -29,7 +29,7 @@ export default function AboutSection() {
             </p>
           </div>
 
-          <h3 className="mt-14 font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase">
+          <h3 className="mt-14 type-label font-display text-label">
             Indicadores considerados
           </h3>
           <dl className="mt-5 divide-y divide-line border-y border-line">
@@ -39,7 +39,7 @@ export default function AboutSection() {
                   <span className="font-display text-xl leading-snug text-ink">
                     {metric.label}
                   </span>
-                  <span className="font-mono text-sm text-accent sm:mt-1 sm:block">
+                  <span className="text-sm text-label sm:mt-1 sm:block">
                     {METRIC_UNIT_LABELS[metric.unit]}
                   </span>
                 </dt>

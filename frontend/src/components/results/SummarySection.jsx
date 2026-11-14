@@ -15,7 +15,7 @@ import SourceLabel from './SourceLabel.jsx';
 import StatusDisplay from './StatusDisplay.jsx';
 import { statusToneStyles } from './statusTone.js';
 
-const SECTION_LINK = 'font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent';
+const SECTION_LINK = 'font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:text-interactive hover:decoration-interactive';
 
 function sectionHref(section) {
   return `${ROUTES.consultation}#${section.id}`;
@@ -74,7 +74,7 @@ function PrimaryResult({ result, source }) {
         caption={isFallbackSource ? 'Estado segundo a avaliação técnica' : 'Estado da recomendação'}
       />
       <div className="mt-8 border-l-4 border-transparent pl-4">
-        <p className="font-mono text-xs font-medium tracking-[0.14em] text-ink-muted uppercase">
+        <p className="type-label text-ink-muted">
           Nível de confiança
         </p>
         <p className="mt-1.5 font-display text-4xl leading-none text-ink tabular-nums">
@@ -187,7 +187,7 @@ export default function SummarySection({ params, advisory, evaluate, today, comp
           </dl>
 
           <div>
-            <h4 className="font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase">
+            <h4 className="type-label text-label">
               Fontes desta consulta
             </h4>
             <ul className="mt-3 text-sm">
