@@ -54,3 +54,30 @@ export function resolveApiTimeoutMs(env = import.meta.env) {
   }
   return value;
 }
+
+/**
+ * Envio de `lang` aos endpoints que a API v1.1 ainda não suporta. Cada capacidade só fica activa
+ * com a variável exactamente "true"; desactivadas por omissão. Activar só depois de o backend
+ * publicar o suporte (docs/ESPECIFICACAO-BACKEND-I18N.md). Observado em 2026-11-15: /evaluate e
+ * /optimal-planting ignoraram `lang`; o motor IMERG não o documenta.
+ * (O /advisory não precisa de capacidade: `lang` está documentado no docs2 §3.)
+ */
+export const LANGUAGE_CAPABILITY_ENV = Object.freeze({
+  evaluate: 'VITE_API_EVALUATE_LANG',
+  imerg: 'VITE_API_IMERG_LANG',
+  optimalPlanting: 'VITE_API_PLANTING_LANG',
+});
+
+/**
+ * @param {keyof typeof LANGUAGE_CAPABILITY_ENV} endpoint
+ * @param {Record<string, unknown>} [env]
+ */
+export function isLanguageCapabilityEnabled(endpoint, env = import.meta.env) {
+  const name = LANGUAGE_CAPABILITY_ENV[endpoint];
+  return Boolean(name) && env?.[name] === 'true';
+}
+
+/** `lang` no POST /api/v1/evaluate (VITE_API_EVALUATE_LANG). */
+export function isEvaluateLanguageEnabled(env = import.meta.env) {
+  return isLanguageCapabilityEnabled('evaluate', env);
+}

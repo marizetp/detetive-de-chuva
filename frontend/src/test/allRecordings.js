@@ -1,5 +1,5 @@
 // Só para testes: as 50 gravações de 2026-11-15, lidas do disco com o manifesto completo.
-// A aplicação nunca importa este módulo (carrega apenas as 7 elegíveis, em demo/recordings.js).
+// A aplicação nunca importa este módulo (carrega apenas as 8 elegíveis, em demo/recordings.js).
 
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

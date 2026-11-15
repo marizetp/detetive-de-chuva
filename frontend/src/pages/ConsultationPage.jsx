@@ -21,7 +21,7 @@ function revealResults(heading) {
 }
 
 export default function ConsultationPage() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   useDocumentTitle(t('documentTitle.consultation'));
 
   // Data de referência fixada ao abrir a página (data local do dispositivo).
@@ -39,7 +39,7 @@ export default function ConsultationPage() {
     !isSameConsultation(draftValues, consultation.submittedParams);
 
   const handleSubmit = (params) => {
-    const started = consultation.submit(params);
+    const started = consultation.submit(params, { language });
     if (started) {
       setDraftValues(params);
       requestAnimationFrame(() => revealResults(resultsHeadingRef.current));
@@ -87,6 +87,8 @@ export default function ConsultationPage() {
             evaluate={consultation.evaluate}
             crops={crops}
             onRetry={consultation.retrySource}
+            onRequestAdvisoryLanguage={consultation.requestAdvisoryInLanguage}
+            onRequestEvaluateLanguage={consultation.requestEvaluateInLanguage}
             today={today}
             headingRef={resultsHeadingRef}
             isStale={isStale}

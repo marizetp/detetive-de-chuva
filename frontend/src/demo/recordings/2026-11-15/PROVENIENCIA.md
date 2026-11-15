@@ -26,19 +26,20 @@
 
 ## Uso no modo de demonstração
 
-Só 7 respostas são elegíveis (`demo: true`). Só essas entram no bundle da aplicação, através de `demo-manifest.json`, o subconjunto elegível de `manifest.json`, e de uma lista explícita de 7 ficheiros em `demo/recordings.js`. As outras 43 respostas e o manifesto completo ficam no repositório para auditoria e testes de integridade. Os testes garantem que `demo-manifest.json` coincide com as entradas `demo: true` de `manifest.json` e que os ficheiros carregados são exactamente esses 7.
+Só 8 respostas são elegíveis (`demo: true`). Só essas entram no bundle da aplicação, através de `demo-manifest.json`, o subconjunto elegível de `manifest.json`, e de uma lista explícita de 8 ficheiros em `demo/recordings.js`. As outras 42 respostas e o manifesto completo ficam no repositório para auditoria e testes de integridade. Os testes garantem que `demo-manifest.json` coincide com as entradas `demo: true` de `manifest.json` e que os ficheiros carregados são exactamente esses 8.
 
 | Pedido | Uso |
 |---|---|
 | `GET /health` | Estado do serviço |
 | `GET /api/v1/provinces`, `GET /api/v1/crops` | Catálogos do formulário |
-| `POST /api/v1/advisory` + `POST /api/v1/evaluate`: Huambo, Caála, Milho, 2026-11-15 | **A única consulta com as duas fontes** |
+| `POST /api/v1/advisory` + `POST /api/v1/evaluate`: Huambo, Caála, Milho, 2026-11-15 | **A única consulta com as duas fontes** (recomendação em português, sem `lang`) |
+| `POST /api/v1/advisory` com `lang: "en"`: Huambo, Caála, Milho, 2026-11-15 | A mesma consulta com a recomendação em inglês (interface em inglês). O `/evaluate` não recebe `lang` e usa a mesma resposta |
 | `POST /api/v1/evaluate`: Bié, Arroz, 2026-06-15 | Só avaliação técnica (não há `/advisory` gravado) |
 | `POST /api/v1/evaluate`: Huambo, Milho, 2027-10-20 | Só avaliação técnica (não há `/advisory` gravado) |
 
 **Excluídas do modo de demonstração, de propósito:**
 - **Respostas a entradas inválidas.** Por exemplo, a recomendação para a cultura inexistente «Batata», um município inexistente ou uma data impossível. Mostrá-las como consulta seria apresentar um resultado sem fundamento.
-- **Respostas a pedidos com `lang: "en"`.** O frontend não envia `lang` (decisão D3, adiada).
+- **As outras respostas a pedidos com `lang: "en"`.** `adv_mandioca_en` não tem `/evaluate` nem versão em português correspondentes, e `eval_en` nunca é pedida, porque o frontend não envia `lang` ao `/evaluate`. Só `adv_en` é elegível (decisão D3, 2026-11-15).
 - **Endpoints que o frontend não usa:** motor IMERG, janela de plantio, linha de base e conformidade.
 
 Todas continuam disponíveis como evidência do contrato v1.1, por exemplo para testes.

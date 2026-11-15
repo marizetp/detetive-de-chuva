@@ -194,6 +194,9 @@ const pt = {
       'O serviço pode estar a arrancar após um período sem utilização. Aguarde alguns instantes e tente novamente.',
     networkTitle: 'Não foi possível ligar ao servidor.',
     networkDescription: 'Verifique a sua ligação à Internet e tente novamente.',
+    unsupportedLanguageTitle: 'O idioma pedido não é suportado por este serviço.',
+    unsupportedLanguageDescription:
+      'O serviço de avaliação não aceitou o idioma do pedido. Os dados da consulta não foram afectados. Mude o idioma da interface e volte a consultar, ou tente mais tarde.',
     validationTitle: 'Os dados da consulta não são válidos.',
     validationDescription:
       'Verifique a província, a cultura e a data seleccionadas e corrija o que for necessário antes de voltar a enviar.',
@@ -227,6 +230,8 @@ const pt = {
     errorTitle: 'Erro na consulta',
     errorNoticeTitle: 'Não foi possível obter a recomendação.',
     reportTitle: 'Relatório da consulta',
+    mechanism:
+      'Avaliação agrícola do motor de decisão: combina a linha de base NASA POWER de 25 anos, dados Open-Meteo e o perfil da cultura, para a cultura e o local indicados. Não inclui a avaliação IMERG do início da época das chuvas nem a janela de plantio, que são análises científicas independentes.',
     changeData: 'Alterar dados da consulta',
     staleTitle: 'Dados alterados no formulário',
     staleBody:
@@ -277,9 +282,9 @@ const pt = {
     fallback: {
       confirmedTitle: 'Dados meteorológicos alternativos',
       confirmedBody:
-        'Segundo a avaliação técnica, os dados meteorológicos em tempo real (Open-Meteo) não estavam disponíveis para esta consulta e foi usada climatologia histórica ou sazonal como alternativa. Não foi possível confirmar se os indicadores da recomendação usaram a mesma origem; por isso, os valores apresentados podem não corresponder a observações actuais.',
+        'Segundo a avaliação técnica, os dados meteorológicos em tempo real (Open-Meteo) não estavam disponíveis para esta consulta e o motor de decisão usou, como alternativa, a climatologia NASA POWER de 2000–2024. Os valores obtidos desta forma são expectativas históricas para a época do ano, não observações actuais nem previsões. A recomendação foi obtida num pedido separado, que não indica a origem dos seus dados; por isso, não é possível confirmar se os seus indicadores usaram a mesma alternativa.',
       confirmedBodyAssessment:
-        'Segundo a avaliação técnica, os dados meteorológicos em tempo real (Open-Meteo) não estavam disponíveis para esta consulta e foi usada climatologia histórica ou sazonal como alternativa. A avaliação técnica não indica quais dos seus indicadores usaram essa alternativa; por isso, os valores apresentados podem não corresponder a observações actuais.',
+        'Segundo a avaliação técnica, os dados meteorológicos em tempo real (Open-Meteo) não estavam disponíveis para esta consulta e o motor de decisão usou, como alternativa, a climatologia NASA POWER de 2000–2024. Os valores obtidos desta forma são expectativas históricas para a época do ano, não observações actuais nem previsões. A avaliação técnica não indica quais dos seus indicadores usaram essa alternativa.',
       unconfirmedTitle: 'Origem dos dados por confirmar',
       evaluateUnavailable:
         'A avaliação técnica não está disponível, por isso não foi possível confirmar se foram usados dados meteorológicos em tempo real ou alternativos.',
@@ -314,7 +319,52 @@ const pt = {
       recommendationTitle: 'A recomendação detalhada ainda não está disponível em Português.',
       justificationsTitle: 'As justificações técnicas ainda não estão disponíveis em Português.',
       body: 'Este texto é produzido pelo serviço de avaliação noutro idioma e ainda não foi traduzido. O texto original está disponível abaixo, para consulta.',
+      recommendationBody:
+        'Esta recomendação foi pedida ao serviço de avaliação em {source}. Pode pedi-la em português: o serviço gera-a de novo, por isso a redacção pode ser diferente. O texto pedido em {source} continua disponível abaixo.',
+      requestInLanguage: 'Obter a recomendação em {language}',
+      justificationsBody:
+        'Estas justificações foram pedidas ao serviço de avaliação em {source}. Pode pedi-las em português: o serviço repete só a avaliação técnica. O texto em {source} continua disponível abaixo.',
+      requestJustificationsInLanguage: 'Obter as justificações em {language}',
       viewOriginal: 'Ver o texto original ({language})',
+    },
+  },
+  // Mecanismos científicos e motor IMERG. Preparado para a integração (D11): o IMERG e a janela de
+  // plantio ainda não têm ecrã. Textos com significado científico: revisão humana obrigatória.
+  mechanisms: {
+    decisionEngine: {
+      title: 'Avaliação agrícola (motor de decisão)',
+      description:
+        'Avaliação operacional por cultura e município, com a linha de base NASA POWER de 25 anos, dados Open-Meteo e perfis das culturas.',
+    },
+    imerg: {
+      title: 'Início da época das chuvas (IMERG)',
+      description:
+        'Avaliação científica independente do início da época das chuvas e do risco de falso início, com dados NASA GPM IMERG V07.',
+    },
+    optimalPlanting: {
+      title: 'Janela de plantio',
+      description:
+        'Informação de planeamento que combina indicadores IMERG e dados históricos NASA POWER. Indicativa; não é uma garantia de data.',
+    },
+  },
+  imerg: {
+    noDecision: {
+      noReliableBasis: {
+        title: 'Sem conclusão: dados IMERG insuficientes',
+        body: 'Não há dados IMERG fiáveis suficientes para avaliar a época das chuvas actual. Isto não é uma indicação para plantar, aguardar ou não plantar. Consulte um técnico agrícola.',
+      },
+      outOfSeason: {
+        title: 'Sem conclusão: fora da época das chuvas',
+        body: 'A data indicada está fora da época das chuvas da região, por isso o motor IMERG não faz nenhuma indicação de plantio.',
+      },
+      unknown: {
+        title: 'Resultado IMERG não reconhecido',
+        body: 'O motor IMERG devolveu um resultado que a plataforma não reconhece. Não é apresentada nenhuma indicação de plantio.',
+      },
+      missing: {
+        title: 'Resultado IMERG indisponível',
+        body: 'A resposta do motor IMERG não indica nenhum resultado. Não é apresentada nenhuma indicação de plantio.',
+      },
     },
   },
   notFound: {

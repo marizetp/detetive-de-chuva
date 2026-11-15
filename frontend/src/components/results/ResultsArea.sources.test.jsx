@@ -109,7 +109,7 @@ describe('Recomendação falhou, avaliação técnica disponível (cenário 5)',
     renderReport({ advisory: failed('http', 500), language });
     expect(screen.getByText(variant)).toBeInTheDocument();
     // A ressalva sobre a origem mantém-se, sem mencionar os indicadores da recomendação.
-    expect(screen.getByText(/podem não corresponder a observações actuais|may not reflect current observations/)).toBeInTheDocument();
+    expect(screen.getByText(/expectativas históricas para a época do ano, não observações actuais nem previsões|historical expectations for the time of year, not current observations or forecasts/)).toBeInTheDocument();
     expect(screen.queryByText(recommendationVariant)).not.toBeInTheDocument();
   });
 
@@ -188,7 +188,8 @@ describe('Aviso de dados meteorológicos alternativos (is_fallback_weather)', ()
     renderReport();
     expect(screen.getByText('Dados meteorológicos alternativos')).toBeInTheDocument();
     expect(screen.getByText(/Segundo a avaliação técnica, os dados meteorológicos em tempo real \(Open-Meteo\)/)).toBeInTheDocument();
-    expect(screen.getByText(/Não foi possível confirmar se os indicadores da recomendação usaram a mesma origem/)).toBeInTheDocument();
+    expect(screen.getByText(/climatologia NASA POWER de 2000–2024. Os valores obtidos desta forma são expectativas históricas/)).toBeInTheDocument();
+    expect(screen.getByText(/A recomendação foi obtida num pedido separado, que não indica a origem dos seus dados/)).toBeInTheDocument();
   });
 
   it('false: sem aviso nem nota', () => {

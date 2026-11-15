@@ -8,10 +8,11 @@ import demoManifest from './recordings/2026-11-15/demo-manifest.json';
 import { CAPTURE_DATE, DEMO_RECORDINGS, LOADED_FILES, listDemoConsultations } from './recordings.js';
 
 // Integridade das gravações reais (2026-11-15): os 50 ficheiros são exactamente os bytes recebidos
-// do servidor (sha256 do manifesto); a aplicação só carrega as 7 elegíveis, sem alterações.
+// do servidor (sha256 do manifesto); a aplicação só carrega as 8 elegíveis, sem alterações.
 
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
 const ELIGIBLE = [
+  'adv_en',
   'adv_pt',
   'eval_arroz_bie',
   'eval_future',
@@ -44,16 +45,16 @@ describe('gravações da API v1.1 — integridade dos 50 ficheiros', () => {
     }
   });
 
-  it('respostas a entradas inválidas e a pedidos com lang nunca são elegíveis', () => {
-    const excluded = ['adv_badcrop', 'adv_badmun', 'eval_baddate', 'adv_en', 'adv_mandioca_en', 'eval_en'];
+  it('respostas a entradas inválidas e a pedidos com lang sem par completo nunca são elegíveis', () => {
+    const excluded = ['adv_badcrop', 'adv_badmun', 'eval_baddate', 'adv_mandioca_en', 'eval_en'];
     for (const id of excluded) {
       expect(ALL_RECORDINGS.find((entry) => entry.id === id).demo, id).toBe(false);
     }
   });
 });
 
-describe('gravações carregadas pela aplicação — só as 7 elegíveis', () => {
-  it('o manifesto completo marca exactamente 7 respostas como elegíveis', () => {
+describe('gravações carregadas pela aplicação — só as 8 elegíveis', () => {
+  it('o manifesto completo marca exactamente 8 respostas como elegíveis', () => {
     expect(FULL_MANIFEST.entries.filter((entry) => entry.demo).map((entry) => entry.id).sort()).toEqual(ELIGIBLE);
   });
 
@@ -62,7 +63,7 @@ describe('gravações carregadas pela aplicação — só as 7 elegíveis', () =
     expect(demoManifest.entries).toEqual(FULL_MANIFEST.entries.filter((entry) => entry.demo === true));
   });
 
-  it('a aplicação carrega só os 7 ficheiros elegíveis (nenhum dos outros 43)', () => {
+  it('a aplicação carrega só os 8 ficheiros elegíveis (nenhum dos outros 42)', () => {
     expect([...LOADED_FILES].sort()).toEqual(demoManifest.entries.map((entry) => entry.file).sort());
     expect(DEMO_RECORDINGS.map((entry) => entry.id).sort()).toEqual(ELIGIBLE);
     expect(CAPTURE_DATE).toBe('2026-11-15');
@@ -79,9 +80,18 @@ describe('gravações carregadas pela aplicação — só as 7 elegíveis', () =
       {
         params: { provincia: 'Huambo', municipio: 'Caála', cultura: 'Milho', data_consulta: '2026-11-15' },
         sources: ['advisory', 'evaluate'],
+        advisoryLanguages: ['en', 'pt'],
       },
-      { params: { provincia: 'Bié', cultura: 'Arroz', data_consulta: '2026-06-15' }, sources: ['evaluate'] },
-      { params: { provincia: 'Huambo', cultura: 'Milho', data_consulta: '2027-10-20' }, sources: ['evaluate'] },
+      {
+        params: { provincia: 'Bié', cultura: 'Arroz', data_consulta: '2026-06-15' },
+        sources: ['evaluate'],
+        advisoryLanguages: [],
+      },
+      {
+        params: { provincia: 'Huambo', cultura: 'Milho', data_consulta: '2027-10-20' },
+        sources: ['evaluate'],
+        advisoryLanguages: [],
+      },
     ]);
   });
 });

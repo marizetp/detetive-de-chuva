@@ -101,6 +101,25 @@ describe('consulta em modo de demonstração', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it('consulta gravada em inglês: recomendação real em inglês (lang=en), sem pedidos à rede', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+    activateDemoMode();
+    render(<ConsultationPage />, { language: 'en' });
+    await screen.findByRole('option', { name: 'Huambo' });
+    await screen.findByRole('option', { name: 'Maize' });
+    fireEvent.change(screen.getByLabelText('Province'), { target: { value: 'Huambo' } });
+    fireEvent.change(screen.getByLabelText('Municipality'), { target: { value: 'Caála' } });
+    fireEvent.change(screen.getByLabelText('Crop'), { target: { value: 'Milho' } });
+    fireEvent.change(screen.getByLabelText(/Intended sowing date/), { target: { value: '2026-11-15' } });
+    fireEvent.click(screen.getByRole('button', { name: /Check suitability/ }));
+    expect(await screen.findByText('Favourable for sowing')).toBeInTheDocument();
+    expect(screen.getByText(/FAVORABLE: November 2026 presents favorable conditions/)).toBeInTheDocument();
+    expect(screen.queryByText(/not yet available in English/)).toBeInTheDocument(); // só as justificações do /evaluate (pt)
+    expect(screen.queryByText('The detailed recommendation is not yet available in English.')).not.toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it('consulta só com avaliação técnica gravada: recomendação «não disponível no modo de demonstração»', async () => {
     vi.stubGlobal('fetch', vi.fn());
     activateDemoMode();
