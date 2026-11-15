@@ -118,11 +118,11 @@ export default function AgroCycleRing({
   return (
     <section
       aria-label={t('cycle.ring.sectionLabel')}
-      className="flex flex-col items-center rounded-2xl border border-line bg-surface p-5 sm:p-6"
+      className="flex flex-col items-center rounded-2xl border border-line bg-surface p-5 font-display sm:p-6"
     >
       <div className="flex w-full flex-wrap items-start justify-between gap-2 text-left">
         <div>
-          <p className="font-mono text-xs tracking-wider text-label uppercase">
+          <p className="font-display text-xs font-medium tracking-wider text-label uppercase">
             {t('cycle.ring.eyebrow')}
           </p>
           <h2 className="mt-1 text-xl font-semibold text-ink">
@@ -132,7 +132,7 @@ export default function AgroCycleRing({
 
         {activeEval && (
           <span
-            className={`rounded-full border px-2.5 py-0.5 font-mono text-xs font-semibold ${
+            className={`rounded-full border px-2.5 py-0.5 font-display text-xs font-semibold ${
               (STATUS_BADGE[activeEval.status] ?? TIER_COLORS.baixa).badgeClass
             }`}
           >
@@ -172,7 +172,7 @@ export default function AgroCycleRing({
                 fill="#9ab0c7"
                 fontSize="10"
                 fontWeight="600"
-                fontFamily="Space Mono, monospace"
+                fontFamily="var(--font-display)"
               >
                 {item.label}
               </text>
@@ -234,7 +234,8 @@ export default function AgroCycleRing({
             textAnchor="middle"
             fill="#6f9bfd"
             fontSize="11"
-            fontFamily="Space Mono, monospace"
+            fontWeight="600"
+            fontFamily="var(--font-display)"
           >
             {seasonDay ? t('cycle.ring.seasonDay', { day: seasonDay }) : `${t('cycle.weekShort')} ${activeWeekIso}`}
           </text>
@@ -246,7 +247,7 @@ export default function AgroCycleRing({
             fill="#eaf2f8"
             fontSize="36"
             fontWeight="700"
-            fontFamily="Montserrat, sans-serif"
+            fontFamily="var(--font-display)"
           >
             {activeWeekObj ? `${activeWeekObj.probabilidade_cultura_pct}%` : '—'}
           </text>
@@ -258,6 +259,7 @@ export default function AgroCycleRing({
             fill="#eaf2f8"
             fontSize="12"
             fontWeight="600"
+            fontFamily="var(--font-display)"
           >
             {t(`cycle.tier.${activeTier}`)}
           </text>
@@ -268,6 +270,7 @@ export default function AgroCycleRing({
             textAnchor="middle"
             fill="#9ab0c7"
             fontSize="10"
+            fontFamily="var(--font-display)"
           >
             {t('cycle.ring.weekLabel', { week: activeWeekObj?.semana_iso ?? activeWeekIso })}
           </text>
@@ -277,16 +280,16 @@ export default function AgroCycleRing({
       {/* Center summary cards below ring (matching the Flo detail strip) */}
       <div className="mt-3 grid w-full grid-cols-2 gap-3 text-sm">
         <div className="rounded-xl border border-line bg-canvas/80 p-3">
-          <p className="font-mono text-[11px] text-label uppercase">
+          <p className="font-display text-[11px] font-medium tracking-wider text-label uppercase">
             {t('cycle.ring.optimalWindow')}
           </p>
-          <p className="mt-1 font-semibold text-ink">
+          <p className="mt-1 font-display font-semibold text-ink">
             {optimal?.janela_recomendada?.descricao_periodo ?? '—'}
           </p>
         </div>
 
         <div className="rounded-xl border border-line bg-canvas/80 p-3">
-          <p className="font-mono text-[11px] text-label uppercase">
+          <p className="font-display text-[11px] font-medium tracking-wider text-label uppercase">
             {t('cycle.ring.soilReserve')}
           </p>
           <div className="mt-1.5 flex items-center gap-1.5" aria-label={`${activeDrops} / 4`}>
@@ -301,7 +304,7 @@ export default function AgroCycleRing({
                 aria-hidden="true"
               />
             ))}
-            <span className="ml-1 font-mono text-xs text-ink-muted">
+            <span className="ml-1 font-display text-xs font-semibold text-ink-muted">
               {Math.round(moisture * 100)}%
             </span>
           </div>

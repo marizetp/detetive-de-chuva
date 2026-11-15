@@ -107,14 +107,14 @@ export default function AgroCycleMonthGrid({
   return (
     <section
       aria-label={t('cycle.calendar.sectionLabel')}
-      className="rounded-2xl border border-line bg-surface p-5 sm:p-6"
+      className="rounded-2xl border border-line bg-surface p-5 font-display sm:p-6"
     >
       <div className="flex flex-col gap-6">
         {/* Top: Monthly Color-Pill Calendar */}
         <div>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="font-mono text-xs tracking-wider text-label uppercase">
+              <p className="font-display text-xs font-medium tracking-wider text-label uppercase">
                 {t('cycle.calendar.eyebrow')}
               </p>
               <h2 className="mt-1 text-xl font-semibold text-ink">{monthHeading}</h2>
@@ -140,7 +140,7 @@ export default function AgroCycleMonthGrid({
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-7 gap-1.5 text-center font-mono text-[11px] text-ink-subtle uppercase">
+          <div className="mt-5 grid grid-cols-7 gap-1.5 text-center font-display text-[11px] font-medium text-ink-subtle uppercase">
             {weekdayHeaders.map((w, idx) => (
               <div key={idx} className="py-1">
                 {w}
@@ -193,11 +193,11 @@ export default function AgroCycleMonthGrid({
         </div>
 
         {/* Bottom: Selected Day / Week Cycle Drawer (wide, clean 2-column strip) */}
-        <div className="flex flex-col justify-between rounded-xl border border-line bg-canvas/85 p-5">
+        <div className="flex flex-col justify-between rounded-xl border border-line bg-canvas/85 p-5 font-display">
           <div>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div>
-                <p className="font-mono text-xs text-label uppercase">
+                <p className="font-display text-xs font-medium tracking-wider text-label uppercase">
                   {t('cycle.drawer.title')}
                 </p>
                 <h3 className="mt-1 text-lg font-semibold text-ink">
@@ -214,14 +214,14 @@ export default function AgroCycleMonthGrid({
                 <>
                   <div className="flex items-baseline justify-between gap-3">
                     <dt className="text-ink-muted">{t('cycle.drawer.liveStatus')}</dt>
-                    <dd className="shrink-0 text-right font-mono font-semibold text-ink">
+                    <dd className="shrink-0 text-right font-display font-semibold text-ink">
                       {t(`status.${activeEval.status}`)} · {activeEval.score_confianca}/100
                     </dd>
                   </div>
                   {activeEval.metricas?.humidade_solo_raiz !== undefined && (
                     <div className="flex items-baseline justify-between gap-3">
                       <dt className="text-ink-muted">{t('cycle.drawer.liveMoisture')}</dt>
-                      <dd className="shrink-0 text-right font-mono font-semibold text-ink">
+                      <dd className="shrink-0 text-right font-display font-semibold text-ink">
                         {Math.round(Number(activeEval.metricas.humidade_solo_raiz) * 100)}%
                       </dd>
                     </div>
@@ -229,7 +229,7 @@ export default function AgroCycleMonthGrid({
                   {activeEval.metricas?.chuva_acumulada_recente_mm !== undefined && (
                     <div className="flex items-baseline justify-between gap-3">
                       <dt className="text-ink-muted">{t('cycle.drawer.liveRecentRain')}</dt>
-                      <dd className="shrink-0 text-right font-mono font-semibold text-ink">
+                      <dd className="shrink-0 text-right font-display font-semibold text-ink">
                         {activeEval.metricas.chuva_acumulada_recente_mm} mm
                       </dd>
                     </div>
@@ -238,7 +238,7 @@ export default function AgroCycleMonthGrid({
               )}
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-muted">{t('cycle.drawer.weekSuitability')}</dt>
-                <dd className="text-right font-mono font-semibold text-ink">
+                <dd className="text-right font-display font-semibold text-ink">
                   {activeWeekData
                     ? `${activeWeekData.probabilidade_cultura_pct}% (${t(`cycle.tier.${activeWeekData.nivel}`)})`
                     : '—'}
@@ -246,19 +246,19 @@ export default function AgroCycleMonthGrid({
               </div>
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-muted">{t('cycle.drawer.weeklyRain')}</dt>
-                <dd className="shrink-0 text-right font-mono font-semibold text-ink">
+                <dd className="shrink-0 text-right font-display font-semibold text-ink">
                   {activeWeekData ? `${activeWeekData.chuva_semanal_media_mm} mm` : '—'}
                 </dd>
               </div>
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-muted">{t('cycle.drawer.monthlyRainMean')}</dt>
-                <dd className="shrink-0 text-right font-mono font-semibold text-ink">
+                <dd className="shrink-0 text-right font-display font-semibold text-ink">
                   {monthSummary ? `${monthSummary.chuva_media_mensal_mm} mm` : '—'}
                 </dd>
               </div>
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-muted">{t('cycle.drawer.falseStartRisk')}</dt>
-                <dd className="shrink-0 text-right font-mono font-semibold text-status-wait">
+                <dd className="shrink-0 text-right font-display font-semibold text-status-wait">
                   {falseStart
                     ? `${falseStart.probabilidade_pct}% (IC90 ${falseStart.ic90_pct?.[0]}–${falseStart.ic90_pct?.[1]}%)`
                     : '—'}
@@ -266,7 +266,7 @@ export default function AgroCycleMonthGrid({
               </div>
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-muted">{t('cycle.drawer.openingRainMin')}</dt>
-                <dd className="shrink-0 text-right font-mono font-semibold text-ink">
+                <dd className="shrink-0 text-right font-display font-semibold text-ink">
                   {reqs ? `${reqs.chuva_abertura_3d_mm} mm · ${reqs.profundidade_cm} cm` : '—'}
                 </dd>
               </div>

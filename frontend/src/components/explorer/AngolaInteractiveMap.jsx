@@ -115,11 +115,11 @@ export default function AngolaInteractiveMap({
   return (
     <section
       aria-label={t('cycle.map.sectionLabel')}
-      className="flex flex-col rounded-2xl border border-line bg-surface p-5 sm:p-6"
+      className="flex flex-col rounded-2xl border border-line bg-surface p-5 font-display sm:p-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
         <div>
-          <p className="font-mono text-xs tracking-wider text-label uppercase">
+          <p className="font-display text-xs font-medium tracking-wider text-label uppercase">
             {t('cycle.map.eyebrow')}
           </p>
           <h2 className="mt-1 text-xl font-semibold text-ink">
@@ -166,15 +166,15 @@ export default function AngolaInteractiveMap({
         </div>
         <div className="flex items-center gap-2">
           {isLoading ? (
-            <span className="font-mono text-xs text-label">{t('cycle.loading')}</span>
+            <span className="font-display text-xs text-label">{t('cycle.loading')}</span>
           ) : activeEval ? (
             <>
-              <span className={`rounded-full border px-2.5 py-0.5 font-mono text-xs font-semibold ${activeStyle.badgeClass}`}>
+              <span className={`rounded-full border px-2.5 py-0.5 font-display text-xs font-semibold ${activeStyle.badgeClass}`}>
                 {t(`status.${activeEval.status}`)} · {activeEval.score_confianca}/100
               </span>
             </>
           ) : (
-            <span className="font-mono text-xs text-ink-subtle">{t('cycle.map.noDataYet')}</span>
+            <span className="font-display text-xs text-ink-subtle">{t('cycle.map.noDataYet')}</span>
           )}
         </div>
       </div>
@@ -243,6 +243,7 @@ export default function AngolaInteractiveMap({
                       fill="#eaf2f8"
                       fontSize="12"
                       fontWeight="700"
+                      fontFamily="var(--font-display)"
                       className="pointer-events-none"
                     >
                       {feat.pilotProvince}
@@ -254,7 +255,7 @@ export default function AngolaInteractiveMap({
                         textAnchor="middle"
                         fill="#eaf2f8"
                         fontSize="10"
-                        fontFamily="Space Mono, monospace"
+                        fontFamily="var(--font-display)"
                         className="pointer-events-none"
                       >
                         {evalInfo.score_confianca}%
@@ -302,6 +303,7 @@ export default function AngolaInteractiveMap({
                       strokeWidth="2.4"
                       strokeLinejoin="round"
                       fontWeight={isSelected ? '700' : '600'}
+                      fontFamily="var(--font-display)"
                       className="pointer-events-none"
                     >
                       {m.canonical}
@@ -326,7 +328,7 @@ export default function AngolaInteractiveMap({
           <span className="size-2.5 rounded-full bg-status-unfavorable" aria-hidden="true" />
           {t('status.DESFAVORAVEL')}
         </span>
-        <span className="ml-auto font-mono text-[11px] text-ink-subtle">
+        <span className="ml-auto font-display text-[11px] text-ink-subtle">
           {t('cycle.map.clickHint')}
         </span>
       </div>

@@ -19,11 +19,11 @@ import { getCropDisplayLabel } from '../utils/cropDisplay.js';
 import { getLocalIsoDate } from '../utils/dates.js';
 
 const DEFAULT_CROPS = [
-  { value: 'Milho', icon: '🌽' },
-  { value: 'Feijão', icon: '🫘' },
-  { value: 'Soja', icon: '🌱' },
-  { value: 'Mandioca', icon: '🥔' },
-  { value: 'Arroz', icon: '🌾' },
+  { value: 'Milho' },
+  { value: 'Feijão' },
+  { value: 'Soja' },
+  { value: 'Mandioca' },
+  { value: 'Arroz' },
 ];
 
 const STATUS_BADGE = Object.freeze({
@@ -72,7 +72,6 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
     if (cropsCatalog.status === 'success' && Array.isArray(cropsCatalog.options) && cropsCatalog.options.length > 0) {
       return cropsCatalog.options.map((opt) => ({
         value: opt.value,
-        icon: opt.raw?.icone || '🌱',
       }));
     }
     return DEFAULT_CROPS;
@@ -197,10 +196,10 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
       <div
         role="region"
         aria-label={t('cycle.controlsLabel')}
-        className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-surface p-4 sm:p-5"
+        className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-surface p-4 font-display sm:p-5"
       >
         <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 font-mono text-xs text-label uppercase">{t('cycle.cropLabel')}:</span>
+          <span className="mr-1 font-display text-xs font-medium tracking-wider text-label uppercase">{t('cycle.cropLabel')}:</span>
           {cropChoices.map((crop) => {
             const active = selectedCrop === crop.value;
             return (
@@ -209,13 +208,12 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
                 type="button"
                 aria-pressed={active}
                 onClick={() => handleSelectCrop(crop.value)}
-                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                className={`inline-flex cursor-pointer items-center rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
                   active
                     ? 'border-transparent bg-action text-action-ink'
                     : 'border-line bg-canvas text-ink-muted hover:border-aurora-text hover:text-ink'
                 }`}
               >
-                <span aria-hidden="true">{crop.icon}</span>
                 <span>{getCropDisplayLabel(crop.value, language)}</span>
               </button>
             );
@@ -226,7 +224,7 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
           {!isMapView && (
             <>
               <label className="flex items-center gap-2 text-sm text-ink-muted">
-                <span className="font-mono text-xs text-label uppercase">{t('consultation.form.province.label')}</span>
+                <span className="font-display text-xs font-medium tracking-wider text-label uppercase">{t('consultation.form.province.label')}</span>
                 <select
                   value={selectedProvince}
                   onChange={(e) => handleSelectProvince(e.target.value)}
@@ -241,7 +239,7 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
               </label>
 
               <label className="flex items-center gap-2 text-sm text-ink-muted">
-                <span className="font-mono text-xs text-label uppercase">{t('consultation.form.municipality.label')}</span>
+                <span className="font-display text-xs font-medium tracking-wider text-label uppercase">{t('consultation.form.municipality.label')}</span>
                 <select
                   value={selectedMunicipality}
                   onChange={(e) => handleSelectMunicipality(e.target.value)}
@@ -259,12 +257,12 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
           )}
 
           <label className="flex items-center gap-2 text-sm text-ink-muted">
-            <span className="font-mono text-xs text-label uppercase">{t('cycle.dateLabel')}</span>
+            <span className="font-display text-xs font-medium tracking-wider text-label uppercase">{t('cycle.dateLabel')}</span>
             <input
               type="date"
               value={selectedDateIso}
               onChange={(e) => e.target.value && handleSelectDate(e.target.value)}
-              className="rounded-lg border border-line-strong bg-canvas px-3 py-1.5 font-mono text-sm text-ink focus:border-aurora-text focus:outline-none"
+              className="rounded-lg border border-line-strong bg-canvas px-3 py-1.5 font-display text-sm text-ink focus:border-aurora-text focus:outline-none"
             />
           </label>
         </div>
@@ -294,22 +292,22 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
 
           <aside
             aria-label={t('cycle.mapPage.summaryLabel')}
-            className="flex flex-col justify-between rounded-2xl border border-line bg-surface p-5 sm:p-6 lg:col-span-4"
+            className="flex flex-col justify-between rounded-2xl border border-line bg-surface p-5 font-display sm:p-6 lg:col-span-4"
           >
             <div>
-              <p className="font-mono text-xs tracking-wider text-label uppercase">
+              <p className="font-display text-xs font-medium tracking-wider text-label uppercase">
                 {t('cycle.mapPage.summaryEyebrow')}
               </p>
               <h2 className="mt-1 text-xl font-semibold text-ink">
                 {activePlaceLabel} · {cropDisplay}
               </h2>
-              <p className="mt-1 font-mono text-xs text-ink-subtle">{selectedDateIso}</p>
+              <p className="mt-1 font-display text-xs text-ink-subtle">{selectedDateIso}</p>
 
               {activePlaceEval ? (
                 <>
                   <div className="mt-4">
                     <span
-                      className={`inline-flex rounded-full border px-3 py-1 font-mono text-xs font-semibold ${
+                      className={`inline-flex rounded-full border px-3 py-1 font-display text-xs font-semibold ${
                         STATUS_BADGE[activePlaceEval.status] ?? 'border-line bg-canvas text-ink-muted'
                       }`}
                     >
@@ -320,13 +318,13 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
                   <dl className="mt-5 space-y-3 border-t border-line pt-4 text-sm">
                     <div className="flex items-center justify-between gap-3">
                       <dt className="text-ink-muted">{t('results.rainRecent.label')}</dt>
-                      <dd className="font-mono font-semibold text-ink">
+                      <dd className="font-display font-semibold text-ink">
                         {activePlaceEval.metricas?.chuva_acumulada_recente_mm ?? '—'} mm
                       </dd>
                     </div>
                     <div className="flex items-center justify-between gap-3">
                       <dt className="text-ink-muted">{t('results.rootMoisture.label')}</dt>
-                      <dd className="font-mono font-semibold text-ink">
+                      <dd className="font-display font-semibold text-ink">
                         {activePlaceEval.metricas?.humidade_solo_raiz !== undefined
                           ? `${Math.round(Number(activePlaceEval.metricas.humidade_solo_raiz) * 100)}%`
                           : '—'}
@@ -334,7 +332,7 @@ export default function CycleExplorerPage({ mode = 'cycle' }) {
                     </div>
                     <div className="flex items-center justify-between gap-3">
                       <dt className="text-ink-muted">{t('results.forecastRain.label')}</dt>
-                      <dd className="font-mono font-semibold text-ink">
+                      <dd className="font-display font-semibold text-ink">
                         {activePlaceEval.metricas?.previsao_7dias_mm ?? '—'} mm
                       </dd>
                     </div>
