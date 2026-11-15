@@ -68,6 +68,24 @@ MOTOR_CODE_TO_RESPONSE: Dict[str, str] = {
     "FORA_DA_EPOCA": "SEM CONCLUSÃO (fora da época)",
 }
 
+MOTOR_CODE_TO_RESPONSE_EN: Dict[str, str] = {
+    "FAVORAVEL_INDICATIVO": "PLANT (indicative)",
+    "AGUARDAR_RISCO_ELEVADO": "WAIT (elevated risk)",
+    "AGUARDAR_CANDIDATA_EM_FORMACAO": "WAIT (onset forming)",
+    "AGUARDAR_SEM_CHUVA_CANDIDATA": "WAIT (no onset rain yet)",
+    "SEM_BASE_FIAVEL": "NO CONCLUSION",
+    "FORA_DA_EPOCA": "NO CONCLUSION (off-season)",
+}
+
+MOTOR_CODE_NOTES_EN: Dict[str, str] = {
+    "FAVORAVEL_INDICATIVO": "Indicative favorable rain onset detected within historical tolerance bounds; verify soil readiness locally.",
+    "AGUARDAR_RISCO_ELEVADO": "False-start risk remains above safety tolerance based on historical IMERG V07 distribution.",
+    "AGUARDAR_CANDIDATA_EM_FORMACAO": "Candidate onset rainfall detected and under confirmation window.",
+    "AGUARDAR_SEM_CHUVA_CANDIDATA": "No qualifying onset rain event observed up to the reference date.",
+    "SEM_BASE_FIAVEL": "Insufficient observed IMERG data up to the reference date to issue an operational decision.",
+    "FORA_DA_EPOCA": "Reference date falls outside the September-February rainy onset monitoring season.",
+}
+
 ZONE_ALIASES: Dict[str, str] = {
     "huambo": "huambo",
     "bie": "bie",
@@ -101,11 +119,13 @@ def normalize_zone(zona: str) -> str:
     raise ValueError(f"Zona '{zona}' não suportada. Zonas válidas: {list(IMERG_CONTRACT_FILES.keys())}")
 
 
-def map_codigo_to_resposta(codigo: Optional[str]) -> str:
+def map_codigo_to_resposta(codigo: Optional[str], lang: str = "pt") -> str:
     """Strictly maps motor code to farmer answer; never invents PLANTAR."""
+    is_en = str(lang or "pt").strip().lower().startswith("en")
     if not codigo:
-        return "SEM CONCLUSÃO"
-    return MOTOR_CODE_TO_RESPONSE.get(codigo, "SEM CONCLUSÃO")
+        return "NO CONCLUSION" if is_en else "SEM CONCLUSÃO"
+    table = MOTOR_CODE_TO_RESPONSE_EN if is_en else MOTOR_CODE_TO_RESPONSE
+    return table.get(codigo, "NO CONCLUSION" if is_en else "SEM CONCLUSÃO")
 
 
 class CicloEngineAdapter:
@@ -397,19 +417,25 @@ class CicloEngineAdapter:
 
             return {"saida": saida, "envelope": envelope, "obs_csv": obs_csv}
 
-    def get_decisao_payload(self, zona: str, data_ref: Optional[str] = None) -> Dict[str, Any]:
+    def get_decisao_payload(self, zona: str, data_ref: Optional[str] = None, lang: str = "pt") -> Dict[str, Any]:
         """Section 7: GET /zonas/{zona}/decisao[/data]."""
+        is_en = str(lang or "pt").strip().lower().startswith("en")
+        norm_lang = "en" if is_en else "pt"
         res = self.run_cycle(zona, data_ref=data_ref)
         saida = res["saida"]
         env = res["envelope"]
-        msg = saida.get("mensagem_agricultor", {})
+        msg = dict(saida.get("mensagem_agricultor") or {})
+        codigo = msg.get("codigo")
+        if is_en and codigo in MOTOR_CODE_NOTES_EN:
+            msg["texto_original_pt"] = msg.get("texto")
+            msg["texto"] = MOTOR_CODE_NOTES_EN[codigo]
         return {
             "zona": env["zona"],
             "zona_nome": env["zona_nome"],
             "epoca": saida.get("epoca"),
             "data_ref": saida.get("data_ref"),
             "gerado_em": saida.get("gerado_em"),
-            "resposta": map_codigo_to_resposta(msg.get("codigo")),
+            "resposta": map_codigo_to_resposta(codigo, lang=norm_lang),
             "mensagem_agricultor": msg,
             "estado_motor": saida.get("estado_motor"),
             "grau_confianca": saida.get("grau_confianca"),
@@ -417,6 +443,7 @@ class CicloEngineAdapter:
             "limiares_provisorios": saida.get("limiares_provisorios", True),
             "versao_codigo": saida.get("versao_codigo"),
             "n_epocas": (saida.get("climatologia") or {}).get("n_epocas"),
+            "content_language": norm_lang,
             "envelope_operacional": {
                 "sha256_saida": env["sha256_saida"],
                 "motor_sha256": env["motor_sha256"],
@@ -509,6 +536,9 @@ class CicloEngineAdapter:
         zona: str,
         cultura: str = "Milho",
         epoca_agricola: str = "2024/2025",
+        lang: str = "pt",
+        municipio: Optional[str] = None,
+        data_consulta: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Computes the recommended optimal planting window for a crop and agricultural season.
 
@@ -517,7 +547,10 @@ class CicloEngineAdapter:
         2. 25-year NASA POWER soil moisture & temperature baseline
         3. Crop-specific biological requirements (Milho, Feijão, Soja, Mandioca, Arroz)
         4. Optional 6-month seasonal outlook (Open-Meteo ECMWF SEAS5) for upcoming seasons
+        5. Optional synchronized deterministic evaluation (`avaliacao_atual`) for municipality + reference date
         """
+        is_en = str(lang or "pt").strip().lower().startswith("en")
+        norm_lang = "en" if is_en else "pt"
         zona_id = normalize_zone(zona)
         prov_name = {"huambo": "Huambo", "bie": "Bié", "huila": "Huíla"}[zona_id]
 
@@ -550,8 +583,6 @@ class CicloEngineAdapter:
         p90_dt = date.fromisoformat(p90_str)
 
         # Crop-specific agronomic offset from historical rainfall onset
-        # Arroz/Soja wait for deeper soil moisture & lower false-start risk (~P90 or +10/+14 days)
-        # Mandioca can start closer to P50; Feijão avoids heavy Jan/Dec waterlogging peaks
         if crop_key == "Arroz":
             rec_start = p90_dt + timedelta(days=7)
             rec_end = date(start_year, 12, 15)
@@ -592,28 +623,171 @@ class CicloEngineAdapter:
             seasonal_outlook = get_weather_service().fetch_seasonal_outlook(prov_name)
 
         # Weekly probability curve during the main agricultural window (Sept - Feb: ISO weeks 36-52, 1-9)
+        def _week_month_and_metrics(w_iso: int) -> Tuple[int, float, float]:
+            approx_m = date.fromisocalendar(2025, w_iso, 4).month
+            w_row = weekly_curve.get(str(w_iso)) or weekly_curve.get(w_iso) or {}
+            m_row = monthly_matrix.get(str(approx_m)) or monthly_matrix.get(approx_m) or {}
+            moist_val = w_row.get("humidade_raiz_mediana")
+            if moist_val is None:
+                moist_val = w_row.get("gwetroot_mediana")
+            if moist_val is None:
+                moist_val = m_row.get("gwetroot_p50", 0.30)
+            rain_val = w_row.get("chuva_semanal_media_mm")
+            if rain_val is None:
+                rain_val = float(m_row.get("chuva_media_mensal_mm", 0.0)) / 4.33
+            return approx_m, float(moist_val), float(rain_val)
+
         season_weeks = list(range(36, 53)) + list(range(1, 10))
         weekly_series = []
         for w in season_weeks:
             w_data = weekly_curve.get(str(w)) or weekly_curve.get(w)
             if w_data:
+                _, w_moist_val, w_rain_val = _week_month_and_metrics(w)
                 weekly_series.append({
                     "semana_iso": w,
                     "probabilidade_favoravel_pct": w_data.get("probabilidade_sementeira_pct", 0.0),
-                    "humidade_raiz_mediana": w_data.get("humidade_raiz_mediana", 0.4),
-                    "chuva_semanal_media_mm": w_data.get("chuva_semanal_media_mm", 0.0),
+                    "humidade_raiz_mediana": round(w_moist_val, 3),
+                    "chuva_semanal_media_mm": round(w_rain_val, 1),
                 })
+
+        # Full 52-week crop-adjusted annual cycle (powers the cycle wheel & monthly calendar)
+        min_monthly_rain = float(crop_cfg.get("min_monthly_rain_mm", 110.0))
+        min_root = float(crop_cfg.get("min_absolute_root_moisture", 0.35))
+        waterlog_limit = float(crop_cfg.get("waterlogging_limit", 0.85))
+        rec_start_week = rec_start.isocalendar()[1]
+        rec_end_week = rec_end.isocalendar()[1]
+
+        def _is_in_rec_window(w: int) -> bool:
+            if rec_start_week <= rec_end_week:
+                return rec_start_week <= w <= rec_end_week
+            return w >= rec_start_week or w <= rec_end_week
+
+        ciclo_anual_52s = []
+        for w in range(1, 53):
+            w_data = weekly_curve.get(str(w)) or weekly_curve.get(w) or {}
+            base_prob = float(w_data.get("probabilidade_sementeira_pct", 5.0))
+            approx_month, w_moist, w_rain = _week_month_and_metrics(w)
+
+            # Crop-specific moisture & rainfall modulation (deterministic, aligned with decision_engine thresholds)
+            rain_ratio = min((w_rain * 4.33) / max(min_monthly_rain, 1.0), 1.35)
+            moist_factor = 1.0 if w_moist >= min_root else max(0.35, w_moist / max(min_root, 0.01))
+            waterlog_penalty = 0.72 if w_moist > waterlog_limit else 1.0
+
+            is_kakimbo = approx_month in (5, 6, 7, 8)
+            in_opt = _is_in_rec_window(w)
+
+            raw_score = base_prob * (0.55 + 0.45 * min(rain_ratio, 1.15)) * moist_factor * waterlog_penalty
+            if is_kakimbo:
+                raw_score = min(raw_score, 18.0)
+
+            prob_clamped = round(min(max(raw_score, 5.0), 95.0), 1)
+            if is_kakimbo or prob_clamped < 35.0:
+                nivel = "baixa"
+                fase = "CACIMBO_SECO" if is_kakimbo else "FORA_JANELA"
+            elif w_moist > waterlog_limit or prob_clamped < 65.0:
+                nivel = "media"
+                fase = "ENCHARCAMENTO_CAUTELA" if w_moist > waterlog_limit else "TRANSICAO_CAUTELA"
+            else:
+                nivel = "alta"
+                fase = "PLANTIO_OTIMO" if in_opt else "CHUVAS_CONSOLIDADAS"
+
+            ciclo_anual_52s.append({
+                "semana_iso": w,
+                "probabilidade_cultura_pct": prob_clamped,
+                "nivel": nivel,
+                "fase_ciclo": fase,
+                "dentro_janela_otima": in_opt,
+                "humidade_raiz_mediana": round(w_moist, 3),
+                "chuva_semanal_media_mm": round(w_rain, 1),
+            })
+
+        ciclo_mensal_12m = []
+        for m in range(1, 13):
+            m_data = monthly_matrix.get(str(m)) or monthly_matrix.get(m) or {}
+            m_rain = float(m_data.get("chuva_media_mensal_mm", 0.0))
+            m_moist = float(m_data.get("gwetroot_p50", 0.30))
+            m_temp = float(m_data.get("temperatura_media_c", 20.0))
+            is_kakimbo = m in (5, 6, 7, 8)
+
+            rain_fit = min(m_rain / max(min_monthly_rain, 1.0), 1.25)
+            moist_fit = 1.0 if m_moist >= min_root else max(0.3, m_moist / max(min_root, 0.01))
+            waterlog_penalty = 0.72 if m_moist > waterlog_limit else 1.0
+            m_score = 88.0 * min(rain_fit, 1.0) * moist_fit * waterlog_penalty
+            if is_kakimbo:
+                m_score = min(m_score, 15.0)
+            m_prob = round(min(max(m_score, 5.0), 95.0), 1)
+            nivel = "baixa" if (is_kakimbo or m_prob < 35.0) else ("alta" if m_prob >= 65.0 else "media")
+            ciclo_mensal_12m.append({
+                "mes": m,
+                "probabilidade_cultura_pct": m_prob,
+                "nivel": nivel,
+                "chuva_media_mensal_mm": round(m_rain, 1),
+                "humidade_solo_raiz_p50": round(m_moist, 3),
+                "temperatura_media_c": round(m_temp, 1),
+            })
+
+        n_epocas = clim.get("n_epocas", 24)
+        desc_sep = "to" if is_en else "a"
+        freq_hist = cal_stats.get("frequencia")
+        if is_en:
+            freq_hist_out = f"observed across {n_epocas} historical seasons"
+            nota_falsa = "risk estimated from past seasons (NASA GPM IMERG V07); not a certainty (Wilson IC90)"
+            notas_agro = crop_cfg.get("notes_en", crop_cfg["notes"])
+            aviso_out = "Indicative outlook based on 25-season probabilistic analysis; always verify field soil conditions locally."
+            cultura_display = crop_cfg.get("name_en", crop_key)
+        else:
+            freq_hist_out = freq_hist or f"em {n_epocas} épocas"
+            nota_falsa = "risco estimado a partir de épocas passadas (IMERG V07); não é certeza"
+            notas_agro = crop_cfg["notes"]
+            aviso_out = "Indicativo baseado em análise probabilística histórica de 25 épocas; sem validação agronómica local de campo."
+            cultura_display = crop_key
+
+        # Synchronized current/date-specific deterministic evaluation (matches /api/v1/map-overview & /evaluate)
+        avaliacao_atual = None
+        if data_consulta or municipio:
+            try:
+                try:
+                    from src.decision_engine import get_decision_engine
+                except ImportError:
+                    from decision_engine import get_decision_engine
+
+                query_date = data_consulta or date.today().isoformat()
+                w_data = get_weather_service().fetch_weather(prov_name, query_date, municipio)
+                ev = get_decision_engine().evaluate(
+                    provincia=prov_name,
+                    cultura=crop_key,
+                    data_consulta=query_date,
+                    weather_data=w_data,
+                    lang=norm_lang,
+                )
+                avaliacao_atual = {
+                    "provincia": prov_name,
+                    "municipio": municipio or None,
+                    "data_consulta": query_date,
+                    "status": ev.status.value,
+                    "score_confianca": ev.score_confianca,
+                    "metricas": ev.metricas.model_dump(),
+                    "justificacoes_tecnicas": ev.justificacoes_tecnicas,
+                    "is_fallback_weather": ev.is_fallback_weather,
+                    "prob_sementeira_semanal": ev.detalhes_agroclimaticos.get("prob_sementeira_semanal"),
+                }
+            except Exception:
+                avaliacao_atual = None
 
         return {
             "zona": zona_id,
             "provincia": prov_name,
+            "municipio": municipio or None,
             "cultura": crop_key,
+            "cultura_exibicao": cultura_display,
             "icone_cultura": crop_cfg.get("icon", "🌱"),
             "epoca_agricola": f"{start_year}/{start_year + 1}",
+            "content_language": norm_lang,
+            "avaliacao_atual": avaliacao_atual,
             "janela_recomendada": {
                 "inicio": rec_start.isoformat(),
                 "fim": rec_end.isoformat(),
-                "descricao_periodo": f"{rec_start.strftime('%d/%m/%Y')} a {rec_end.strftime('%d/%m/%Y')}",
+                "descricao_periodo": f"{rec_start.strftime('%d/%m/%Y')} {desc_sep} {rec_end.strftime('%d/%m/%Y')}",
                 "inicio_chuvas_mediano_imerg": p50_str,
                 "consolidacao_chuvas_p90_imerg": p90_str,
             },
@@ -622,8 +796,8 @@ class CicloEngineAdapter:
                 "data_referencia": cal_key,
                 "probabilidade_pct": round(float(false_start_p) * 100.0, 1),
                 "ic90_pct": [round(float(x) * 100.0, 1) for x in false_start_ic90],
-                "frequencia_historica": cal_stats.get("frequencia", f"em {clim.get('n_epocas', 24)} épocas"),
-                "nota": "risco estimado a partir de épocas passadas (IMERG V07); não é certeza",
+                "frequencia_historica": freq_hist_out,
+                "nota": nota_falsa,
             },
             "condicoes_historicas_epoca": {
                 "outubro_chuva_mm": oct_stats.get("chuva_media_mensal_mm"),
@@ -638,16 +812,18 @@ class CicloEngineAdapter:
                 "humidade_raiz_min": crop_cfg["min_absolute_root_moisture"],
                 "limite_encharcamento": crop_cfg["waterlogging_limit"],
                 "profundidade_cm": crop_cfg["sowing_depth_cm"],
-                "notas_agronomicas": crop_cfg["notes"],
+                "notas_agronomicas": notas_agro,
             },
             "curva_semanal_safra": weekly_series,
+            "ciclo_anual_52s": ciclo_anual_52s,
+            "ciclo_mensal_12m": ciclo_mensal_12m,
             "previsao_sazonal_6m": seasonal_outlook,
             "fontes": {
                 "precipitacao": "NASA GPM IMERG V07 (2000-2024)",
                 "solo_e_temperatura": "NASA POWER / MERRA-2 (2000-2024)",
                 "motor_estatistico": f"ciclo_diario.py v{saida.get('versao_codigo')}",
             },
-            "aviso": "Indicativo baseado em análise probabilística histórica de 25 épocas; sem validação agronómica local de campo.",
+            "aviso": aviso_out,
         }
 
 

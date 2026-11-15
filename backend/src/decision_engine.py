@@ -44,8 +44,11 @@ class DecisionEngine:
         cultura: str,
         data_consulta: Any,
         weather_data: Dict[str, Any],
+        lang: str = "pt",
     ) -> DecisionEvaluationResult:
         """Evaluates agroclimatic criteria based on crop profiles and historical/current conditions."""
+        is_en = str(lang or "pt").strip().lower().startswith("en")
+        norm_lang = "en" if is_en else "pt"
         if not data_consulta or not isinstance(data_consulta, str):
             data_consulta = date.today().isoformat()
         try:
@@ -140,69 +143,132 @@ class DecisionEngine:
             is_strategic=is_strategic,
         )
 
+        crop_display = crop_cfg.get("name_en", cultura) if is_en else cultura
+
         # --- STRUCTURED JUSTIFICATIONS ---
         if status == AdvisoryStatus.DESFAVORAVEL:
             triggers_ativados.append("SEASONAL_DROUGHT_RISK")
             triggers_ativados.append("CAPITAL_PROTECTION_ALERT")
             if is_dry_season:
-                justificacoes.append(
-                    f"Período de estiagem sazonal (Cacimbo): precipitação média histórica ({avg_monthly_rain:.1f} mm/mês) "
-                    f"é totalmente insuficiente para a cultura de {cultura} (exigência mínima: {min_monthly_rain:.1f} mm)."
-                )
-                justificacoes.append(
-                    f"Reserva hídrica do solo estimada em {root_moisture:.2f}, muito abaixo do limiar biológico ({min_abs_root_moisture:.2f})."
-                )
-                justificacoes.append(
-                    "Alerta de proteção de capital: semear nesta época em regime de sequeiro causará perda de 100% dos recursos "
-                    "(sementes, fertilizantes e custo de mão-de-obra). Recomenda-se reservar o investimento para a época chuvosa."
-                )
+                if is_en:
+                    justificacoes.append(
+                        f"Seasonal dry period (Cacimbo): historical average rainfall ({avg_monthly_rain:.1f} mm/month) "
+                        f"is insufficient for {crop_display} (minimum requirement: {min_monthly_rain:.1f} mm)."
+                    )
+                    justificacoes.append(
+                        f"Estimated root-zone soil moisture ({root_moisture:.2f}) is well below the biological floor ({min_abs_root_moisture:.2f})."
+                    )
+                    justificacoes.append(
+                        "Capital protection alert: rainfed sowing during this period carries near-total resource loss risk "
+                        "(seeds, fertilizer, and labor). Reserve investment for the rainy season."
+                    )
+                else:
+                    justificacoes.append(
+                        f"Período de estiagem sazonal (Cacimbo): precipitação média histórica ({avg_monthly_rain:.1f} mm/mês) "
+                        f"é totalmente insuficiente para a cultura de {cultura} (exigência mínima: {min_monthly_rain:.1f} mm)."
+                    )
+                    justificacoes.append(
+                        f"Reserva hídrica do solo estimada em {root_moisture:.2f}, muito abaixo do limiar biológico ({min_abs_root_moisture:.2f})."
+                    )
+                    justificacoes.append(
+                        "Alerta de proteção de capital: semear nesta época em regime de sequeiro causará perda de 100% dos recursos "
+                        "(sementes, fertilizantes e custo de mão-de-obra). Recomenda-se reservar o investimento para a época chuvosa."
+                    )
             else:
-                justificacoes.append(
-                    f"Condições agroclimáticas desfavoráveis para {cultura}: probabilidade de sementeira viável de apenas {prob_sementeira_semanal:.1f}%."
-                )
-                justificacoes.append(
-                    f"Humidade na raiz ({root_moisture:.2f}) e chuvas esperadas ({rain_7d:.1f} mm) não garantem germinação uniforme."
-                )
+                if is_en:
+                    justificacoes.append(
+                        f"Unfavorable agroclimatic conditions for {crop_display}: historical weekly sowing suitability is only {prob_sementeira_semanal:.1f}%."
+                    )
+                    justificacoes.append(
+                        f"Root-zone soil moisture ({root_moisture:.2f}) and expected rainfall ({rain_7d:.1f} mm) do not support uniform germination."
+                    )
+                else:
+                    justificacoes.append(
+                        f"Condições agroclimáticas desfavoráveis para {cultura}: probabilidade de sementeira viável de apenas {prob_sementeira_semanal:.1f}%."
+                    )
+                    justificacoes.append(
+                        f"Humidade na raiz ({root_moisture:.2f}) e chuvas esperadas ({rain_7d:.1f} mm) não garantem germinação uniforme."
+                    )
 
         elif status == AdvisoryStatus.AGUARDAR:
             if is_waterlogged:
-                justificacoes.append(
-                    f"Risco de asfixia radicular e encharcamento: humidade no solo ({root_moisture:.2f}) excede o limite de tolerância "
-                    f"do {cultura} ({waterlogging_limit:.2f}) com previsão de chuvas intensas ({rain_7d:.1f} mm)."
-                )
-                justificacoes.append("As sementes correm risco severo de apodrecimento no solo. Aguarde a drenagem do terreno.")
+                if is_en:
+                    justificacoes.append(
+                        f"Root asphyxiation and waterlogging risk: root-zone moisture ({root_moisture:.2f}) exceeds {crop_display} tolerance "
+                        f"({waterlogging_limit:.2f}) alongside heavy forecast rainfall ({rain_7d:.1f} mm)."
+                    )
+                    justificacoes.append("Seeds face severe rot risk in saturated soil. Wait for field drainage before sowing.")
+                else:
+                    justificacoes.append(
+                        f"Risco de asfixia radicular e encharcamento: humidade no solo ({root_moisture:.2f}) excede o limite de tolerância "
+                        f"do {cultura} ({waterlogging_limit:.2f}) com previsão de chuvas intensas ({rain_7d:.1f} mm)."
+                    )
+                    justificacoes.append("As sementes correm risco severo de apodrecimento no solo. Aguarde a drenagem do terreno.")
             elif dry_spell_risk:
-                justificacoes.append(
-                    f"Risco de falsa partida / veranico: previsão de calor excessivo ({t_max_7d:.1f}°C) e ausência de chuva nos próximos 7 dias ({rain_7d:.1f} mm)."
-                )
-                justificacoes.append("Aguarde a regularização do regime de chuvas para evitar a queima das sementes germinadas.")
+                if is_en:
+                    justificacoes.append(
+                        f"False-start / dry-spell risk: high heat forecast ({t_max_7d:.1f}°C) with near-zero rainfall over the next 7 days ({rain_7d:.1f} mm)."
+                    )
+                    justificacoes.append("Wait for rainfall patterns to stabilize to avoid scorching newly germinated seedlings.")
+                else:
+                    justificacoes.append(
+                        f"Risco de falsa partida / veranico: previsão de calor excessivo ({t_max_7d:.1f}°C) e ausência de chuva nos próximos 7 dias ({rain_7d:.1f} mm)."
+                    )
+                    justificacoes.append("Aguarde a regularização do regime de chuvas para evitar a queima das sementes germinadas.")
             elif is_soy_deficit:
-                justificacoes.append(
-                    f"A cultura da Soja exige alta absorção de água (~50% do seu peso) e solo com reserva firme (>= 0.40). "
-                    f"A humidade atual/esperada ({root_moisture:.2f}) ainda é insuficiente para emergência uniforme."
-                )
-                justificacoes.append("Recomenda-se aguardar a plena recarga hídrica do solo.")
+                if is_en:
+                    justificacoes.append(
+                        f"Soybean requires high water absorption (~50% of seed weight) and firm soil moisture reserve (>= 0.40). "
+                        f"Current/expected moisture ({root_moisture:.2f}) is not yet sufficient for uniform emergence."
+                    )
+                    justificacoes.append("Wait for full root-zone soil moisture recharge.")
+                else:
+                    justificacoes.append(
+                        f"A cultura da Soja exige alta absorção de água (~50% do seu peso) e solo com reserva firme (>= 0.40). "
+                        f"A humidade atual/esperada ({root_moisture:.2f}) ainda é insuficiente para emergência uniforme."
+                    )
+                    justificacoes.append("Recomenda-se aguardar a plena recarga hídrica do solo.")
             else:
-                justificacoes.append(
-                    f"Janela agroclimática de transição: probabilidade histórica de sementeira moderada ({prob_sementeira_semanal:.1f}%), "
-                    f"com chuvas em consolidação ({avg_monthly_rain:.1f} mm/mês)."
-                )
-                justificacoes.append(
-                    "Recomenda-se concluir a preparação da terra, aragem e correção do solo, aguardando o estabelecimento definitivo das chuvas."
-                )
+                if is_en:
+                    justificacoes.append(
+                        f"Transitional agroclimatic window: moderate historical sowing probability ({prob_sementeira_semanal:.1f}%), "
+                        f"with rainfall still consolidating ({avg_monthly_rain:.1f} mm/month)."
+                    )
+                    justificacoes.append(
+                        "Finish land preparation, plowing, and soil amendment while waiting for steady rainfall onset."
+                    )
+                else:
+                    justificacoes.append(
+                        f"Janela agroclimática de transição: probabilidade histórica de sementeira moderada ({prob_sementeira_semanal:.1f}%), "
+                        f"com chuvas em consolidação ({avg_monthly_rain:.1f} mm/mês)."
+                    )
+                    justificacoes.append(
+                        "Recomenda-se concluir a preparação da terra, aragem e correção do solo, aguardando o estabelecimento definitivo das chuvas."
+                    )
 
         else:  # FAVORAVEL
             triggers_ativados.append("FAVORABLE_HISTORICAL_WINDOW")
             triggers_ativados.append("SATISFIED_CROP_WATER_REQUIREMENT")
-            justificacoes.append(
-                f"Período agroclimático favorável e estável para sementeira de {cultura}: probabilidade histórica de sucesso de {prob_sementeira_semanal:.1f}%."
-            )
-            justificacoes.append(
-                f"Precipitação média de {avg_monthly_rain:.1f} mm/mês satisfaz plenamente a demanda da cultura ({min_monthly_rain:.1f} mm)."
-            )
-            justificacoes.append(
-                f"Reserva de água na raiz ({root_moisture:.2f}) compatível com germinação vigorosa na profundidade de {depth_cm} cm."
-            )
+            if is_en:
+                justificacoes.append(
+                    f"Favorable and stable agroclimatic window for {crop_display}: historical sowing suitability probability of {prob_sementeira_semanal:.1f}%."
+                )
+                justificacoes.append(
+                    f"Average rainfall of {avg_monthly_rain:.1f} mm/month satisfies the crop requirement ({min_monthly_rain:.1f} mm)."
+                )
+                justificacoes.append(
+                    f"Root-zone water reserve ({root_moisture:.2f}) supports vigorous germination at {depth_cm} cm sowing depth."
+                )
+            else:
+                justificacoes.append(
+                    f"Período agroclimático favorável e estável para sementeira de {cultura}: probabilidade histórica de sucesso de {prob_sementeira_semanal:.1f}%."
+                )
+                justificacoes.append(
+                    f"Precipitação média de {avg_monthly_rain:.1f} mm/mês satisfaz plenamente a demanda da cultura ({min_monthly_rain:.1f} mm)."
+                )
+                justificacoes.append(
+                    f"Reserva de água na raiz ({root_moisture:.2f}) compatível com germinação vigorosa na profundidade de {depth_cm} cm."
+                )
 
         metrics = AdvisoryMetrics(
             chuva_acumulada_recente_mm=round(rain_recent, 1),
@@ -217,6 +283,7 @@ class DecisionEngine:
             justificacoes_tecnicas=justificacoes,
             metricas=metrics,
             is_fallback_weather=bool(weather_data.get("is_fallback", False)),
+            content_language=norm_lang,
             detalhes_agroclimaticos={
                 "provincia": provincia,
                 "cultura": cultura,

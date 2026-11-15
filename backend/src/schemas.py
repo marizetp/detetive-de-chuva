@@ -46,14 +46,14 @@ class AdvisoryRequest(BaseModel):
     @field_validator("lang", mode="before")
     @classmethod
     def normalize_lang(cls, v: Any) -> str:
-        if not v or not str(v).strip():
+        if v is None:
             return "pt"
         raw = str(v).strip().lower()
-        if raw.startswith("en"):
-            return "en"
-        if raw.startswith("pt"):
+        if raw in ("pt", "pt-ao"):
             return "pt"
-        raise ValueError("Unsupported language. Use 'pt' or 'en'.")
+        if raw in ("en", "en-us"):
+            return "en"
+        raise ValueError("Unsupported language. Use 'pt', 'pt-AO', 'en', or 'en-US'.")
 
     @field_validator("data_consulta", mode="before")
     @classmethod
@@ -128,6 +128,11 @@ class AdvisoryResponse(BaseModel):
         description="Texto completo formal, simples e sem jargões para o agricultor",
         examples=["**FAVORÁVEL: O período atual é favorável para a sementeira de Milho na província do Huambo...**"]
     )
+    content_language: str = Field(
+        default="pt",
+        description="Effective language returned for narrative content ('pt' or 'en')",
+        examples=["pt"]
+    )
 
 
 class DecisionEvaluationResult(BaseModel):
@@ -138,6 +143,7 @@ class DecisionEvaluationResult(BaseModel):
     justificacoes_tecnicas: List[str]
     metricas: AdvisoryMetrics
     is_fallback_weather: bool = False
+    content_language: str = "pt"
     detalhes_agroclimaticos: Dict[str, Any] = Field(default_factory=dict)
 
 

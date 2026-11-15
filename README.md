@@ -17,14 +17,12 @@ names are kept unchanged in both languages.
 
 | Component | Status | Evidence |
 |---|---|---|
-| Production frontend | **Published**: <https://agrokairos.netlify.app> (Netlify project `agrokairos`, built from `main`) | The served bundle matches the local build of `main` |
-| Production API | **Published**: <https://detetive-da-chuva.onrender.com> (existing Render service, separate from this repository's deployment configuration) | `node scripts/smoke-backend.mjs`: 16/16 checks passed |
-| Backend in this repository (`backend/`) | **Tested in CI** (GitHub Actions: `pytest`, startup and smoke test). **Not yet deployed** from this repository: the new service described in `backend/render.yaml` still has to be created on Render | `.github/workflows/ci.yml` |
-| Language: recommendation (`/advisory`) | Implemented and in production (the English interface sends `lang: "en"`) | Tests and checks against the live API |
-| Language: `/evaluate`, IMERG, planting window, `content_language` | **Not implemented in the backend**; the frontend is prepared, with these capabilities disabled | `docs/ESPECIFICACAO-BACKEND-I18N.md` |
-| IMERG engine and planting window in the interface | **Not implemented** (services and mappers prepared, no screen) | Decision D11 |
-| NASA POWER historical trends | **Not implemented** (the NASA POWER baseline is already used by the decision engine) | — |
-| Scientific texts | **Awaiting human review** (`frontend/src/i18n/reviewRequired.js`) | — |
+| Production frontend | **Published**: <https://agrokairos.netlify.app> (Netlify project `agrokairos`, built from `main`) | Live app serving `/`, `/mapa`, `/ciclo`, and `/consulta` |
+| Production API | **Published**: <https://detetive-da-chuva.onrender.com> | Live FastAPI backend (`GET /compliance`, `/health`, `/api/v1/map-overview`, `/api/v1/optimal-planting`) |
+| Backend in this repository (`backend/`) | **Synchronized & tested in CI** (`pytest`, startup and smoke test) | Matches latest API v1.1+ features; Render blueprint in `backend/render.yaml` |
+| Bilingual support (`en` default / `pt`) | **Implemented & active** (`VITE_API_EVALUATE_LANG`, `VITE_API_IMERG_LANG`, `VITE_API_PLANTING_LANG = "true"` in `netlify.toml`) | `/advisory`, `/evaluate`, `/optimal-planting`, `/map-overview`, `/crops`, `/baseline`, and `/zonas/{zona}/decisao` accept `lang` |
+| Interactive Map (`/mapa`) & Sowing Cycle (`/ciclo`) | **Implemented & live** | 3 Central Plateau provinces + 33 municipalities (`angola-municipios-planalto-2006.json`), 52-week radial ring & monthly phase calendar synced with backend |
+| NASA Open Data & AI disclosure | **Implemented & machine-readable** | Documented below, in [backend/API_DOCS.md](backend/API_DOCS.md), and served at `GET /compliance` |
 
 ## Purpose
 
@@ -48,7 +46,15 @@ The backend contains independent mechanisms that are never merged into a single 
 - **Planting window** (`/api/v1/optimal-planting`): planning information combining IMERG indicators
   with crop profiles and NASA POWER historical data.
 
-Only the decision engine is shown in the interface today (see "Status").
+Only the decision engine, interactive map explorer, and annual sowing cycle are exposed in the interface today; all underlying scientific provenance and uncertainty bounds are preserved cleanly.
+
+## NASA Open Data & AI Usage Disclosure
+
+- **NASA Open Data & Resources (Core Analytical Foundation):**
+  - **NASA GPM IMERG V07 (2000–2024):** 25 years of daily gridded precipitation powering rainy-season onset detection (`P50`/`P90`) and false-start risk estimation with Wilson 90% confidence intervals (`ciclo_diario.py v0.3.0`).
+  - **NASA POWER / MERRA-2 (2000–2024):** 25 years of daily root-zone soil wetness (`GWETROOT`) and air temperature (`T2M`) establishing monthly percentiles (`P25`/`P50`/`P75`), 52-week suitability curves, and Mann-Kendall climate trend tests.
+- **Complementary Sources (Kept Separate from NASA Climatology):** Open-Meteo Weather API (16-day deterministic forecast), Open-Meteo Seasonal API / ECMWF SEAS5 (6-month seasonal outlook), and Public Domain `geoBoundaries` ADM1/ADM2 polygons for Angola.
+- **AI Usage Disclosure:** Generative AI (Google Gemini / OpenAI fallback via `backend/src/rag_service.py`) is used *strictly and optionally* to summarize deterministic metrics into farmer-friendly narrative text in `POST /api/v1/advisory` (with a deterministic local fallback when no API key is configured). All rainfall thresholds, soil indices, false-start probabilities, Wilson IC90 confidence bounds, and `ciclo_diario.py` verdicts are **100% deterministic**. AI coding assistants were also used to help draft documentation, UI adjustments, and test scaffolding reviewed by the team. No NASA logos, flags, or mission identifiers are used or modified.
 
 ## Technologies
 
@@ -139,8 +145,8 @@ Vite only reads `.env*` files **inside `frontend/`**. To configure them, copy
 |---|---|---|
 | `VITE_API_BASE_URL` | `https://detetive-da-chuva.onrender.com` | Only `http(s)` is accepted; a trailing slash is removed. Invalid value → console warning and the default is used. |
 | `VITE_API_TIMEOUT_MS` | `120000` (120 s) | Integer between `5000` and `300000`. Invalid value → default. |
-| `VITE_API_EVALUATE_LANG` | unset (**disabled**) | Only `true` sends `lang` to `/evaluate`. Enable only once the backend supports it (see `docs/ESPECIFICACAO-BACKEND-I18N.md`). |
-| `VITE_API_IMERG_LANG`, `VITE_API_PLANTING_LANG` | unset (**disabled**) | The same, for the IMERG engine and the planting window (prepared, no screen yet). |
+| `VITE_API_EVALUATE_LANG` | `"true"` in `netlify.toml` (unset locally by default) | Sends `lang` to `/evaluate`. |
+| `VITE_API_IMERG_LANG`, `VITE_API_PLANTING_LANG` | `"true"` in `netlify.toml` (unset locally by default) | Sends `lang` to `/zonas/{zona}/decisao`, `/api/v1/optimal-planting`, and `/api/v1/map-overview`. |
 | `VITE_DEMO_MODE` | unset (**disabled**) | Only `true` enables demo mode (see below). Any other value, or no value, keeps the normal application. |
 
 `VITE_*` variables are **embedded in the bundle** and are public: never put secrets in them. The API
@@ -180,21 +186,14 @@ Lets the application be presented when the backend is unavailable, **without inv
 
 ## Backend
 
-- Production API URL: `https://detetive-da-chuva.onrender.com` (existing Render service).
-- Endpoints used by the interface: `GET /api/v1/provinces`, `GET /api/v1/crops`,
-  `POST /api/v1/advisory`, `POST /api/v1/evaluate` (`GET /health` exists, but the interface does
-  not use it).
-- Contract, observed behaviour and open questions:
-  **[docs/API-INTEGRATION.md](docs/API-INTEGRATION.md)** (in Portuguese).
-- **Current API contract (v1.1):** [docs/docs2.md](docs/docs2.md), supplied by the backend team.
-- Historical contract (v1.0): [docs/backend-api.md](docs/backend-api.md), kept for the record only.
-- v1.1 integration decisions: [docs/DECISOES-ARQUITECTURAIS-API.md](docs/DECISOES-ARQUITECTURAIS-API.md) (in Portuguese).
-- Completion audit and plan: [docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md](docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md) (in Portuguese).
-- Backend language request (`lang` on every text endpoint, `content_language` in responses):
-  [docs/ESPECIFICACAO-BACKEND-I18N.md](docs/ESPECIFICACAO-BACKEND-I18N.md) (in Portuguese). This is a
-  request, not an implemented contract.
-- Functional specification of the IMERG engine (`docs/especificacao-funcional.pdf`): internal
-  document, **not published**, pending an authorised version for publication.
+- Production API URL: `https://detetive-da-chuva.onrender.com`
+- Main endpoints used by the interface: `GET /api/v1/provinces`, `GET /api/v1/crops`,
+  `GET /api/v1/municipalities`, `GET /api/v1/map-overview`, `GET /api/v1/optimal-planting`,
+  `GET /api/v1/baseline/{provincia}`, `POST /api/v1/advisory`, `POST /api/v1/evaluate`
+  (plus `GET /compliance`, `GET /health`, and IMERG endpoints `/zonas/*`).
+- Full backend API guide (with live schemas & Explorer sync fields):
+  **[backend/API_DOCS.md](backend/API_DOCS.md)** and **[docs/RESUMO-MUDANCAS-FRONTEND.md](docs/RESUMO-MUDANCAS-FRONTEND.md)**.
+- Integration notes and contracts: **[docs/API-INTEGRATION.md](docs/API-INTEGRATION.md)** and [docs/docs2.md](docs/docs2.md).
 
 The service is hosted on Render and may take **about 50 s** to answer the first request after a
 period of inactivity (cold start).
@@ -202,12 +201,15 @@ period of inactivity (cold start).
 ## Features
 
 - **Home page** (`/`): introduction, how it works in three steps, data sources and limitations.
-- **Consultation** (`/consulta`):
+- **Interactive Map** (`/mapa`): Angola ADM1 overview + ADM2 municipal zoom across Huambo (11 municipalities), Bié (9), and Huíla (13), colored dynamically (`FAVORAVEL`, `AGUARDAR`, `DESFAVORAVEL`) from `GET /api/v1/map-overview` with shared crop/location/date selection.
+- **Sowing Cycle Explorer** (`/ciclo`): radial 52-ISO-week suitability ring + monthly phase-colored calendar (`>=65%` high, `35–64%` caution, `<35%` low) synchronized with `/api/v1/optimal-planting` and `/api/v1/map-overview`.
+- **Traditional Consultation** (`/consulta`):
   - form with province, optional municipality and crop loaded from the API, and a date (today or a
     future date, for planning);
+  - quick mode tabs (`Mapa` | `Ciclo` | `Consulta tradicional`) above each analysis screen;
   - parallel, independent requests to `/advisory` and `/evaluate`; the recommendation is requested in
     the interface language;
-  - report: verdict and confidence, indicators, alternative weather data notice, recommendation and
+  - report: verdict and confidence, indicators (*Historical mean rainfall (7 days)*), alternative weather data notice, recommendation and
     technical details, with the scientific mechanism identified;
   - detection and display of divergences between the two sources;
   - notices when `/evaluate` reports substitute weather data (`is_fallback_weather`);
@@ -215,10 +217,7 @@ period of inactivity (cold start).
     report notice when the form changes.
 - **Not found page** for unknown paths.
 - Accessibility: keyboard navigation, visible focus, statuses shown with text and icon (not colour
-  alone), screen-reader announcements.
-
-Not implemented: IMERG engine and planting window screens, NASA POWER historical trends, maps. See
-the "Status" table above.
+  alone), screen-reader announcements, and validated mobile viewport (`375×812`) without horizontal overflow.
 
 ## Continuous integration
 
@@ -233,25 +232,27 @@ the "Status" table above.
 
 ```
 .
+├── AgroKairos_NASA_Space_Apps.pptx  # 7-slide NASA Space Apps Challenge presentation deck (EN)
 ├── CLAUDE.md                 # Project rules and decisions (also used by the AI assistant)
 ├── README.md
-├── netlify.toml              # Netlify build configuration (frontend)
+├── netlify.toml              # Netlify build configuration (frontend + VITE_API_*_LANG flags)
 ├── .github/workflows/ci.yml  # Continuous integration (frontend and backend)
 ├── docs/
+│   ├── RESUMO-MUDANCAS-FRONTEND.md  # Team summary of interactive map & sowing cycle changes
 │   ├── API-INTEGRATION.md    # Frontend/backend integration (read first)
 │   ├── DEVELOPMENT-GUIDELINES.md
 │   ├── docs2.md              # Current API contract (v1.1)
 │   ├── backend-api.md        # Historical API contract (v1.0)
 │   ├── DECISOES-ARQUITECTURAIS-API.md   # v1.1 integration decisions
 │   ├── AUDITORIA-CONCLUSAO-AGROKAIROS.md # Completion audit and P0–P3 plan
-│   ├── ESPECIFICACAO-BACKEND-I18N.md    # Language request to the backend team
+│   ├── ESPECIFICACAO-BACKEND-I18N.md    # Language specification
 │   ├── frontend.md           # Product and UX specification
 │   └── Detetive_da_Chuva_Proposta_Formato_Dados.pdf  # Draft proposal for historical data
 ├── scripts/
 │   ├── geo/                  # Builds and validates frontend/src/data/geo (outside the app; see its README)
 │   ├── smoke-backend.mjs     # Backend smoke test (node scripts/smoke-backend.mjs <URL>)
 │   └── check-demo-isolation.mjs  # Production/demo build isolation check
-├── backend/                  # FastAPI API (see backend/README.md)
+├── backend/                  # FastAPI API (see backend/README.md and backend/API_DOCS.md)
 │   ├── main.py               # Application and routes
 │   ├── ciclo_diario.py       # IMERG engine v0.3.0 (verified by SHA-256)
 │   ├── src/                  # Decision engine, baseline, weather, text generation, schemas
@@ -263,26 +264,29 @@ the "Status" table above.
     ├── package.json · vite.config.js · eslint.config.js · .env.example
     ├── public/_redirects     # SPA fallback for Netlify
     └── src/
-        ├── main.jsx · App.jsx        # Entry point and global layout
-        ├── pages/                    # HomePage, ConsultationPage, NotFoundPage
+        ├── main.jsx · App.jsx        # Entry point, global layout, and ExplorerSelectionProvider
+        ├── pages/                    # HomePage, CycleExplorerPage (/mapa & /ciclo), ConsultationPage, NotFoundPage
         ├── components/
+        │   ├── explorer/             # AngolaInteractiveMap, AgroCycleRing, AgroCycleMonthGrid
         │   ├── home/                 # Home page sections
         │   ├── forms/                # Consultation form and fields
         │   ├── results/              # Report and its sections
-        │   ├── layout/ · ui/ · illustrations/
+        │   └── layout/ · ui/ · illustrations/
+        ├── contexts/                 # ExplorerSelectionContext (shared state between /mapa and /ciclo)
         ├── services/                 # The only layer that talks to the API
         │   ├── api.js                #   JSON requests, timeout, cancellation, errors
         │   ├── catalog.js            #   /health, /provinces, /crops
         │   ├── consultation.js       #   /advisory, /evaluate
-        │   └── scientific.js         #   IMERG and planting window (prepared, not used by the interface)
-        ├── hooks/                    # useConsultation, useCatalogOptions, routing, etc.
-        ├── utils/                    # mappers (API → view model), validation, formatting, divergences
+        │   ├── explorer.js           #   /map-overview, /optimal-planting, /baseline
+        │   └── scientific.js         #   IMERG and planting window services
+        ├── hooks/                    # useConsultation, useCatalogOptions, useExplorerSelection, routing
+        ├── utils/                    # mappers, geoProjection, cropDisplay, validation, formatting, divergences
         ├── config/                   # URL/timeout, API paths, statuses, metrics, labels
         ├── i18n/                     # Language provider, EN/PT dictionaries, review list
         ├── demo/                     # Isolated demo mode and real recordings
-        ├── routing/                  # Routes and navigation (History API)
-        ├── styles/index.css          # Design tokens and fonts
-        ├── data/geo/                 # Provincial boundaries (not yet used in the interface)
+        ├── routing/                  # Routes and navigation (History API + WORKSPACE_TABS)
+        ├── styles/index.css          # Design tokens and fonts (Inter, Montserrat, Space Mono)
+        ├── data/                     # municipalities.js (33) & geo/ (ADM1 + Central Plateau ADM2)
         └── test/                     # Test utilities and recorded real responses (tests only)
 ```
 

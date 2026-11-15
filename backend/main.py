@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import date
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,12 +30,24 @@ from src.schemas import (
 from src.config import (
     PROVINCES,
     CROPS,
+    MUNICIPALITIES,
     PROCESSED_BASELINE_PATH,
     ENVIRONMENT,
     IS_PRODUCTION,
     IMERG_CONTRACT_FILES,
     COMPLIANCE_METADATA,
+    normalize_lang,
 )
+
+
+def _parse_query_lang(lang: Optional[str]) -> str:
+    try:
+        return normalize_lang(lang)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=[{"loc": ["query", "lang"], "msg": str(e), "type": "value_error"}],
+        )
 from src.baseline_engine import get_baseline_engine
 from src.weather_service import get_weather_service
 from src.decision_engine import get_decision_engine
@@ -178,8 +191,9 @@ def list_provinces() -> List[ProvinceInfo]:
     tags=["Metadados"],
     summary="Listar Culturas Agrícolas",
 )
-def list_crops() -> List[CropInfo]:
+def list_crops(lang: Optional[str] = Query(default=None, description="Language ('pt' or 'en')")) -> List[CropInfo]:
     """Lista as culturas suportadas no sistema para preenchimento de seletores no frontend."""
+    norm_lang = _parse_query_lang(lang)
     crops_list = []
     for c_key, c_val in CROPS.items():
         crops_list.append(
@@ -190,10 +204,39 @@ def list_crops() -> List[CropInfo]:
                 icone=c_val.get("icon", "🌱"),
                 profundidade_sementeira_cm=c_val.get("sowing_depth_cm", c_val.get("soil_depth_cm", 5)),
                 min_chuva_abertura_mm=c_val.get("min_rain_3d_mm", c_val.get("min_rain_onset_mm", 20.0)),
-                notas_agronomicas=c_val.get("notes", ""),
+                notas_agronomicas=c_val.get("notes_en", c_val.get("notes", "")) if norm_lang == "en" else c_val.get("notes", ""),
             )
         )
     return crops_list
+
+
+@app.get(
+    "/api/v1/municipalities",
+    tags=["Metadados"],
+    summary="Listar Municípios Suportados",
+)
+def list_municipalities(provincia: Optional[str] = Query(default=None, description="Filtrar por província (Huambo, Bié ou Huíla)")) -> List[Dict[str, Any]]:
+    """Lista os municípios agrícolas suportados no Planalto Central com coordenadas geográficas."""
+    result = []
+    seen = set()
+    for m_id, m_val in MUNICIPALITIES.items():
+        if m_val.get("alias"):
+            continue
+        if provincia and m_val["provincia"].lower() != provincia.strip().lower():
+            continue
+        key = (m_val["provincia"], m_val["name"])
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append({
+            "id": m_id,
+            "nome": m_val["name"],
+            "provincia": m_val["provincia"],
+            "latitude": m_val["latitude"],
+            "longitude": m_val["longitude"],
+            "is_sede": bool(m_val.get("is_seat", False)),
+        })
+    return result
 
 
 @app.get(
@@ -201,15 +244,19 @@ def list_crops() -> List[CropInfo]:
     tags=["Agroclima"],
     summary="Consultar Linha de Base Histórica",
 )
-def get_province_baseline(provincia: str) -> Dict[str, Any]:
+def get_province_baseline(
+    provincia: str,
+    lang: Optional[str] = Query(default=None, description="Language ('pt' or 'en')"),
+) -> Dict[str, Any]:
     """Consulta as matrizes históricas (2000-2024), percentis mensais e tendências de Mann-Kendall."""
+    norm_lang = _parse_query_lang(lang)
     engine = get_baseline_engine()
     baseline = engine.load_baseline()
 
     # Search province
     for p_key, p_val in baseline.get("provincias", {}).items():
         if p_key.lower() == provincia.lower() or p_val.get("id") == provincia.lower():
-            return p_val
+            return {**p_val, "content_language": norm_lang}
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -241,6 +288,7 @@ def evaluate_decision_only(payload: AdvisoryRequest) -> DecisionEvaluationResult
             cultura=payload.cultura,
             data_consulta=payload.data_consulta,
             weather_data=weather_data,
+            lang=payload.lang,
         )
         return eval_result
     except KeyError as e:
@@ -277,6 +325,7 @@ def get_agricultural_advisory(payload: AdvisoryRequest) -> AdvisoryResponse:
             cultura=payload.cultura,
             data_consulta=payload.data_consulta,
             weather_data=weather_data,
+            lang=payload.lang,
         )
     except Exception as e:
         raise HTTPException(
@@ -309,6 +358,7 @@ def get_agricultural_advisory(payload: AdvisoryRequest) -> AdvisoryResponse:
             previsao_7dias_mm=eval_result.metricas.previsao_7dias_mm,
         ),
         recomendacao_extensao=recomendacao_texto,
+        content_language=payload.lang,
     )
 
     return response
@@ -338,10 +388,14 @@ def list_motor_zones() -> Dict[str, Any]:
 
 
 @app.get("/zonas/{zona}/decisao", tags=["Motor IMERG (Secção 7)"])
-def get_zone_decision_latest(zona: str) -> Dict[str, Any]:
+def get_zone_decision_latest(
+    zona: str,
+    lang: Optional[str] = Query(default=None, description="Language ('pt' or 'en')"),
+) -> Dict[str, Any]:
     """Ciclo mais recente do motor para a zona: mensagem_agricultor, estado_motor, grau_confianca e resposta."""
+    norm_lang = _parse_query_lang(lang)
     try:
-        return get_ciclo_adapter().get_decisao_payload(zona, data_ref=None)
+        return get_ciclo_adapter().get_decisao_payload(zona, data_ref=None, lang=norm_lang)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except FileNotFoundError as e:
@@ -349,10 +403,15 @@ def get_zone_decision_latest(zona: str) -> Dict[str, Any]:
 
 
 @app.get("/zonas/{zona}/decisao/{data_ref}", tags=["Motor IMERG (Secção 7)"])
-def get_zone_decision_by_date(zona: str, data_ref: str) -> Dict[str, Any]:
+def get_zone_decision_by_date(
+    zona: str,
+    data_ref: str,
+    lang: Optional[str] = Query(default=None, description="Language ('pt' or 'en')"),
+) -> Dict[str, Any]:
     """Decisão do motor ciclo_diario.py para uma zona e data específica (AAAA-MM-DD)."""
+    norm_lang = _parse_query_lang(lang)
     try:
-        return get_ciclo_adapter().get_decisao_payload(zona, data_ref=data_ref)
+        return get_ciclo_adapter().get_decisao_payload(zona, data_ref=data_ref, lang=norm_lang)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except FileNotFoundError as e:
@@ -428,21 +487,94 @@ def get_sources_health() -> Dict[str, Any]:
 def get_optimal_planting_window(
     zona: Optional[str] = None,
     provincia: Optional[str] = Query(default=None, description="Província (Huambo, Bié ou Huíla)"),
+    municipio: Optional[str] = Query(default=None, description="Município opcional para avaliação sincronizada"),
+    data_consulta: Optional[str] = Query(default=None, description="Data ISO opcional (AAAA-MM-DD)"),
     cultura: str = Query(default="Milho", description="Cultura (Milho, Feijão, Soja, Mandioca, Arroz)"),
     epoca_agricola: str = Query(default="2024/2025", description="Época agrícola / Safra (ex: 2024/2025)"),
+    lang: Optional[str] = Query(default=None, description="Language ('pt' or 'en')"),
 ) -> Dict[str, Any]:
     """Identifica automaticamente a melhor época de plantio para uma cultura e ano agrícola."""
+    norm_lang = _parse_query_lang(lang)
     target_zone = zona or provincia or "huambo"
     try:
         return get_ciclo_adapter().compute_optimal_planting_window(
             zona=target_zone,
             cultura=cultura,
             epoca_agricola=epoca_agricola,
+            lang=norm_lang,
+            municipio=municipio,
+            data_consulta=data_consulta,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except FileNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+
+
+@app.get("/api/v1/map-overview", tags=["Mapa Interactivo"])
+def get_map_overview(
+    cultura: str = Query(default="Milho", description="Cultura (Milho, Feijão, Soja, Mandioca, Arroz)"),
+    data_consulta: Optional[str] = Query(default=None, description="Data ISO (AAAA-MM-DD)"),
+    provincia: Optional[str] = Query(default=None, description="Se indicada, inclui os municípios da província"),
+    lang: Optional[str] = Query(default=None, description="Language ('pt' or 'en')"),
+) -> Dict[str, Any]:
+    """Devolve o estado agroclimático determinístico das 3 províncias (e municípios opcionais) para colorir o mapa."""
+    norm_lang = _parse_query_lang(lang)
+    query_date = data_consulta or date.today().isoformat()
+    weather_svc = get_weather_service()
+    decision_engine = get_decision_engine()
+
+    def _eval_place(prov_name: str, muni_name: Optional[str] = None) -> Dict[str, Any]:
+        w = weather_svc.fetch_weather(prov_name, query_date, muni_name)
+        ev = decision_engine.evaluate(
+            provincia=prov_name,
+            cultura=cultura,
+            data_consulta=query_date,
+            weather_data=w,
+            lang=norm_lang,
+        )
+        return {
+            "provincia": prov_name,
+            "municipio": muni_name,
+            "status": ev.status.value,
+            "score_confianca": ev.score_confianca,
+            "metricas": ev.metricas.model_dump(),
+            "justificacoes_tecnicas": ev.justificacoes_tecnicas,
+            "is_fallback_weather": ev.is_fallback_weather,
+            "prob_sementeira_semanal": ev.detalhes_agroclimaticos.get("prob_sementeira_semanal"),
+        }
+
+    try:
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            prov_futures = {p_name: pool.submit(_eval_place, p_name, None) for p_name in PROVINCES.keys()}
+            provs_out = {p_name: fut.result() for p_name, fut in prov_futures.items()}
+
+            munis_out: Dict[str, Any] = {}
+            if provincia:
+                target_prov = next((p for p in PROVINCES.keys() if p.lower() == provincia.strip().lower()), None)
+                if not target_prov:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Província '{provincia}' inválida.",
+                    )
+                unique_munis = [
+                    m["name"] for m in MUNICIPALITIES.values()
+                    if m["provincia"] == target_prov and not m.get("alias")
+                ]
+                muni_futures = {m_name: pool.submit(_eval_place, target_prov, m_name) for m_name in unique_munis}
+                munis_out = {m_name: fut.result() for m_name, fut in muni_futures.items()}
+    except HTTPException:
+        raise
+    except (ValueError, KeyError) as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return {
+        "cultura": cultura,
+        "data_consulta": query_date,
+        "content_language": norm_lang,
+        "provincias": provs_out,
+        "municipios": munis_out,
+    }
 
 
 if __name__ == "__main__":

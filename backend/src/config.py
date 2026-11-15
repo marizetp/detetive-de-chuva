@@ -4,9 +4,25 @@ Planalto Central de Angola (Huambo, Bié, Huíla).
 """
 
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import os
 from dotenv import load_dotenv
+
+
+def normalize_lang(lang: Optional[str]) -> str:
+    """Normalizes optional API language parameter to 'pt' or 'en'.
+
+    Accepts 'pt', 'pt-AO', 'en', 'en-US' (case-insensitive).
+    None -> 'pt' (legacy default). Empty or unsupported values raise ValueError.
+    """
+    if lang is None:
+        return "pt"
+    raw = str(lang).strip().lower()
+    if raw in ("pt", "pt-ao"):
+        return "pt"
+    if raw in ("en", "en-us"):
+        return "en"
+    raise ValueError("Unsupported language. Use 'pt', 'pt-AO', 'en', or 'en-US'.")
 
 # Load environment variables
 load_dotenv()
@@ -56,6 +72,7 @@ CROP_PROFILES: Dict[str, Dict[str, Any]] = {
     "Milho": {
         "id": "milho",
         "name": "Milho",
+        "name_en": "Maize",
         "scientific_name": "Zea mays",
         "icon": "🌽",
         "min_rain_3d_mm": 20.0,
@@ -67,10 +84,12 @@ CROP_PROFILES: Dict[str, Dict[str, Any]] = {
         "waterlogging_limit": 0.85,
         "sowing_depth_cm": 5,
         "notes": "Cultura base de segurança alimentar no Planalto Central. Exige solo húmido até 5 cm e boa reserva radicular.",
+        "notes_en": "Core food security crop in the Central Plateau. Requires moist topsoil down to 5 cm and solid root-zone water reserves.",
     },
     "Feijão": {
         "id": "feijao",
         "name": "Feijão",
+        "name_en": "Common Bean",
         "scientific_name": "Phaseolus vulgaris",
         "icon": "🫘",
         "min_rain_3d_mm": 15.0,
@@ -82,10 +101,12 @@ CROP_PROFILES: Dict[str, Dict[str, Any]] = {
         "waterlogging_limit": 0.72,  # CRÍTICO: apodrece com facilidade em solo encharcado
         "sowing_depth_cm": 4,
         "notes": "Menor exigência inicial de água (15 mm), ciclo curto, mas muito vulnerável ao encharcamento (>0.72) e calor acima de 29°C.",
+        "notes_en": "Lower initial water requirement (15 mm) and short cycle, but highly vulnerable to waterlogging (>0.72) and heat above 29°C.",
     },
     "Soja": {
         "id": "soja",
         "name": "Soja",
+        "name_en": "Soybean",
         "scientific_name": "Glycine max",
         "icon": "🌱",
         "min_rain_3d_mm": 25.0,
@@ -97,10 +118,12 @@ CROP_PROFILES: Dict[str, Dict[str, Any]] = {
         "waterlogging_limit": 0.80,
         "sowing_depth_cm": 4,
         "notes": "Semente oleaginosa que exige alta absorção hídrica para germinar (~50% do seu peso). Requer humidade radicular robusta (>=0.40).",
+        "notes_en": "Oilseed crop requiring high water uptake to germinate (~50% of seed weight). Needs robust root-zone moisture (>=0.40).",
     },
     "Mandioca": {
         "id": "mandioca",
         "name": "Mandioca",
+        "name_en": "Cassava",
         "scientific_name": "Manihot esculenta",
         "icon": "🥔",
         "min_rain_3d_mm": 12.0,
@@ -112,10 +135,12 @@ CROP_PROFILES: Dict[str, Dict[str, Any]] = {
         "waterlogging_limit": 0.75,
         "sowing_depth_cm": 10,
         "notes": "Cultura altamente resiliente a veranicos após o pegamento das manivas, mas exige solo bem drenado para evitar podridão radicular.",
+        "notes_en": "Highly resilient to dry spells once stem cuttings establish, but requires well-drained soil to avoid root rot.",
     },
     "Arroz": {
         "id": "arroz",
         "name": "Arroz",
+        "name_en": "Rice",
         "scientific_name": "Oryza sativa",
         "icon": "🌾",
         "min_rain_3d_mm": 30.0,
@@ -127,6 +152,7 @@ CROP_PROFILES: Dict[str, Dict[str, Any]] = {
         "waterlogging_limit": 0.98,
         "sowing_depth_cm": 3,
         "notes": "Cultura de elevada exigência hídrica. Recomenda-se sementeira apenas após a plena consolidação das chuvas e recarga do solo.",
+        "notes_en": "High water-demand crop. Sowing is recommended only after rainy-season consolidation and full soil-moisture recharge.",
     },
 }
 
@@ -135,30 +161,49 @@ CROPS: Dict[str, Dict[str, Any]] = CROP_PROFILES
 
 # Agricultural Municipalities in the Central Plateau (Huambo, Bié, Huíla)
 MUNICIPALITIES: Dict[str, Dict[str, Any]] = {
-    # Huambo
-    "huambo": {"name": "Huambo", "provincia": "Huambo", "latitude": -12.7761, "longitude": 15.7392},
+    # Huambo (11 ADM2 + province key)
+    "huambo": {"name": "Huambo", "provincia": "Huambo", "latitude": -12.7761, "longitude": 15.7392, "is_seat": True},
     "caala": {"name": "Caála", "provincia": "Huambo", "latitude": -12.8525, "longitude": 15.5606},
     "bailundo": {"name": "Bailundo", "provincia": "Huambo", "latitude": -12.1936, "longitude": 15.8697},
     "chicala-cholohanga": {"name": "Chicala-Cholohanga", "provincia": "Huambo", "latitude": -12.9833, "longitude": 16.0333},
+    "tchikala-tcholohanga": {"name": "Chicala-Cholohanga", "provincia": "Huambo", "latitude": -12.9833, "longitude": 16.0333, "alias": True},
     "longonjo": {"name": "Longonjo", "provincia": "Huambo", "latitude": -12.9067, "longitude": 15.2533},
     "ukuma": {"name": "Ukuma", "provincia": "Huambo", "latitude": -12.8500, "longitude": 15.0667},
     "ekunha": {"name": "Ekunha", "provincia": "Huambo", "latitude": -12.6739, "longitude": 15.5133},
-    # Bié
-    "bie": {"name": "Bié", "provincia": "Bié", "latitude": -12.3833, "longitude": 16.9333},
-    "kuito": {"name": "Kuito", "provincia": "Bié", "latitude": -12.3833, "longitude": 16.9333},
+    "ecunha (ekunha)": {"name": "Ekunha", "provincia": "Huambo", "latitude": -12.6739, "longitude": 15.5133, "alias": True},
+    "catchiungo": {"name": "Catchiungo", "provincia": "Huambo", "latitude": -12.5667, "longitude": 16.2167},
+    "londuimbale": {"name": "Londuimbale", "provincia": "Huambo", "latitude": -12.2333, "longitude": 15.3000},
+    "mungo": {"name": "Mungo", "provincia": "Huambo", "latitude": -11.8333, "longitude": 16.2167},
+    "tchinjenje": {"name": "Tchinjenje", "provincia": "Huambo", "latitude": -12.8833, "longitude": 14.9500},
+    # Bié (9 ADM2 + province key)
+    "bie": {"name": "Bié", "provincia": "Bié", "latitude": -12.3833, "longitude": 16.9333, "alias": True},
+    "kuito": {"name": "Kuito", "provincia": "Bié", "latitude": -12.3833, "longitude": 16.9333, "is_seat": True},
+    "cuito": {"name": "Kuito", "provincia": "Bié", "latitude": -12.3833, "longitude": 16.9333, "alias": True},
     "camacupa": {"name": "Camacupa", "provincia": "Bié", "latitude": -12.0167, "longitude": 17.4833},
     "catabola": {"name": "Catabola", "provincia": "Bié", "latitude": -12.1500, "longitude": 17.2833},
     "chinguar": {"name": "Chinguar", "provincia": "Bié", "latitude": -12.5833, "longitude": 16.3500},
     "andulo": {"name": "Andulo", "provincia": "Bié", "latitude": -11.4833, "longitude": 16.9667},
     "chitembo": {"name": "Chitembo", "provincia": "Bié", "latitude": -13.5167, "longitude": 16.7500},
-    # Huíla
-    "huila": {"name": "Huíla", "provincia": "Huíla", "latitude": -14.9172, "longitude": 13.5414},
-    "lubango": {"name": "Lubango", "provincia": "Huíla", "latitude": -14.9172, "longitude": 13.5414},
+    "cuemba": {"name": "Cuemba", "provincia": "Bié", "latitude": -12.1500, "longitude": 18.0833},
+    "cunhinga": {"name": "Cunhinga", "provincia": "Bié", "latitude": -11.9667, "longitude": 16.7500},
+    "nharea": {"name": "N'harea", "provincia": "Bié", "latitude": -11.4667, "longitude": 17.5167},
+    "n'harea": {"name": "N'harea", "provincia": "Bié", "latitude": -11.4667, "longitude": 17.5167, "alias": True},
+    # Huíla (13 ADM2 + province key)
+    "huila": {"name": "Huíla", "provincia": "Huíla", "latitude": -14.9172, "longitude": 13.5414, "alias": True},
+    "lubango": {"name": "Lubango", "provincia": "Huíla", "latitude": -14.9172, "longitude": 13.5414, "is_seat": True},
     "matala": {"name": "Matala", "provincia": "Huíla", "latitude": -15.6833, "longitude": 15.0333},
     "caconda": {"name": "Caconda", "provincia": "Huíla", "latitude": -13.7333, "longitude": 15.0667},
     "chibia": {"name": "Chibia", "provincia": "Huíla", "latitude": -15.1833, "longitude": 13.6833},
     "caluquembe": {"name": "Caluquembe", "provincia": "Huíla", "latitude": -13.7833, "longitude": 14.6833},
     "quilengues": {"name": "Quilengues", "provincia": "Huíla", "latitude": -14.0833, "longitude": 14.0833},
+    "chicomba": {"name": "Chicomba", "provincia": "Huíla", "latitude": -14.1500, "longitude": 14.9500},
+    "chipindo": {"name": "Chipindo", "provincia": "Huíla", "latitude": -13.8333, "longitude": 15.8000},
+    "cuvango": {"name": "Cuvango", "provincia": "Huíla", "latitude": -14.4667, "longitude": 16.3000},
+    "gambos": {"name": "Gambos (Chiange)", "provincia": "Huíla", "latitude": -15.8000, "longitude": 14.1000},
+    "gambos(chiange)": {"name": "Gambos (Chiange)", "provincia": "Huíla", "latitude": -15.8000, "longitude": 14.1000, "alias": True},
+    "humpata": {"name": "Humpata", "provincia": "Huíla", "latitude": -15.0167, "longitude": 13.3833},
+    "jamba": {"name": "Jamba", "provincia": "Huíla", "latitude": -14.6833, "longitude": 16.0500},
+    "quipungo": {"name": "Quipungo", "provincia": "Huíla", "latitude": -14.8167, "longitude": 14.5667},
 }
 
 # Processed Baseline File Path
