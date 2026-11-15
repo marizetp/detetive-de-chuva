@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '../services/api.js';
-import { getUserErrorMessage } from './errorMessages.js';
+import { createTranslator } from '../i18n/translate.js';
+import { getUserErrorMessage as getMessage } from './errorMessages.js';
 import { ConsultationInputError } from './validators.js';
+
+const pt = createTranslator('pt');
+const en = createTranslator('en');
+const getUserErrorMessage = (error) => getMessage(error, pt);
 
 describe('getUserErrorMessage', () => {
   it('cancelamento pelo cliente não gera mensagem', () => {
@@ -43,8 +48,8 @@ describe('getUserErrorMessage', () => {
 
   it('erros de validação local juntam as mensagens por campo', () => {
     const error = new ConsultationInputError({
-      provincia: 'Seleccione uma província.',
-      cultura: 'Seleccione uma cultura.',
+      provincia: 'validation.provinceRequired',
+      cultura: 'validation.cropRequired',
     });
     expect(getUserErrorMessage(error)).toMatchObject({
       canRetry: false,
@@ -56,5 +61,16 @@ describe('getUserErrorMessage', () => {
     const message = getUserErrorMessage(new Error('stack trace secreto'));
     expect(message.title).toBe('Ocorreu um erro inesperado.');
     expect(JSON.stringify(message)).not.toContain('secreto');
+  });
+
+  it('as mensagens seguem o idioma do tradutor (en)', () => {
+    expect(getMessage(new ApiError('http', 'x', { status: 503 }), en).title).toBe(
+      'The server encountered a problem.',
+    );
+    expect(getMessage(new ApiError('network', 'x'), en).description).toBe(
+      'Check your Internet connection and try again.',
+    );
+    const error = new ConsultationInputError({ provincia: 'validation.provinceRequired' });
+    expect(getMessage(error, en).description).toBe('Select a province.');
   });
 });

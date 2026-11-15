@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { NAV_ITEMS, ROUTES } from '../../routing/routes.js';
 import AppLink from '../ui/AppLink.jsx';
 import BrandMark from '../ui/BrandMark.jsx';
@@ -9,6 +10,8 @@ const FOOTER_LINK =
 const FOOTER_HEADING = 'type-label font-display text-label';
 
 export default function SiteFooter() {
+  const { t } = useI18n();
+
   return (
     <footer className="border-t border-line bg-surface text-ink-muted">
       <Container className="py-14 lg:py-16">
@@ -19,38 +22,38 @@ export default function SiteFooter() {
               <span className="font-display text-xl font-semibold">Detetive da Chuva</span>
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed">
-              Inteligência agroclimática para apoiar decisões agrícolas em Angola.
+              {t('footer.tagline')}
             </p>
           </div>
 
-          <nav aria-label="Rodapé" className="md:col-span-3">
-            <h2 className={FOOTER_HEADING}>Navegar</h2>
+          <nav aria-label={t('footer.navLabel')} className="md:col-span-3">
+            <h2 className={FOOTER_HEADING}>{t('footer.navHeading')}</h2>
             <ul className="mt-3 space-y-1 text-sm">
               {NAV_ITEMS.map((item) => (
                 <li key={item.to}>
                   <AppLink to={item.to} className={FOOTER_LINK}>
-                    {item.label}
+                    {t(item.labelKey)}
                   </AppLink>
                 </li>
               ))}
               <li>
                 <AppLink to={ROUTES.consultation} className={FOOTER_LINK}>
-                  Consulta agrícola
+                  {t('footer.consultation')}
                 </AppLink>
               </li>
             </ul>
           </nav>
 
           <div className="md:col-span-4">
-            <h2 className={FOOTER_HEADING}>Dados</h2>
+            <h2 className={FOOTER_HEADING}>{t('footer.dataHeading')}</h2>
             <dl className="mt-4 space-y-3 text-sm leading-relaxed">
               <div>
-                <dt className="font-semibold text-ink">Avaliações e recomendações</dt>
-                <dd>Serviço de avaliação do Detetive da Chuva (API do projecto).</dd>
+                <dt className="font-semibold text-ink">{t('footer.advisoryTerm')}</dt>
+                <dd>{t('footer.advisoryDescription')}</dd>
               </div>
               <div>
-                <dt className="font-semibold text-ink">Tendências históricas</dt>
-                <dd>NASA POWER (reanálise MERRA-2) — em preparação, ainda não disponível.</dd>
+                <dt className="font-semibold text-ink">{t('footer.trendsTerm')}</dt>
+                <dd>{t('footer.trendsDescription')}</dd>
               </div>
             </dl>
           </div>
@@ -58,10 +61,9 @@ export default function SiteFooter() {
 
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs leading-relaxed text-ink-muted md:flex-row md:justify-between md:gap-8">
           <p className="max-w-2xl">
-            Projecto desenvolvido no âmbito do NASA Space Apps Challenge 2026. O Detetive da Chuva
-            não é um serviço oficial da NASA.
+            {t('footer.disclaimer')}
           </p>
-          <p className="shrink-0">Ferramenta de apoio à decisão — não garante resultados agrícolas.</p>
+          <p className="shrink-0">{t('footer.decisionSupport')}</p>
         </div>
       </Container>
     </footer>

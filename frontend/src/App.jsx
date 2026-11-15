@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import LanguageSuggestion from './components/layout/LanguageSuggestion.jsx';
 import SiteFooter from './components/layout/SiteFooter.jsx';
 import SiteHeader from './components/layout/SiteHeader.jsx';
 import SkipLink from './components/layout/SkipLink.jsx';
@@ -30,6 +31,7 @@ export default function App() {
     <div className="flex min-h-dvh flex-col">
       <SkipLink targetId={MAIN_CONTENT_ID} />
       <SiteHeader currentPath={location.pathname} />
+      <LanguageSuggestion />
       <main id={MAIN_CONTENT_ID} ref={mainRef} tabIndex={-1} className="flex-1">
         <Page />
       </main>

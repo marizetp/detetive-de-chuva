@@ -1,7 +1,7 @@
 # Frontend Specification — Detetive da Chuva
 
 **Status:** Initial implementation specification  
-**Product language:** Portuguese (Angola)  
+**Product languages:** English (`en`, default) and Portuguese (`pt`, Angola) — decided 2026-11-14  
 **Frontend:** React + JavaScript  
 **Backend:** Existing public REST API
 
@@ -137,11 +137,13 @@ Navigation and whether results should be a separate route or an in-page state ca
 
 Documented values:
 
-| API value | Suggested Portuguese label | Visual treatment |
-|---|---|---|
-| `FAVORAVEL` | Favorável | Positive, but not a guarantee |
-| `AGUARDAR` | Aguardar | Caution / wait |
-| `DESFAVORAVEL` | Desfavorável | Warning |
+| API value | Portuguese label | English label | Visual treatment |
+|---|---|---|---|
+| `FAVORAVEL` | Favorável | Favourable | Positive, but not a guarantee |
+| `AGUARDAR` | Aguardar | Wait | Caution / wait |
+| `DESFAVORAVEL` | Desfavorável | Unfavourable | Warning |
+
+Labels come from the i18n dictionaries (`status.*`, `results.verdict.*`), keyed by the API code.
 
 Do not rely on colour alone. Include text and, where useful, an icon. Define final status colours in the design system after contrast checks.
 
@@ -269,6 +271,23 @@ Do not expose technical stack traces to end users.
 - Soil moisture: API value is between 0.0 and 1.0; multiply by 100 for percentage display.
 - Confidence score: display as `N/100` (e.g. `95/100`), with explanatory copy that it is a score supplied by the system, not a probability or a guarantee. **Decided 2026-11-12:** replaces the earlier percentage display, to avoid reading the score as a probability.
 - Do not invent thresholds or interpretive labels for metrics unless the backend team provides them.
+- Numbers and dates follow the interface language: `en-GB` (`25.6 mm`, `12 November 2026`) or `pt-AO` (`25,6 mm`, `12 de novembro de 2026`). Only the presentation changes.
+
+## 7a. Internationalisation (implemented 2026-11-14)
+
+- **Languages:** English (`en`) by default; Portuguese (`pt`, `pt-AO`) as the second language. `<html lang>` follows the active language.
+- **Architecture** (no dependencies), `frontend/src/i18n/`:
+  - `messages/en.js`, `messages/pt.js` — every interface text, same keys (parity test);
+  - `translate.js` — `createTranslator(language)`; a missing key shows the key, never the other language;
+  - `LanguageProvider.jsx`, `useI18n()` — `language`, `t(key, vars)`, `setLanguage`, `suggestion`;
+  - `languagePreference.js`, `browserLanguage.js` — persistence and detection;
+  - `catalogNames.js` — crop names by API `id` (the value sent to the API is unchanged);
+  - `reviewRequired.js` — English texts awaiting human scientific review.
+- **Selector:** EN | PT, always visible in the header (desktop and mobile). The choice is stored and has priority over any detection.
+- **Suggestion:** on a first visit, if the browser's primary language is `pt`/`pt-*`, a non-blocking strip below the header offers «Switch to Portuguese» / «Keep English». It never switches automatically; a dismissal is stored separately from a language choice and the strip does not reappear. Only `navigator.languages`/`navigator.language` are used.
+- **Storage keys:** `ddc.language` `{ language, source: 'manual' | 'suggestion', at }`; `ddc.languageSuggestion` `{ status: 'dismissed', at }`. If localStorage is blocked, choices last for the page session.
+- **Backend free text** (`recomendacao_extensao`, `justificacoes_tecnicas`): delivered in Portuguese by the API, which has no language parameter yet. In English the report shows an English notice and a closed «View the original text (Portuguese)» panel (`lang="pt"`) with the unmodified text. The frontend never machine-translates or rewrites it. Translation is requested from the backend (see §11, question 7).
+- **Not translated:** API field names, `triggers_ativados` codes (technical identifiers), province and municipality names, the brand name.
 
 ## 8. Historical trend proposal — not yet confirmed as a live API
 
@@ -288,6 +307,7 @@ Therefore:
 - Keyboard-operable controls and visible focus indicators.
 - Adequate text/background contrast.
 - Status conveyed by text as well as colour.
+- Correct `lang` on the document and on any content in another language (backend text, language options, the Portuguese line of the language suggestion).
 - Avoid large assets and unnecessary animation.
 - Provide useful feedback on slower connections.
 - Consider that a hosted backend may take time to wake up; show a clear loading state rather than appearing frozen.
@@ -314,3 +334,4 @@ Therefore:
 4. Is there a documented offline/demo requirement?
 5. Are there approved thresholds or explanatory descriptions for the metrics?
 6. ~~Should the date of consultation be user-selectable?~~ **Decided 2026-11-12:** yes — today or any past date; future dates disabled. Validated against the device's local date (known limitation: an incorrect device clock can affect validation). See `CLAUDE.md` §11.
+7. **Multilingual API (requested 2026-11-14):** can `/advisory` and `/evaluate` accept an `idioma` parameter and return the free text (`recomendacao_extensao`, `justificacoes_tecnicas`) in English, together with the Portuguese original and translation metadata? Can the list of `triggers_ativados` codes be documented? Until confirmed, the frontend shows the Portuguese original with a notice in English.

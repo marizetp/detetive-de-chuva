@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { MUNICIPALITIES_BY_PROVINCE } from '../../data/municipalities.js';
+import { localizeCropName, localizeCropValue } from '../../i18n/catalogNames.js';
+import { useI18n } from '../../i18n/useI18n.js';
 import { CONSULTATION_ANCHORS } from '../../routing/routes.js';
 import { describeConsultation } from '../../utils/report.js';
 import { ConsultationInputError, validateConsultationParams } from '../../utils/validators.js';
@@ -33,6 +35,7 @@ export default function ConsultationForm({
   lastSubmitted = null,
   isStale = false,
 }) {
+  const { t, language } = useI18n();
   const [values, setValues] = useState({ provincia: '', municipio: '', cultura: '', data_consulta: today });
   const [errors, setErrors] = useState({});
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
@@ -48,10 +51,10 @@ export default function ConsultationForm({
   const validate = (candidate) => {
     const result = validateConsultationParams(candidate, { requireDate: true, today });
     if (!result.provincia && !isOptionAvailable(provinces, candidate.provincia)) {
-      result.provincia = 'Seleccione uma província da lista.';
+      result.provincia = 'validation.provinceFromList';
     }
     if (!result.cultura && !isOptionAvailable(crops, candidate.cultura)) {
-      result.cultura = 'Seleccione uma cultura da lista.';
+      result.cultura = 'validation.cropFromList';
     }
     return result;
   };
@@ -95,17 +98,27 @@ export default function ConsultationForm({
   };
 
   let submitHint = null;
-  if (isPending) submitHint = 'A consulta está em curso. Aguarde a resposta do serviço.';
-  else if (!catalogsReady) submitHint = 'Disponível quando as províncias e as culturas estiverem carregadas.';
+  if (isPending) submitHint = t('consultation.form.hintPending');
+  else if (!catalogsReady) submitHint = t('consultation.form.hintCatalogs');
 
-  const loadingCatalogs = [
-    provinces.status === 'loading' ? 'as províncias' : null,
-    crops.status === 'loading' ? 'as culturas' : null,
-  ].filter(Boolean);
+  const provincesLoading = provinces.status === 'loading';
+  const cropsLoading = crops.status === 'loading';
+  let catalogsLoadingLabel = null;
+  if (provincesLoading && cropsLoading) catalogsLoadingLabel = t('consultation.form.loadingBoth');
+  else if (provincesLoading) catalogsLoadingLabel = t('consultation.form.loadingProvinces');
+  else if (cropsLoading) catalogsLoadingLabel = t('consultation.form.loadingCrops');
 
-  let submitLabel = 'Consultar Viabilidade';
-  if (isPending) submitLabel = 'A avaliar viabilidade…';
-  else if (isStale) submitLabel = 'Actualizar Viabilidade';
+  let submitLabel = t('consultation.form.submit');
+  if (isPending) submitLabel = t('consultation.form.submitPending');
+  else if (isStale) submitLabel = t('consultation.form.submitUpdate');
+
+  const describe = (params) =>
+    describeConsultation(params, {
+      language,
+      cropLabel: (value) => localizeCropValue(value, crops.options, language),
+    });
+  // Mensagens de validação: chaves do dicionário, traduzidas aqui.
+  const errorText = (name) => (errors[name] ? t(errors[name]) : undefined);
 
   const availableMunicipalities = values.provincia ? MUNICIPALITIES_BY_PROVINCE[values.provincia] ?? [] : [];
 
@@ -117,34 +130,35 @@ export default function ConsultationForm({
       aria-labelledby="consulta-formulario-titulo"
     >
       <h2 id="consulta-formulario-titulo" className="text-2xl leading-snug font-semibold text-ink">
-        Dados da consulta
+        {t('consultation.form.title')}
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-ink-muted">Indique a localização, a cultura e a data pretendida para avaliar as condições de sementeira.</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t('consultation.form.lead')}</p>
 
-      {loadingCatalogs.length > 0 ? (
+      {catalogsLoadingLabel ? (
         <div className="mt-6">
-          <LoadingIndicator label={`A carregar ${loadingCatalogs.join(' e ')} do serviço…`} />
+          <LoadingIndicator label={catalogsLoadingLabel} />
         </div>
       ) : null}
 
       <div className="mt-7 space-y-6">
         <CatalogSelectField
           id="provincia"
-          label="Província"
-          placeholder="Seleccione a província"
-          resourceLabel="as províncias"
-          emptyMessage="Não há províncias disponíveis de momento."
+          label={t('consultation.form.province.label')}
+          placeholder={t('consultation.form.province.placeholder')}
+          loadingLabel={t('consultation.form.province.loading')}
+          errorTitle={t('consultation.form.province.loadError')}
+          emptyMessage={t('consultation.form.province.empty')}
           catalog={provinces}
           value={values.provincia}
           onChange={(value) => updateField('provincia', value)}
-          error={errors.provincia}
+          error={errorText('provincia')}
           inputRef={provinciaRef}
         />
         {availableMunicipalities.length > 0 ? (
           <FieldShell
             id="municipio"
-            label="Município"
-            hint="Opcional. Permite maior precisão geográfica da previsão."
+            label={t('consultation.form.municipality.label')}
+            hint={t('consultation.form.municipality.hint')}
           >
             <div className="relative">
               <select
@@ -154,10 +168,12 @@ export default function ConsultationForm({
                 onChange={(event) => updateField('municipio', event.target.value)}
                 className={`${CONTROL_CLASSES} appearance-none pr-11`}
               >
-                <option value="">Sede provincial / Toda a província</option>
+                <option value="">{t('consultation.form.municipality.wholeProvince')}</option>
                 {availableMunicipalities.map((item) => (
                   <option key={item.id} value={item.value}>
-                    {item.label}
+                    {item.isSeat
+                      ? t('consultation.form.municipality.seat', { name: item.label })
+                      : item.label}
                   </option>
                 ))}
               </select>
@@ -167,31 +183,35 @@ export default function ConsultationForm({
         ) : null}
         <CatalogSelectField
           id="cultura"
-          label="Cultura"
-          placeholder="Seleccione a cultura"
-          resourceLabel="as culturas"
-          emptyMessage="Não há culturas disponíveis de momento."
+          label={t('consultation.form.crop.label')}
+          placeholder={t('consultation.form.crop.placeholder')}
+          loadingLabel={t('consultation.form.crop.loading')}
+          errorTitle={t('consultation.form.crop.loadError')}
+          emptyMessage={t('consultation.form.crop.empty')}
+          getOptionLabel={(option) => localizeCropName(option, language)}
           catalog={crops}
           value={values.cultura}
           onChange={(value) => updateField('cultura', value)}
-          error={errors.cultura}
+          error={errorText('cultura')}
           inputRef={culturaRef}
         />
         <DateField
           id="data_consulta"
-          label="Data da consulta para sementeira"
-          hint="Hoje ou qualquer data futura de planeamento de safra."
+          label={t('consultation.form.date.label')}
+          hint={t('consultation.form.date.hint')}
           value={values.data_consulta}
           onChange={(value) => updateField('data_consulta', value)}
-          error={errors.data_consulta}
+          error={errorText('data_consulta')}
           inputRef={dataRef}
         />
       </div>
 
       {isStale && !isPending && lastSubmitted ? (
-        <InlineNotice tone="info" role="status" title="Dados alterados" className="mt-8">
-          O relatório ao lado mostra a consulta anterior ({describeConsultation(lastSubmitted)}).
-          Seleccione «Actualizar consulta» para obter um relatório com os novos dados.
+        <InlineNotice tone="info" role="status" title={t('consultation.form.staleTitle')} className="mt-8">
+          {t('consultation.form.staleBody', {
+            consultation: describe(lastSubmitted),
+            action: t('consultation.form.submitUpdate'),
+          })}
         </InlineNotice>
       ) : null}
 

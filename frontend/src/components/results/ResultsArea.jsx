@@ -1,6 +1,14 @@
 import { RESULT_SOURCES } from '../../config/api.js';
-import { MISSING_STATUS, UNKNOWN_STATUS } from '../../config/status.js';
+import { STATUS_CODES } from '../../config/status.js';
+import { localizeCropValue } from '../../i18n/catalogNames.js';
+import { useI18n } from '../../i18n/useI18n.js';
 import { CONSULTATION_ANCHORS, ROUTES } from '../../routing/routes.js';
+import {
+  formatFractionAsPercentNumber,
+  formatMillimetreNumber,
+  formatScoreNumber,
+} from '../../utils/format.js';
+import { isFiniteNumber } from '../../utils/validators.js';
 import { describeConsultation } from '../../utils/report.js';
 import AppLink from '../ui/AppLink.jsx';
 import Button from '../ui/Button.jsx';
@@ -9,7 +17,15 @@ import { DropletIcon, ForecastIcon, RainIcon, RetryIcon, SproutIcon, StatusIcon 
 import InlineNotice from '../ui/InlineNotice.jsx';
 import LoadingIndicator from '../ui/LoadingIndicator.jsx';
 import MarkdownContent from './MarkdownContent.jsx';
+import SourceLanguageContent from './SourceLanguageContent.jsx';
 import { statusToneStyles } from './statusTone.js';
+
+/** Tom de cada estado documentado (cores em statusTone.js). */
+const VERDICT_TONES = Object.freeze({
+  [STATUS_CODES.FAVORAVEL]: 'positive',
+  [STATUS_CODES.AGUARDAR]: 'caution',
+  [STATUS_CODES.DESFAVORAVEL]: 'warning',
+});
 
 const HEADING = 'mt-3 text-3xl leading-tight font-semibold text-ink sm:text-4xl';
 
@@ -26,16 +42,19 @@ export default function ResultsArea({
   submittedParams,
   advisory,
   evaluate,
+  crops,
   onRetry,
   today,
   headingRef,
   isStale = false,
 }) {
+  const { t, language } = useI18n();
+
   if (!submittedParams) {
     return (
       <section aria-labelledby="resultados-titulo">
         <Eyebrow className="font-display" data-reveal>
-          Resultado da Avaliação
+          {t('results.eyebrow')}
         </Eyebrow>
         <h2
           id="resultados-titulo"
@@ -45,11 +64,10 @@ export default function ResultsArea({
           data-reveal
           data-reveal-delay="1"
         >
-          Ainda sem consulta
+          {t('results.emptyTitle')}
         </h2>
         <p className="mt-4 max-w-prose text-lg leading-relaxed text-ink-muted" data-reveal data-reveal-delay="2">
-          Preencha a província, a cultura e a data pretendida, e clique em «Consultar Viabilidade».
-          O parecer agronómico e os indicadores de apoio à decisão serão apresentados aqui.
+          {t('results.emptyBody', { action: t('consultation.form.submit') })}
         </p>
       </section>
     );
@@ -60,7 +78,7 @@ export default function ResultsArea({
     return (
       <section aria-labelledby="resultados-titulo">
         <Eyebrow className="font-display" data-reveal>
-          Resultado da Avaliação
+          {t('results.eyebrow')}
         </Eyebrow>
         <h2
           id="resultados-titulo"
@@ -70,10 +88,10 @@ export default function ResultsArea({
           data-reveal
           data-reveal-delay="1"
         >
-          A avaliar viabilidade…
+          {t('results.loadingTitle')}
         </h2>
         <div className="mt-8 rounded-2xl border border-line bg-surface p-10 text-center" data-reveal="fade" data-reveal-delay="2">
-          <LoadingIndicator label="A consultar dados climatológicos de 25 anos da NASA e a gerar parecer agronómico…" />
+          <LoadingIndicator label={t('results.loadingLabel')} />
         </div>
       </section>
     );
@@ -84,7 +102,7 @@ export default function ResultsArea({
     return (
       <section aria-labelledby="resultados-titulo">
         <Eyebrow className="font-display" data-reveal>
-          Resultado da Avaliação
+          {t('results.eyebrow')}
         </Eyebrow>
         <h2
           id="resultados-titulo"
@@ -94,23 +112,23 @@ export default function ResultsArea({
           data-reveal
           data-reveal-delay="1"
         >
-          Erro na consulta
+          {t('results.errorTitle')}
         </h2>
         {/* Falha técnica: aviso de erro (filete e triângulo vermelhos, texto ink), distinto do
             cartão de veredito usado para um resultado desfavorável. */}
         <InlineNotice
           tone="error"
           role="alert"
-          title="Não foi possível obter a recomendação."
+          title={t('results.errorNoticeTitle')}
           className="mt-8"
           action={
             <Button variant="outline" size="sm" onClick={() => onRetry(RESULT_SOURCES.advisory)}>
               <RetryIcon className="size-4" />
-              <span>Tentar novamente</span>
+              <span>{t('common.retry')}</span>
             </Button>
           }
         >
-          O servidor demorou a responder ou ocorreu uma falha de ligação.
+          {t('results.errorNoticeBody')}
         </InlineNotice>
       </section>
     );
@@ -119,7 +137,8 @@ export default function ResultsArea({
   const result = advisory.result;
   // `null` quando o serviço não enviou estado (mapStatus → MISSING_STATUS); nunca se assume um.
   const statusRaw = result?.status?.code ?? null;
-  const confidenceScore = result?.confidenceScore ?? 85;
+  // `null` quando a pontuação falta ou é inválida (mapper). Nunca se assume um valor.
+  const confidenceScore = isFiniteNumber(result?.confidenceScore) ? result.confidenceScore : null;
   const metrics = result?.metrics ?? [];
 
   const rainRecent = getMetricValue(metrics, 'chuva_acumulada_recente_mm');
@@ -132,36 +151,24 @@ export default function ResultsArea({
   // sem classificação inventada (CLAUDE.md §5–6).
   //  - ausente: o serviço não enviou estado → MISSING_STATUS («Estado indisponível»);
   //  - não reconhecido: enviou um valor fora dos três documentados → UNKNOWN_STATUS, com o valor.
-  let statusTheme =
-    statusRaw === null
-      ? {
-          tone: 'neutral',
-          title: MISSING_STATUS.label.toUpperCase(),
-          description: 'O serviço não enviou o estado desta avaliação. Nenhuma classificação é assumida.',
-        }
-      : {
-          tone: 'neutral',
-          title: UNKNOWN_STATUS.label.toUpperCase(),
-          description: `O serviço devolveu um estado que a plataforma não reconhece («${statusRaw}»). É apresentado sem interpretação.`,
-        };
-
-  if (statusRaw === 'FAVORAVEL') {
+  let statusTheme;
+  if (statusRaw === null) {
     statusTheme = {
-      tone: 'positive',
-      title: 'FAVORÁVEL PARA SEMEADURA',
-      description: 'As condições climáticas e as reservas de humidade do solo são adequadas para o desenvolvimento da cultura neste período.',
+      tone: 'neutral',
+      title: t('status.missing'),
+      description: t('results.verdict.missingDescription'),
     };
-  } else if (statusRaw === 'AGUARDAR') {
+  } else if (VERDICT_TONES[statusRaw]) {
     statusTheme = {
-      tone: 'caution',
-      title: 'AGUARDAR MELHORES CONDIÇÕES',
-      description: 'Transição ou humidade ainda incipiente na raiz. Recomenda-se cautela antes de semear para proteger sementes e capital.',
+      tone: VERDICT_TONES[statusRaw],
+      title: t(`results.verdict.${statusRaw}.title`),
+      description: t(`results.verdict.${statusRaw}.description`),
     };
-  } else if (statusRaw === 'DESFAVORAVEL') {
+  } else {
     statusTheme = {
-      tone: 'warning',
-      title: 'NÃO RECOMENDADO / DESFAVORÁVEL',
-      description: 'Risco elevado de perda do investimento e insumos. Período de estiagem ou condições hídricas insuficientes.',
+      tone: 'neutral',
+      title: t('status.unknown'),
+      description: t('results.verdict.unknownDescription', { value: statusRaw }),
     };
   }
   const statusColors = statusToneStyles(statusTheme.tone);
@@ -170,7 +177,7 @@ export default function ResultsArea({
     <section aria-labelledby="resultados-titulo" className="space-y-8">
       <div>
         <Eyebrow className="font-display" data-reveal>
-          Resultado da Avaliação
+          {t('results.eyebrow')}
         </Eyebrow>
         <h2
           id="resultados-titulo"
@@ -180,23 +187,26 @@ export default function ResultsArea({
           data-reveal
           data-reveal-delay="1"
         >
-          Relatório da consulta
+          {t('results.reportTitle')}
         </h2>
         <div className="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-2" data-reveal data-reveal-delay="2">
           <p className="text-base font-medium text-ink-muted">
-            {describeConsultation(submittedParams)}
+            {describeConsultation(submittedParams, {
+              language,
+              cropLabel: (value) => localizeCropValue(value, crops?.options, language),
+            })}
           </p>
           <AppLink
             to={`${ROUTES.consultation}#${CONSULTATION_ANCHORS.form}`}
             className="inline-flex min-h-11 items-center rounded-sm text-sm font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:text-interactive hover:decoration-interactive"
           >
-            Alterar dados da consulta
+            {t('results.changeData')}
           </AppLink>
         </div>
 
         {isStale ? (
-          <InlineNotice tone="info" title="Dados alterados no formulário" className="mt-5">
-            Os dados do formulário foram alterados. Seleccione «Actualizar Viabilidade» para obter a avaliação com os novos dados.
+          <InlineNotice tone="info" title={t('results.staleTitle')} className="mt-5">
+            {t('results.staleBody', { action: t('consultation.form.submitUpdate') })}
           </InlineNotice>
         ) : null}
       </div>
@@ -221,17 +231,35 @@ export default function ResultsArea({
           {/* Nível de Confiança */}
           <div className="shrink-0 rounded-xl bg-canvas border border-line p-4 text-center md:min-w-[180px]">
             <p className="type-label font-display text-label">
-              Nível de Confiança
+              {t('results.confidence')}
             </p>
-            <p className="mt-1 font-display text-4xl font-bold text-ink tabular-nums">
-              {confidenceScore !== null ? `${confidenceScore}%` : '—'}
-            </p>
-            <div className="mt-2 h-2 w-full rounded-full bg-surface overflow-hidden">
-              <div
-                className={`motion-fill h-full ${statusColors.bar} transition-all duration-500`}
-                style={{ width: `${confidenceScore ?? 0}%` }}
-              />
-            </div>
+            {confidenceScore !== null ? (
+              <>
+                {/* Formato N/100 (decisão de 2026-11-12): pontuação do sistema, não percentagem.
+                    «/100» funciona como unidade: span próprio em Aurora text. */}
+                <p className="mt-1 font-display text-4xl font-bold text-ink tabular-nums">
+                  {formatScoreNumber(confidenceScore, language)}
+                  <span className="text-2xl text-label">/100</span>
+                </p>
+                <div className="mt-2 h-2 w-full rounded-full bg-surface overflow-hidden" aria-hidden="true">
+                  <div
+                    className={`motion-fill h-full ${statusColors.bar} transition-all duration-500`}
+                    style={{ width: `${confidenceScore}%` }}
+                  />
+                </div>
+                {/* Legenda discreta (decisão de 2026-11-12): pontuação do sistema, não probabilidade.
+                    Inter, texto secundário, abaixo da pontuação na hierarquia. `w-0 min-w-full`: a
+                    legenda ocupa a largura da caixa sem a alargar (o layout do cartão não muda). */}
+                <p className="mt-2 w-0 min-w-full font-sans text-xs leading-snug text-ink-muted">
+                  {t('results.confidenceCaption')}
+                </p>
+              </>
+            ) : (
+              // Sem pontuação válida: texto explícito e sem barra (uma barra vazia leria-se como 0).
+              <p className="mt-2 font-display text-xl font-semibold text-ink-muted">
+                {t('results.confidenceUnavailable')}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -239,20 +267,20 @@ export default function ResultsArea({
       {/* 2. OS 3 CARTÕES DE INDICADORES SIMPLES */}
       <div>
         <h3 className="font-display text-lg font-semibold text-ink sm:text-xl" data-reveal>
-          Indicadores Agroclimáticos Chave
+          {t('results.indicatorsTitle')}
         </h3>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* Card 1: Chuva Recente */}
           <div className="rounded-xl border border-line bg-surface p-5" data-reveal data-reveal-delay="1">
             <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
               <RainIcon className="size-5 shrink-0 text-label" />
-              <span>Chuva Recente</span>
+              <span>{t('results.rainRecent.label')}</span>
             </div>
             <div className="mt-3 font-display text-3xl font-bold text-ink tabular-nums">
-              {rainRecent !== null ? (<>{rainRecent}<span className="text-label"> mm</span></>) : '—'}
+              {rainRecent !== null ? (<>{formatMillimetreNumber(rainRecent, language)}<span className="text-label"> mm</span></>) : '—'}
             </div>
             <p className="mt-1 text-xs text-ink-muted">
-              Precipitação recente ou média histórica da época
+              {t('results.rainRecent.caption')}
             </p>
           </div>
 
@@ -260,13 +288,13 @@ export default function ResultsArea({
           <div className="rounded-xl border border-line bg-surface p-5" data-reveal data-reveal-delay="2">
             <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
               <DropletIcon className="size-5 shrink-0 text-label" />
-              <span>Humidade da Raiz</span>
+              <span>{t('results.rootMoisture.label')}</span>
             </div>
             <div className="mt-3 font-display text-3xl font-bold text-ink tabular-nums">
-              {rootMoisture !== null ? (<>{(rootMoisture * 100).toFixed(0)}<span className="text-label">%</span></>) : '—'}
+              {rootMoisture !== null ? (<>{formatFractionAsPercentNumber(rootMoisture, language)}<span className="text-label">%</span></>) : '—'}
             </div>
             <p className="mt-1 text-xs text-ink-muted">
-              Água disponível na zona radicular do solo
+              {t('results.rootMoisture.caption')}
             </p>
           </div>
 
@@ -274,13 +302,13 @@ export default function ResultsArea({
           <div className="rounded-xl border border-line bg-surface p-5" data-reveal data-reveal-delay="3">
             <div className="flex items-center gap-2.5 text-sm font-semibold text-ink-muted">
               <ForecastIcon className="size-5 shrink-0 text-label" />
-              <span>Chuva Prevista</span>
+              <span>{t('results.forecastRain.label')}</span>
             </div>
             <div className="mt-3 font-display text-3xl font-bold text-ink tabular-nums">
-              {forecastRain !== null ? (<>{forecastRain}<span className="text-label"> mm</span></>) : '—'}
+              {forecastRain !== null ? (<>{formatMillimetreNumber(forecastRain, language)}<span className="text-label"> mm</span></>) : '—'}
             </div>
             <p className="mt-1 text-xs text-ink-muted">
-              Expectativa para os próximos 7 dias
+              {t('results.forecastRain.caption')}
             </p>
           </div>
         </div>
@@ -293,16 +321,17 @@ export default function ResultsArea({
             <SproutIcon className="size-6 shrink-0 text-label" />
             <div>
               <h3 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-                Recomendação Técnica do Agrónomo
+                {t('results.recommendationTitle')}
               </h3>
-              <p className="text-xs text-ink-muted">
-                Orientação prática para o terreno, teste do torrão a 5 cm e proteção do investimento
-              </p>
+              <p className="text-xs text-ink-muted">{t('results.recommendationSubtitle')}</p>
             </div>
           </div>
 
+          {/* Texto livre do backend (Português): nunca traduzido no browser. */}
           <div className="mt-6 max-w-none text-ink leading-relaxed">
-            <MarkdownContent text={result.recommendationText} />
+            <SourceLanguageContent unavailableTitleKey="results.sourceLanguage.recommendationTitle">
+              <MarkdownContent text={result.recommendationText} />
+            </SourceLanguageContent>
           </div>
         </div>
       ) : null}
@@ -311,18 +340,25 @@ export default function ResultsArea({
       {(evaluate?.result?.triggers?.length > 0 || evaluate?.result?.justifications?.length > 0) ? (
         <details className="rounded-xl border border-line bg-surface/30 p-4 text-xs text-ink-muted" data-reveal="fade">
           <summary className="cursor-pointer font-medium text-ink-subtle hover:text-ink">
-            Ver detalhes e verificações agronómicas adicionais do modelo
+            {t('results.detailsSummary')}
           </summary>
           <div className="mt-4 space-y-3">
             {evaluate.result.triggers?.length > 0 ? (
               <div>
-                <span className="font-semibold text-ink">Gatilhos identificados: </span>
-                <span>{evaluate.result.triggers.join(', ')}</span>
+                <span className="font-semibold text-ink">{t('results.triggersLabel')}</span>
+                {/* Códigos técnicos da API: identificadores, mostrados tal como recebidos. */}
+                <span translate="no">{evaluate.result.triggers.join(', ')}</span>
               </div>
             ) : null}
-            {evaluate.result.justifications?.map((just, idx) => (
-              <p key={idx} className="leading-relaxed">• {just}</p>
-            ))}
+            {evaluate.result.justifications?.length > 0 ? (
+              <SourceLanguageContent unavailableTitleKey="results.sourceLanguage.justificationsTitle">
+                <div className="space-y-3">
+                  {evaluate.result.justifications.map((just, idx) => (
+                    <p key={idx} className="leading-relaxed">• {just}</p>
+                  ))}
+                </div>
+              </SourceLanguageContent>
+            ) : null}
           </div>
         </details>
       ) : null}

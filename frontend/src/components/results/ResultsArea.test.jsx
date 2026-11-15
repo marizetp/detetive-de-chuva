@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '../../test/render.jsx';
 import { describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../../services/api.js';
 import {
@@ -51,7 +51,11 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
 
   it('em carregamento: apresenta indicador de análise agroclimática', () => {
     renderReport({ advisory: loading });
-    expect(screen.getByText(/A consultar dados climatológicos de 25 anos da NASA/)).toBeInTheDocument();
+    expect(
+      screen.getByText('A analisar dados climáticos históricos e indicadores agrícolas...'),
+    ).toBeInTheDocument();
+    // Não sugere que a plataforma já usa dados NASA POWER.
+    expect(screen.queryByText(/NASA/)).not.toBeInTheDocument();
   });
 
   it('em erro: apresenta mensagem clara e botão de tentar novamente', () => {
@@ -63,44 +67,44 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
 
   it('sucesso FAVORÁVEL: exibe badge grande, confiança e descrição adequada', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'FAVORAVEL' }) });
-    expect(screen.getByText('FAVORÁVEL PARA SEMEADURA')).toBeInTheDocument();
+    expect(screen.getByText('Favorável para semeadura')).toBeInTheDocument();
     expect(screen.getByText(/As condições climáticas e as reservas de humidade do solo são adequadas/)).toBeInTheDocument();
     expect(screen.getByText('Nível de Confiança')).toBeInTheDocument();
   });
 
   it('sucesso AGUARDAR: exibe badge de cautela e aviso para proteger recursos', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'AGUARDAR' }) });
-    expect(screen.getByText('AGUARDAR MELHORES CONDIÇÕES')).toBeInTheDocument();
+    expect(screen.getByText('Aguardar melhores condições')).toBeInTheDocument();
     expect(screen.getByText(/Transição ou humidade ainda incipiente na raiz/)).toBeInTheDocument();
   });
 
   it('sucesso DESFAVORÁVEL: exibe alerta de não recomendação para a época seca', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'DESFAVORAVEL' }) });
-    expect(screen.getByText('NÃO RECOMENDADO / DESFAVORÁVEL')).toBeInTheDocument();
+    expect(screen.getByText('Não recomendado / Desfavorável')).toBeInTheDocument();
     expect(screen.getByText(/Risco elevado de perda do investimento e insumos/)).toBeInTheDocument();
   });
 
   it('estado ausente: apresentação neutra «Estado indisponível», sem assumir AGUARDAR', () => {
     const { status: _omitido, ...semEstado } = advisoryHuamboMilho;
     renderReport({ advisory: advisoryOk(semEstado) });
-    expect(screen.getByText('ESTADO INDISPONÍVEL')).toBeInTheDocument();
+    expect(screen.getByText('Estado indisponível')).toBeInTheDocument();
     expect(screen.getByText(/O serviço não enviou o estado desta avaliação/)).toBeInTheDocument();
-    expect(screen.queryByText('AGUARDAR MELHORES CONDIÇÕES')).not.toBeInTheDocument();
-    expect(screen.queryByText('ESTADO NÃO RECONHECIDO')).not.toBeInTheDocument();
+    expect(screen.queryByText('Aguardar melhores condições')).not.toBeInTheDocument();
+    expect(screen.queryByText('Estado não reconhecido')).not.toBeInTheDocument();
   });
 
   it('estado não reconhecido: apresentação neutra com o valor recebido, sem assumir FAVORÁVEL', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'PENDENTE' }) });
-    expect(screen.getByText('ESTADO NÃO RECONHECIDO')).toBeInTheDocument();
+    expect(screen.getByText('Estado não reconhecido')).toBeInTheDocument();
     expect(screen.getByText(/não reconhece \(«PENDENTE»\)/)).toBeInTheDocument();
-    expect(screen.queryByText('FAVORÁVEL PARA SEMEADURA')).not.toBeInTheDocument();
-    expect(screen.queryByText('ESTADO INDISPONÍVEL')).not.toBeInTheDocument();
+    expect(screen.queryByText('Favorável para semeadura')).not.toBeInTheDocument();
+    expect(screen.queryByText('Estado indisponível')).not.toBeInTheDocument();
   });
 
   it.each([
-    ['FAVORAVEL', 'FAVORÁVEL PARA SEMEADURA', 'status-favorable'],
-    ['AGUARDAR', 'AGUARDAR MELHORES CONDIÇÕES', 'status-wait'],
-    ['DESFAVORAVEL', 'NÃO RECOMENDADO / DESFAVORÁVEL', 'status-unfavorable'],
+    ['FAVORAVEL', 'Favorável para semeadura', 'status-favorable'],
+    ['AGUARDAR', 'Aguardar melhores condições', 'status-wait'],
+    ['DESFAVORAVEL', 'Não recomendado / Desfavorável', 'status-unfavorable'],
   ])('cartão %s usa a cor semântica do estado no texto e no contorno', (code, title, token) => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: code }) });
     const badge = screen.getByText(title).parentElement;
@@ -110,7 +114,7 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
 
   it('cartão de estado não reconhecido usa o contorno neutro tracejado', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'PENDENTE' }) });
-    const badge = screen.getByText('ESTADO NÃO RECONHECIDO').parentElement;
+    const badge = screen.getByText('Estado não reconhecido').parentElement;
     expect(badge).toHaveClass('text-ink-muted');
     expect(badge.closest('.border-2')).toHaveClass('border-dashed', 'border-line-strong');
   });
@@ -123,9 +127,10 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
     // A unidade está num <span> próprio (cor Aurora): o texto completo do valor mantém-se igual.
     const valueWithUnit = (text) => (_, element) =>
       element?.textContent === text && [...element.children].every((child) => child.textContent !== text);
-    expect(screen.getByText(valueWithUnit('25.6 mm'))).toBeInTheDocument();
+    // Português: vírgula decimal (pt-AO). Os valores são os da resposta (25.6, 0.48, 51.2).
+    expect(screen.getByText(valueWithUnit('25,6 mm'))).toBeInTheDocument();
     expect(screen.getByText(valueWithUnit('48%'))).toBeInTheDocument();
-    expect(screen.getByText(valueWithUnit('51.2 mm'))).toBeInTheDocument();
+    expect(screen.getByText(valueWithUnit('51,2 mm'))).toBeInTheDocument();
     expect(screen.getAllByText('mm', { exact: false, selector: 'span' }).length).toBeGreaterThan(0);
   });
 

@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { getUserErrorMessage } from '../../utils/errorMessages.js';
 import Button from '../ui/Button.jsx';
 import { ChevronDownIcon, RetryIcon } from '../ui/icons.jsx';
@@ -12,8 +13,10 @@ import { CONTROL_CLASSES, fieldDescriptionIds } from './fieldStyles.js';
  *
  * @param {{
  *   id: string, label: string, hint?: string, placeholder: string,
- *   resourceLabel: string,  // ex.: "as províncias"
+ *   loadingLabel: string,   // ex.: "A carregar as províncias…" (já traduzido)
+ *   errorTitle: string,     // ex.: "Não foi possível carregar as províncias."
  *   emptyMessage: string,
+ *   getOptionLabel?: (option) => { text: string, lang?: string },  // nome no idioma activo
  *   catalog: ReturnType<typeof import('../../hooks/useCatalogOptions.js').useCatalogOptions>,
  *   value: string, onChange: (value: string) => void, error?: string,
  *   inputRef?: import('react').Ref<HTMLSelectElement>,
@@ -24,32 +27,35 @@ export default function CatalogSelectField({
   label,
   hint,
   placeholder,
-  resourceLabel,
+  loadingLabel,
+  errorTitle,
   emptyMessage,
+  getOptionLabel = (option) => ({ text: option.label }),
   catalog,
   value,
   onChange,
   error,
   inputRef,
 }) {
+  const { t } = useI18n();
   const isReady = catalog.status === 'success';
   const describedBy = fieldDescriptionIds(id, { hint, error });
 
   let extra = null;
   if (catalog.status === 'loading') {
     // O aviso de demora e o anúncio para leitores de ecrã são dados uma vez pelo formulário.
-    extra = <LoadingIndicator label={`A carregar ${resourceLabel}…`} slowNotice={false} live={false} />;
+    extra = <LoadingIndicator label={loadingLabel} slowNotice={false} live={false} />;
   } else if (catalog.status === 'error') {
-    const message = getUserErrorMessage(catalog.error);
+    const message = getUserErrorMessage(catalog.error, t);
     extra = (
       <InlineNotice
         tone="error"
         role="alert"
-        title={`Não foi possível carregar ${resourceLabel}.`}
+        title={errorTitle}
         action={
           <Button variant="outline" size="sm" onClick={catalog.retry}>
             <RetryIcon className="size-4" />
-            <span>Tentar novamente</span>
+            <span>{t('common.retry')}</span>
           </Button>
         }
       >
@@ -65,7 +71,7 @@ export default function CatalogSelectField({
         action={
           <Button variant="outline" size="sm" onClick={catalog.retry}>
             <RetryIcon className="size-4" />
-            <span>Verificar novamente</span>
+            <span>{t('common.checkAgain')}</span>
           </Button>
         }
       />
@@ -90,11 +96,15 @@ export default function CatalogSelectField({
           <option value="" disabled>
             {isReady ? placeholder : '—'}
           </option>
-          {catalog.options.map((option) => (
-            <option key={option.id} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {catalog.options.map((option) => {
+            // O valor enviado à API é sempre o `nome` original; só o texto visível muda.
+            const { text, lang } = getOptionLabel(option);
+            return (
+              <option key={option.id} value={option.value} lang={lang}>
+                {text}
+              </option>
+            );
+          })}
         </select>
         <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-label" />
       </div>

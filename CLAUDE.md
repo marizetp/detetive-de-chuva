@@ -6,7 +6,7 @@
 
 The current backend exposes an agricultural advisory API. The frontend must allow a user to select a province and crop, request an assessment, and understand the returned status, confidence score, metrics, and practical recommendation.
 
-The product language is Portuguese. Use clear, accessible Portuguese suitable for users in Angola. Keep technical identifiers, code, and API field names unchanged.
+The interface is bilingual (decision of 2026-11-14): **English (`en`) is the default language** and **Portuguese (`pt`, pt-AO)** is the second language. Use clear, accessible wording in both — Portuguese suitable for users in Angola, plain English for international readers. Every interface text lives in the dictionaries in `frontend/src/i18n/messages/` (see §11). Keep technical identifiers, code, API field names and the brand name «Detetive da Chuva» unchanged in both languages.
 
 ## 2. Working mode and repository boundaries
 
@@ -238,9 +238,23 @@ Do not build the entire application in one unreviewed operation.
 - Missing and unrecognised statuses are presented neutrally («Estado indisponível» / «Estado não reconhecido»). The report never assumes `AGUARDAR` or `FAVORAVEL`; both cases are covered by tests in `ResultsArea.test.jsx`.
 - Tailwind's default colour palette is disabled.
 
+**2026-11-14 — Internationalisation (English default, Portuguese second language)** (decided by the project owner)
+- Own architecture, no new dependencies, in `frontend/src/i18n/`: `config.js` (languages, `<html lang>` tags `en`/`pt-AO`, Intl locales `en-GB`/`pt-AO`), `messages/en.js` and `messages/pt.js` (same keys, enforced by a parity test), `translate.js` (`createTranslator`, missing key → the key itself, never text from the other language), `LanguageProvider.jsx` + `useI18n()` (`language`, `t`, `setLanguage`, `suggestion`).
+- Components never hard-code interface text: they call `t('key')`. Pure utilities receive the language or `t` as a parameter (`format.js`, `errorMessages.js`, `describeConsultation`); validators return message keys.
+- Numbers and dates are formatted per language (`en-GB`: `25.6 mm`, `12 November 2026`; `pt-AO`: `25,6 mm`, `12 de novembro de 2026`). Values are never changed, only their presentation.
+- Language selector (EN | PT) always visible in the header, desktop and mobile; `aria-pressed`, `lang` on each option, active option on `selection` with white text (4.58:1). Below 1024 px the full navigation moves to the menu (it does not fit on one line with the selector); below 640 px the menu button is icon-only (accessible name kept).
+- Persistence (localStorage, always in try/catch; in memory if blocked): `ddc.language` = explicit choice (`source: manual | suggestion`), absolute priority; `ddc.languageSuggestion` = suggestion dismissed (does not set a language). A dismissal is never confused with a choice.
+- Language suggestion: only on a first visit with no stored choice or dismissal, when the browser's **primary** language (`navigator.languages[0]`, else `navigator.language`) is `pt` or `pt-*`. In-flow strip under the header (never covers content), English text plus the question in Portuguese (`lang="pt"`), actions «Switch to Portuguese» / «Keep English». Never changes the language by itself. No geolocation, IP or other personal data.
+- Backend free text (`recomendacao_extensao`, `justificacoes_tecnicas`) is Portuguese and is translated **by the backend only** — never in the browser, never by word substitution. Until the backend offers a documented multilingual contract, the English interface shows an English notice and a closed panel with the original text (`lang="pt"`), kept intact for audit (`SourceLanguageContent.jsx`, `utils/localizedContent.js`). Do not simulate multilingual support that does not exist.
+- Crop names are translated by stable `id` (`i18n/catalogNames.js`); the value sent to the API stays the original `nome`. Province and municipality names are proper nouns and are not translated.
+- English texts with scientific or agronomic meaning are listed in `i18n/reviewRequired.js` and **must be reviewed by a person** before being considered final. Translations must preserve values, units, dates, negations and caveats; a test checks that the numbers in those texts match in both languages.
+- Tests render components through `src/test/render.jsx` (Portuguese by default, `{ language: 'en' }` for English).
+
 ## 12. Known pending decisions
 
 - Confirm whether the historical NASA POWER trend outputs described in the PDF will be exposed to the frontend during this event.
 - Confirm whether the API's live responses match the supplied examples. (Partially verified on 2026-11-12: shapes match, with extra undocumented fields in `/provinces`, `/crops`, and `/evaluate`.)
 - Confirm whether map/geospatial data is available for the current release.
 - Confirm whether offline operation is required for the frontend demo and what data must be cached.
+- Multilingual API (i18n phase 5): request sent to the backend team on 2026-11-14 (`idioma` parameter on `/advisory` and `/evaluate`, translated free text plus the Portuguese original, translation metadata, documented list of `triggers_ativados` codes). Integrate only after the contract is specified and available.
+- Human review of the English scientific texts listed in `frontend/src/i18n/reviewRequired.js`.

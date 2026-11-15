@@ -6,6 +6,7 @@ import Eyebrow from '../components/ui/Eyebrow.jsx';
 import { useCatalogOptions } from '../hooks/useCatalogOptions.js';
 import { useConsultation } from '../hooks/useConsultation.js';
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js';
+import { useI18n } from '../i18n/useI18n.js';
 import { getCrops, getProvinces } from '../services/catalog.js';
 import { getLocalIsoDate } from '../utils/dates.js';
 import { isSameConsultation } from '../utils/report.js';
@@ -20,7 +21,8 @@ function revealResults(heading) {
 }
 
 export default function ConsultationPage() {
-  useDocumentTitle('Consulta agrícola');
+  const { t } = useI18n();
+  useDocumentTitle(t('documentTitle.consultation'));
 
   // Data de referência fixada ao abrir a página (data local do dispositivo).
   const [today] = useState(() => getLocalIsoDate());
@@ -48,13 +50,13 @@ export default function ConsultationPage() {
     <Container className="py-14 lg:py-20">
       <header className="max-w-3xl">
         <Eyebrow className="font-display" data-reveal>
-          Consulta agrícola
+          {t('consultation.eyebrow')}
         </Eyebrow>
         <h1 data-reveal data-reveal-delay="1" className="mt-5 text-4xl leading-[1.08] font-semibold tracking-tight text-ink sm:text-5xl">
-          Avaliar as condições para semear
+          {t('consultation.title')}
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-ink-muted" data-reveal data-reveal-delay="2">
-          Indique a província, o município (opcional), a cultura e a data pretendida — imediata ou de planeamento futuro de safra. Obtenha a recomendação agronómica e os indicadores climáticos de apoio à decisão.
+          {t('consultation.lead')}
         </p>
       </header>
 
@@ -83,6 +85,7 @@ export default function ConsultationPage() {
             submittedParams={consultation.submittedParams}
             advisory={consultation.advisory}
             evaluate={consultation.evaluate}
+            crops={crops}
             onRetry={consultation.retrySource}
             today={today}
             headingRef={resultsHeadingRef}

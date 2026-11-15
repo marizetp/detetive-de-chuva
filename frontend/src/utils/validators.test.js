@@ -73,7 +73,7 @@ describe('validateConsultationParams — data (decisão de 2026-11-12)', () => {
 
   it('requireDate exige a data', () => {
     expect(validateConsultationParams(base, { requireDate: true, today })).toEqual({
-      data_consulta: 'Indique a data da consulta.',
+      data_consulta: 'validation.dateRequired',
     });
     expect(validateConsultationParams(base, { today })).toEqual({});
   });
@@ -113,12 +113,12 @@ describe('buildConsultationPayload', () => {
     ).toEqual({ provincia: 'Huambo', cultura: 'Milho', data_consulta: '2026-09-10' });
   });
 
-  it('lança ConsultationInputError com as mensagens por campo', () => {
+  it('lança ConsultationInputError com as chaves de mensagem (i18n) por campo', () => {
     expect(() => buildConsultationPayload({})).toThrow(ConsultationInputError);
     try {
       buildConsultationPayload({ cultura: 'Milho' });
     } catch (error) {
-      expect(error.fieldErrors).toEqual({ provincia: 'Seleccione uma província.' });
+      expect(error.fieldErrors).toEqual({ provincia: 'validation.provinceRequired' });
     }
   });
 });

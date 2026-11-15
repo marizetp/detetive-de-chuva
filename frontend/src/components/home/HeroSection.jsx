@@ -1,9 +1,12 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { ROUTES, SECTION_IDS } from '../../routing/routes.js';
 import PlanaltoIllustration from '../illustrations/PlanaltoIllustration.jsx';
 import ButtonLink from '../ui/ButtonLink.jsx';
 import Container from '../ui/Container.jsx';
 
 export default function HeroSection() {
+  const { t } = useI18n();
+
   return (
     <section aria-labelledby="hero-title">
       <Container className="grid items-center gap-12 pt-12 pb-16 sm:pt-16 lg:grid-cols-12 lg:gap-12 lg:pt-20 lg:pb-24">
@@ -21,18 +24,16 @@ export default function HeroSection() {
             data-reveal
             data-reveal-delay="2"
           >
-            <span className="motion-question-text">O calendário agrícola de sempre ainda é fiável?</span>
+            <span className="motion-question-text">{t('home.hero.question')}</span>
           </p>
 
           <p className="mt-7 max-w-lg text-lg leading-relaxed text-ink-muted" data-reveal data-reveal-delay="4">
-            Uma plataforma de apoio à decisão agrícola que apresenta os indicadores agroclimáticos
-            disponibilizados pelo sistema, como a chuva e a humidade do solo, para ajudar a decidir
-            quando semear.
+            {t('home.hero.lead')}
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3">
             <ButtonLink to={ROUTES.consultation} data-reveal data-reveal-delay="5">
-              Iniciar consulta agrícola
+              {t('home.hero.cta')}
             </ButtonLink>
             <ButtonLink
               to={`${ROUTES.home}#${SECTION_IDS.howItWorks}`}
@@ -41,7 +42,7 @@ export default function HeroSection() {
               data-reveal
               data-reveal-delay="6"
             >
-              Como funciona
+              {t('home.hero.howItWorks')}
             </ButtonLink>
           </div>
         </div>

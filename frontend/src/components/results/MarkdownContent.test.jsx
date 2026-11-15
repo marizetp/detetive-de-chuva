@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '../../test/render.jsx';
 import { describe, expect, it } from 'vitest';
 import MarkdownContent from './MarkdownContent.jsx';
 

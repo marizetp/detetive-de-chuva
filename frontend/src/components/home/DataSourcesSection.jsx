@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { SECTION_IDS } from '../../routing/routes.js';
 import Container from '../ui/Container.jsx';
 import SectionHeading from '../ui/SectionHeading.jsx';
@@ -5,29 +6,16 @@ import Tag from '../ui/Tag.jsx';
 
 // Só se descreve o que está confirmado (CLAUDE.md §6). A origem dos dados meteorológicos do
 // serviço ainda não está documentada; as tendências NASA POWER são uma proposta em rascunho.
+// Textos em home.sources.* (dicionários i18n).
 const SOURCES = [
-  {
-    status: 'available',
-    statusLabel: 'Disponível',
-    title: 'Serviço de avaliação do Detetive da Chuva',
-    text: 'API do projecto que devolve, para cada consulta, a classificação, o nível de confiança, os indicadores e a recomendação, bem como uma avaliação técnica complementar. A origem detalhada dos dados meteorológicos utilizados pelo serviço ainda não está documentada nesta versão.',
-  },
-  {
-    status: 'pending',
-    statusLabel: 'Em preparação',
-    title: 'Tendências agroclimáticas históricas',
-    text: 'Análise de tendências de longo prazo a partir de dados de reanálise — um produto de modelo, não uma medição directa. Ainda não está disponível na plataforma.',
-  },
+  { key: 'service', status: 'available' },
+  { key: 'trends', status: 'pending' },
 ];
 
-const PLATFORM_NATURE = [
-  'É uma ferramenta de apoio à decisão. Não garante o sucesso da sementeira.',
-  'O nível de confiança é uma pontuação atribuída pelo sistema, não uma probabilidade confirmada.',
-  'O texto da recomendação é produzido pelo serviço e a sua redacção pode variar entre consultas.',
-  'Não substitui o conhecimento local nem o acompanhamento de técnicos de extensão agrícola.',
-];
+const PLATFORM_NATURE = ['nature1', 'nature2', 'nature3', 'nature4'];
 
 export default function DataSourcesSection() {
+  const { t } = useI18n();
   const headingId = `${SECTION_IDS.sources}-titulo`;
 
   return (
@@ -35,28 +23,28 @@ export default function DataSourcesSection() {
       <Container className="py-20 lg:py-28">
         <SectionHeading
           id={headingId}
-          title="De onde vêm os dados, e o que ainda não sabemos"
+          title={t('home.sources.title')}
           className="max-w-3xl"
         />
 
         <div className="mt-14 grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
             <h3 className="type-label font-display text-label" data-reveal>
-              Fontes de dados
+              {t('home.sources.sourcesHeading')}
             </h3>
             <ul className="mt-5 divide-y divide-line border-y border-line">
               {SOURCES.map((source, index) => (
                 <li
-                  key={source.title}
+                  key={source.key}
                   className="py-7"
                   data-reveal
                   data-reveal-delay={String(Math.min(index + 1, 6))}
                 >
-                  <Tag tone={source.status}>{source.statusLabel}</Tag>
+                  <Tag tone={source.status}>{t(`home.sources.${source.status}`)}</Tag>
                   <h4 className="mt-4 font-display text-2xl leading-snug text-ink">
-                    {source.title}
+                    {t(`home.sources.${source.key}Title`)}
                   </h4>
-                  <p className="mt-3 max-w-prose leading-relaxed text-ink-muted">{source.text}</p>
+                  <p className="mt-3 max-w-prose leading-relaxed text-ink-muted">{t(`home.sources.${source.key}Text`)}</p>
                 </li>
               ))}
             </ul>
@@ -68,7 +56,7 @@ export default function DataSourcesSection() {
               className="type-label font-display text-label"
               data-reveal
             >
-              Natureza da plataforma
+              {t('home.sources.natureHeading')}
             </h3>
             <ul className="mt-5 space-y-5">
               {PLATFORM_NATURE.map((item, index) => (
@@ -79,7 +67,7 @@ export default function DataSourcesSection() {
                   data-reveal-delay={String(Math.min(index + 1, 6))}
                 >
                   <span className="mt-3 h-px w-5 shrink-0 bg-aurora" aria-hidden="true" />
-                  <span>{item}</span>
+                  <span>{t(`home.sources.${item}`)}</span>
                 </li>
               ))}
             </ul>

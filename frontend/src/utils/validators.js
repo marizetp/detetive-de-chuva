@@ -31,7 +31,7 @@ export function isValidIsoDate(value) {
 
 /** Erro de validação dos parâmetros da consulta, detectado antes de qualquer pedido. */
 export class ConsultationInputError extends Error {
-  /** @param {Record<string, string>} fieldErrors mensagens por campo, em português */
+  /** @param {Record<string, string>} fieldErrors chaves de mensagem (i18n) por campo */
   constructor(fieldErrors) {
     super('Parâmetros de consulta inválidos.');
     this.name = 'ConsultationInputError';
@@ -50,7 +50,7 @@ export function isFutureIsoDate(isoDate, today) {
  * - Suporta datas actuais e datas futuras para planeamento de safra e investimento.
  * @param {{ provincia?: unknown, cultura?: unknown, data_consulta?: unknown, municipio?: unknown }} params
  * @param {{ requireDate?: boolean, today?: string }} [options]
- * @returns {Record<string, string>} vazio quando válido
+ * @returns {Record<string, string>} chaves de mensagem (i18n) por campo; vazio quando válido
  */
 export function validateConsultationParams(
   params,
@@ -60,16 +60,16 @@ export function validateConsultationParams(
   const { provincia, cultura, data_consulta } = params ?? {};
 
   if (!isNonEmptyString(provincia)) {
-    errors.provincia = 'Seleccione uma província.';
+    errors.provincia = 'validation.provinceRequired';
   }
   if (!isNonEmptyString(cultura)) {
-    errors.cultura = 'Seleccione uma cultura.';
+    errors.cultura = 'validation.cropRequired';
   }
   const hasDate = data_consulta !== undefined && data_consulta !== null && data_consulta !== '';
   if (!hasDate) {
-    if (requireDate) errors.data_consulta = 'Indique a data da consulta.';
+    if (requireDate) errors.data_consulta = 'validation.dateRequired';
   } else if (!isValidIsoDate(data_consulta)) {
-    errors.data_consulta = 'Indique uma data válida no formato AAAA-MM-DD.';
+    errors.data_consulta = 'validation.dateInvalid';
   }
   return errors;
 }

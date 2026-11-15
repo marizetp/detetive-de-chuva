@@ -7,11 +7,16 @@ import { isValidIsoDate } from './validators.js';
 
 const CONSULTATION_FIELDS = ['provincia', 'municipio', 'cultura', 'data_consulta'];
 
-/** "Huambo (Caála) · Milho · 12 de novembro de 2026" — identificação curta de uma consulta. */
-export function describeConsultation(params) {
+/**
+ * "Huambo (Caála) · Milho · 12 de novembro de 2026" — identificação curta de uma consulta.
+ * - `language`: idioma da data;
+ * - `cropLabel`: nome da cultura na interface (por omissão, o valor enviado à API).
+ * Província e município são nomes próprios e ficam iguais em todos os idiomas.
+ */
+export function describeConsultation(params, { language, cropLabel = (value) => value } = {}) {
   if (!params) return '';
   const location = params.municipio ? `${params.provincia} (${params.municipio})` : params.provincia;
-  return [location, params.cultura, formatIsoDateLong(params.data_consulta)].join(' · ');
+  return [location, cropLabel(params.cultura), formatIsoDateLong(params.data_consulta, language)].join(' · ');
 }
 
 /**
