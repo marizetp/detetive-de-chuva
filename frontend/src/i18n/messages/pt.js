@@ -52,7 +52,8 @@ const pt = {
     advisoryDescription:
       'Serviço de avaliação do projecto. Fontes segundo a sua documentação: NASA GPM IMERG, NASA POWER e Open-Meteo.',
     trendsTerm: 'Tendências históricas',
-    trendsDescription: 'NASA POWER (reanálise MERRA-2) — em preparação, ainda não disponível.',
+    trendsDescription:
+      'Análise de tendências dos dados NASA POWER (reanálise MERRA-2) — ainda não disponível na plataforma. O serviço de avaliação já usa o NASA POWER como linha de base histórica.',
     disclaimer:
       'Projecto desenvolvido no âmbito do NASA Space Apps Challenge 2026. O AgroKairos não é um serviço oficial da NASA.',
     decisionSupport: 'Ferramenta de apoio à decisão — não garante resultados agrícolas.',
@@ -95,7 +96,7 @@ const pt = {
       pending: 'Em preparação',
       serviceTitle: 'Serviço de avaliação do AgroKairos',
       serviceText:
-        'Serviço do projecto que devolve, para cada consulta, a classificação, o nível de confiança, os indicadores e a recomendação, bem como uma avaliação técnica complementar. Segundo a sua documentação, usa dados abertos de precipitação, humidade do solo e temperatura, e previsões meteorológicas de um serviço externo; as fontes estão identificadas no rodapé. A documentação não indica que fonte alimenta cada indicador apresentado.',
+        'Serviço do projecto que devolve, para cada consulta, a classificação, o nível de confiança, os indicadores e a recomendação, bem como uma avaliação técnica complementar. Segundo a sua documentação, usa dados abertos de precipitação, humidade do solo e temperatura, e previsões meteorológicas de um serviço externo; as fontes estão identificadas no rodapé. Segundo a equipa de backend, o motor de decisão combina uma linha de base NASA POWER de 25 anos, dados Open-Meteo e perfis das culturas; quando o Open-Meteo não está disponível, usa a climatologia histórica NASA POWER, e o relatório indica-o.',
       trendsTitle: 'Tendências agroclimáticas históricas',
       trendsText:
         'Análise de tendências de longo prazo a partir de dados de reanálise — um produto de modelo, não uma medição directa. Ainda não está disponível na plataforma.',

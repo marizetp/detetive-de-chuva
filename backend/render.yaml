@@ -1,12 +1,19 @@
+# Blueprint do Render para o backend no repositório consolidado (frontend/ + backend/).
+# Ao criar o Blueprint no Render, indicar o caminho `backend/render.yaml`.
+# O nome `agrokairos-api` cria um serviço NOVO: o serviço actual (detetive-da-chuva) não é alterado.
 services:
   - type: web
     name: agrokairos-api
-    env: python
+    runtime: python
+    rootDir: backend
     region: frankfurt
     plan: free
     buildCommand: pip install -r requirements.txt && python -c "from src.baseline_engine import BaselineEngine; BaselineEngine().load_baseline()"
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
       - key: ENVIRONMENT
         value: production
       - key: GEMINI_API_KEY

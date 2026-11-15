@@ -13,7 +13,7 @@ The interface is bilingual (decision of 2026-11-14): **English (`en`) is the def
 - The repository root contains this file, `docs/`, `frontend/` and `backend/` (FastAPI source supplied by the backend team, added on 2026-11-15; see `backend/README.md`).
 - The frontend application must be implemented inside `frontend/`.
 - Read relevant documentation in `docs/` before making architectural or integration decisions.
-- Do not modify backend code or backend deployment.
+- Do not modify backend code (scientific engines, rules, data) without explicit authorisation. Deployment configuration (`backend/render.yaml`, CI) may be changed when the project owner authorises deployment work (authorised 2026-11-15).
 - Do not assume that an endpoint, field, dataset, or capability exists unless it appears in the API documentation or is verified against the live API.
 - Before making broad changes, inspect the existing repository and report what is already present.
 - Prefer small, reviewable implementation steps. Explain the files changed and how to test them.
@@ -225,7 +225,7 @@ Do not build the entire application in one unreviewed operation.
 
 **2026-11-12 — Request timeout:** default `120000` ms (120 s), defined in `frontend/src/config/api.js` and overridable with `VITE_API_TIMEOUT_MS` (accepted range 5000–300000 ms). Rationale: a live `/advisory` request exceeded the previous 90 s limit.
 
-**2026-11-12 — Consultation date:** the user may choose today or any past date; future dates are disabled in the date picker and rejected by validation. `data_consulta` is required in the form (it remains optional in the API contract).
+**2026-11-12 — Consultation date** *(superseded: since commit `1ef7ca2` and per `docs2.md` §3, the form accepts today or any **future** date for season planning; past dates are not offered. The text below is kept for the record.)*: the user may choose today or any past date; future dates are disabled in the date picker and rejected by validation. `data_consulta` is required in the form (it remains optional in the API contract).
 - Reference date: the device's **local** date (`getLocalIsoDate` in `frontend/src/utils/dates.js`), not the server's `data_servidor`. Do not switch to `data_servidor` in this phase.
 - **Known limitation:** if the device clock or time zone is wrong, validation may wrongly reject today's date or accept a date that is already in the future for the server (typically a one-day offset).
 
@@ -279,6 +279,12 @@ Do not build the entire application in one unreviewed operation.
 - IMERG (`/zonas/...`) and `/optimal-planting` have **no screen** (D11, no new features in the stabilisation phase). Prepared and tested against real recordings: `services/scientific.js` (`getImergDecision`, `getOptimalPlanting`), `utils/scientificMappers.js`, `config/imerg.js`. IMERG outcomes (`indicative`, `wait`, `noReliableBasis`, `outOfSeason`, `unknown`, `missing`) are a separate vocabulary, never mapped to `FAVORAVEL`/`AGUARDAR`/`DESFAVORAVEL`; `SEM_BASE_FIAVEL` and `FORA_DA_EPOCA` are «no conclusion», never a decision (`imergNoDecisionMessageKeys`, `imerg.noDecision.*`). Observed: the IMERG code is in `mensagem_agricultor.codigo` (docs2 §5 says `estado_motor`); both are read. Scientific values (quantiles, IC90, probabilities) pass through unchanged.
 - The report names its mechanism (`results.mechanism`, shown only with a submitted consultation): DecisionEngine assessment, not including IMERG or the planting window. Strings in `mechanisms.*`/`imerg.*` are prepared for integration and listed in `reviewRequired.js`.
 - HTTP 422 on `lang` (`ApiError.fields` from `detail[].loc`): own message «unsupported language», no retry, no raw server text (real recording `adv_badlang`).
+
+**2026-11-15 — Deployment and CI** (authorised by the project owner)
+- Frontend production: Netlify project `agrokairos` (<https://agrokairos.netlify.app>), built from `main` via the root `netlify.toml` (`NODE_VERSION` 24). `VITE_API_BASE_URL` is set per context in the Netlify UI, never in source.
+- API production: the existing Render service <https://detetive-da-chuva.onrender.com>, kept unchanged until a service built from `backend/` passes `scripts/smoke-backend.mjs`.
+- `backend/render.yaml` describes a **new** service `agrokairos-api` (`rootDir: backend`, `/health`, Python 3.11.11). Creating it needs Render dashboard access.
+- GitHub Actions (`.github/workflows/ci.yml`) runs frontend tests, lint, both builds and `scripts/check-demo-isolation.mjs`, and backend `pytest`, startup and the smoke test. Backend runtime evidence comes from CI (local Windows policy blocks the compiled Python dependencies).
 
 ## 12. Known pending decisions
 

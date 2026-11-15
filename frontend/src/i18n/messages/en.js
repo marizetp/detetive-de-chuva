@@ -54,7 +54,8 @@ const en = {
     advisoryDescription:
       "The project's assessment service. Sources according to its documentation: NASA GPM IMERG, NASA POWER and Open-Meteo.",
     trendsTerm: 'Historical trends',
-    trendsDescription: 'NASA POWER (MERRA-2 reanalysis) — in preparation, not yet available.',
+    trendsDescription:
+      'Trend analysis of NASA POWER data (MERRA-2 reanalysis) — not yet available on the platform. The assessment service already uses NASA POWER as its historical baseline.',
     disclaimer:
       'Project developed for the NASA Space Apps Challenge 2026. AgroKairos is not an official NASA service.',
     decisionSupport: 'Decision-support tool — it does not guarantee farming outcomes.',
@@ -97,7 +98,7 @@ const en = {
       pending: 'In preparation',
       serviceTitle: 'AgroKairos assessment service',
       serviceText:
-        "The project's service that returns, for each consultation, the classification, the confidence level, the indicators and the recommendation, as well as a complementary technical assessment. According to its documentation, it uses open precipitation, soil moisture and temperature data, and weather forecasts from an external service; the sources are listed in the footer. The documentation does not state which source feeds each indicator shown.",
+        "The project's service that returns, for each consultation, the classification, the confidence level, the indicators and the recommendation, as well as a complementary technical assessment. According to its documentation, it uses open precipitation, soil moisture and temperature data, and weather forecasts from an external service; the sources are listed in the footer. According to the backend team, the decision engine combines a 25-year NASA POWER baseline, Open-Meteo data and crop profiles; when Open-Meteo is unavailable, it uses NASA POWER historical climatology, and the report says so.",
       trendsTitle: 'Historical agroclimatic trends',
       trendsText:
         'Analysis of long-term trends based on reanalysis data — a model product, not a direct measurement. Not yet available on the platform.',

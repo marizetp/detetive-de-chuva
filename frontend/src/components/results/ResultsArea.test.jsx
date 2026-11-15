@@ -3,9 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../../services/api.js';
 import {
   advisoryHuamboMilho,
-  evaluateHuamboAguardar,
   evaluateHuamboMilho,
-  evaluateHuilaDesfavoravel,
 } from '../../test/fixtures/liveResponses.js';
 import { mapAdvisoryResponse, mapEvaluateResponse } from '../../utils/mappers.js';
 import ResultsArea from './ResultsArea.jsx';

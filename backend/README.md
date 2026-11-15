@@ -6,6 +6,8 @@
 
 **AgroKairos** is an open-source analytical backend and decision-support API built to help smallholder farmers and rural extension workers in Angola's Central Plateau decide **when it is safe to sow** and identify the **optimal planting window** for five food crops (**Maize/Milho**, **Common Bean/Feijão**, **Soybean/Soja**, **Cassava/Mandioca**, and **Rice/Arroz**), protecting households against **false starts of the rainy season** and seed loss.
 
+> **Repository layout.** This backend lives in `backend/` of the consolidated AgroKairos repository (the frontend is in `frontend/`). Run every command below from `backend/`. Deployment from this repository uses `backend/render.yaml` (`rootDir: backend`); the production API currently served at `https://detetive-da-chuva.onrender.com` is a separate, pre-existing Render service. CI (`.github/workflows/ci.yml`) runs `pytest`, starts the API and runs `scripts/smoke-backend.mjs` against it. Language support today: `lang` (`pt` | `en`) only on `POST /api/v1/advisory`; see `docs/ESPECIFICACAO-BACKEND-I18N.md` for the requested extensions.
+
 ---
 
 ## NASA Open Data & Resources Used
