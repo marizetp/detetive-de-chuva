@@ -59,8 +59,9 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
   });
 
   it('em erro: apresenta mensagem clara e botão de tentar novamente', () => {
-    const { onRetry } = renderReport({ advisory: failed('timeout') });
+    const { onRetry } = renderReport({ advisory: failed('timeout'), evaluate: loading });
     expect(screen.getByText('Não foi possível obter a recomendação.')).toBeInTheDocument();
+    expect(screen.getByText(/O servidor demorou demasiado a responder/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
     expect(onRetry).toHaveBeenCalledWith('advisory');
   });
@@ -68,20 +69,25 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
   it('sucesso FAVORÁVEL: exibe badge grande, confiança e descrição adequada', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'FAVORAVEL' }) });
     expect(screen.getByText('Favorável para semeadura')).toBeInTheDocument();
-    expect(screen.getByText(/As condições climáticas e as reservas de humidade do solo são adequadas/)).toBeInTheDocument();
+    expect(screen.getByText(/o serviço classifica as condições como favoráveis à sementeira/)).toBeInTheDocument();
+    expect(screen.getByText(/não uma garantia de germinação nem de colheita/)).toBeInTheDocument();
     expect(screen.getByText('Nível de Confiança')).toBeInTheDocument();
   });
 
   it('sucesso AGUARDAR: exibe badge de cautela e aviso para proteger recursos', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'AGUARDAR' }) });
-    expect(screen.getByText('Aguardar melhores condições')).toBeInTheDocument();
-    expect(screen.getByText(/Transição ou humidade ainda incipiente na raiz/)).toBeInTheDocument();
+    expect(screen.getByText('Aguardar antes de semear')).toBeInTheDocument();
+    expect(screen.getByText(/indica que é preferível aguardar/)).toBeInTheDocument();
   });
 
   it('sucesso DESFAVORÁVEL: exibe alerta de não recomendação para a época seca', () => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: 'DESFAVORAVEL' }) });
     expect(screen.getByText('Não recomendado / Desfavorável')).toBeInTheDocument();
-    expect(screen.getByText(/Risco elevado de perda do investimento e insumos/)).toBeInTheDocument();
+    expect(screen.getByText(/classifica as condições como desfavoráveis à sementeira/)).toBeInTheDocument();
+    // A descrição da plataforma (cartão do veredito) não afirma consequências nem causas; o texto do
+    // backend, mais abaixo, é apresentado tal como recebido.
+    const verdict = within(document.querySelector('.border-2'));
+    expect(verdict.queryByText(/perda do investimento|estiagem/)).not.toBeInTheDocument();
   });
 
   it('estado ausente: apresentação neutra «Estado indisponível», sem assumir AGUARDAR', () => {
@@ -89,7 +95,7 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
     renderReport({ advisory: advisoryOk(semEstado) });
     expect(screen.getByText('Estado indisponível')).toBeInTheDocument();
     expect(screen.getByText(/O serviço não enviou o estado desta avaliação/)).toBeInTheDocument();
-    expect(screen.queryByText('Aguardar melhores condições')).not.toBeInTheDocument();
+    expect(screen.queryByText('Aguardar antes de semear')).not.toBeInTheDocument();
     expect(screen.queryByText('Estado não reconhecido')).not.toBeInTheDocument();
   });
 
@@ -103,7 +109,7 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
 
   it.each([
     ['FAVORAVEL', 'Favorável para semeadura', 'status-favorable'],
-    ['AGUARDAR', 'Aguardar melhores condições', 'status-wait'],
+    ['AGUARDAR', 'Aguardar antes de semear', 'status-wait'],
     ['DESFAVORAVEL', 'Não recomendado / Desfavorável', 'status-unfavorable'],
   ])('cartão %s usa a cor semântica do estado no texto e no contorno', (code, title, token) => {
     renderReport({ advisory: advisoryOk({ ...advisoryHuamboMilho, status: code }) });
@@ -136,7 +142,10 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
 
   it('renderiza o parecer técnico do agrônomo formatado em Markdown', async () => {
     renderReport();
-    expect(screen.getByText('Recomendação Técnica do Agrónomo')).toBeInTheDocument();
+    expect(screen.getByText('Recomendação do serviço de avaliação')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Texto gerado automaticamente a partir dos indicadores do serviço, podendo recorrer a inteligência artificial/),
+    ).toBeInTheDocument();
     expect(await screen.findByRole('heading', { level: 4, name: 'Justificações Técnicas:' })).toBeInTheDocument();
     expect(screen.getByRole('listitem')).toHaveTextContent('Reservas Hídricas no Solo:');
   });

@@ -15,6 +15,26 @@ function cleanServerMessage(message) {
 }
 
 /**
+ * Erros HTTP que não são de validação (docs/docs2.md §7).
+ * - 400 e 404: repetir o mesmo pedido dá o mesmo resultado → sem nova tentativa.
+ * - 503 e restantes 5xx: falhas temporárias do serviço → nova tentativa.
+ * - Outros 4xx (não documentados): mensagem genérica de pedido recusado, como até aqui.
+ */
+function httpErrorMessage(status, t) {
+  const message = (key, canRetry) => ({
+    title: t(`errors.${key}Title`),
+    description: t(`errors.${key}Description`),
+    canRetry,
+    serverMessages: [],
+  });
+  if (status === 400) return message('badRequest', false);
+  if (status === 404) return message('notFound', false);
+  if (status === 503) return message('unavailable', true);
+  if (typeof status === 'number' && status >= 500) return message('server', true);
+  return message('rejected', true);
+}
+
+/**
  * @param {unknown} error
  * @param {(key: string) => string} [t] tradutor do idioma activo (useI18n().t)
  * @returns {UserErrorMessage | null} `null` para cancelamentos pedidos pelo próprio cliente
@@ -70,14 +90,7 @@ export function getUserErrorMessage(error, t = createTranslator(DEFAULT_LANGUAGE
         serverMessages: [],
       };
     case 'http':
-    default: {
-      const isServerError = typeof error.status === 'number' && error.status >= 500;
-      return {
-        title: isServerError ? t('errors.serverTitle') : t('errors.rejectedTitle'),
-        description: isServerError ? t('errors.serverDescription') : t('errors.rejectedDescription'),
-        canRetry: true,
-        serverMessages: [],
-      };
-    }
+    default:
+      return httpErrorMessage(error.status, t);
   }
 }

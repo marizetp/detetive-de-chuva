@@ -49,6 +49,25 @@ describe('dicionários pt.js / en.js', () => {
   });
 });
 
+describe('textos sobre a origem da recomendação', () => {
+  it('nenhum texto atribui a recomendação a um agrónomo nem a uma validação profissional', () => {
+    // Especificação funcional §10 (decisão 12): validação agronómica «não há ainda».
+    for (const [name, messages] of [['en', en], ['pt', pt]]) {
+      for (const key of flattenKeys(messages)) {
+        expect(valueAt(messages, key), `${name}:${key}`).not.toMatch(/agrónomo|agronomist/i);
+      }
+    }
+  });
+
+  it('a divulgação de IA é prudente («pode»), nunca afirma que todo o texto é gerado por IA', () => {
+    expect(valueAt(pt, 'home.sources.nature3')).toMatch(/Pode ser redigido com recurso a inteligência artificial/);
+    expect(valueAt(en, 'home.sources.nature3')).toMatch(/may be written with generative artificial intelligence/);
+    for (const messages of [en, pt]) {
+      expect(valueAt(messages, 'home.sources.nature3')).not.toMatch(/Gemini|OpenAI/);
+    }
+  });
+});
+
 describe('createTranslator', () => {
   it('interpola variáveis e mantém as desconhecidas', () => {
     const t = createTranslator('en');

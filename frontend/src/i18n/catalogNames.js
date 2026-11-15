@@ -1,12 +1,21 @@
 // Nomes do catálogo noutros idiomas, indexados pelo `id` estável da API (/crops).
 // Em Português usa-se sempre o `nome` devolvido pelo serviço. Províncias e municípios são nomes
 // próprios e não se traduzem. O valor enviado à API continua a ser o `nome` original.
-// Revisão humana: estes nomes de culturas também constam da revisão científica.
+// Revisão humana: os nomes ingleses das culturas estão listados em CROP_NAMES_REVIEW_REQUIRED
+// (reviewRequired.js); um teste garante que todas as traduções aqui definidas estão nessa lista.
 
 import { BACKEND_CONTENT_LANGUAGE } from './config.js';
 
 const CROP_NAMES = Object.freeze({
-  en: Object.freeze({ milho: 'Maize', feijao: 'Beans', soja: 'Soybean' }),
+  // `mandioca` e `arroz`: culturas acrescentadas na API v1.1 (docs/docs2.md §2). «Cassava» é o termo
+  // que o próprio /advisory usa em inglês (observado em 2026-11-15).
+  en: Object.freeze({
+    milho: 'Maize',
+    feijao: 'Beans',
+    soja: 'Soybean',
+    mandioca: 'Cassava',
+    arroz: 'Rice',
+  }),
 });
 
 /**

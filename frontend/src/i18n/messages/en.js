@@ -44,7 +44,8 @@ const en = {
     consultation: 'Crop consultation',
     dataHeading: 'Data',
     advisoryTerm: 'Assessments and recommendations',
-    advisoryDescription: 'Detetive da Chuva assessment service (project API).',
+    advisoryDescription:
+      "The project's assessment service. Sources according to its documentation: NASA GPM IMERG, NASA POWER and Open-Meteo.",
     trendsTerm: 'Historical trends',
     trendsDescription: 'NASA POWER (MERRA-2 reanalysis) — in preparation, not yet available.',
     disclaimer:
@@ -89,7 +90,7 @@ const en = {
       pending: 'In preparation',
       serviceTitle: 'Detetive da Chuva assessment service',
       serviceText:
-        'The project API that returns, for each consultation, the classification, the confidence level, the indicators and the recommendation, as well as a complementary technical assessment. The detailed origin of the weather data used by the service is not yet documented in this version.',
+        "The project's service that returns, for each consultation, the classification, the confidence level, the indicators and the recommendation, as well as a complementary technical assessment. According to its documentation, it uses open precipitation, soil moisture and temperature data, and weather forecasts from an external service; the sources are listed in the footer. The documentation does not state which source feeds each indicator shown.",
       trendsTitle: 'Historical agroclimatic trends',
       trendsText:
         'Analysis of long-term trends based on reanalysis data — a model product, not a direct measurement. Not yet available on the platform.',
@@ -97,7 +98,7 @@ const en = {
       nature1: 'It is a decision-support tool. It does not guarantee a successful sowing.',
       nature2: 'The confidence level is a score assigned by the system, not a confirmed probability.',
       nature3:
-        'The recommendation text is produced by the service and its wording may vary between consultations.',
+        'The recommendation text is produced automatically by the assessment service, based on the indicators for each consultation. It may be written with generative artificial intelligence or from a fixed text template, and its wording may vary between consultations. It does not replace advice from an agricultural extension officer.',
       nature4:
         'It does not replace local knowledge or the support of agricultural extension officers.',
     },
@@ -129,7 +130,7 @@ const en = {
   consultation: {
     eyebrow: 'Crop consultation',
     title: 'Assess the conditions for sowing',
-    lead: 'Enter the province, the municipality (optional), the crop and the intended date — now or for future season planning. Get the agronomic recommendation and the climate indicators that support the decision.',
+    lead: "Enter the province, the municipality (optional), the crop and the intended date, now or for season planning. Get the service's recommendation and the climate indicators that support the decision.",
     form: {
       title: 'Consultation details',
       lead: 'Enter the location, the crop and the intended date to assess the sowing conditions.',
@@ -187,8 +188,16 @@ const en = {
       'The service may be starting up after a period of inactivity. Wait a moment and try again.',
     networkTitle: 'Could not connect to the server.',
     networkDescription: 'Check your Internet connection and try again.',
-    validationTitle: 'The server did not accept the consultation.',
-    validationDescription: 'Review the selected province, crop and date.',
+    validationTitle: 'The consultation details are not valid.',
+    validationDescription:
+      'Check the selected province, crop and date and correct anything needed before sending again.',
+    badRequestTitle: 'The server did not accept the request.',
+    badRequestDescription:
+      'Check the consultation details and correct anything needed before sending again.',
+    notFoundTitle: 'The requested information was not found.',
+    notFoundDescription: 'This resource may not be available in this version of the service.',
+    unavailableTitle: 'The service is temporarily unavailable.',
+    unavailableDescription: 'Try again in a few minutes.',
     malformedTitle: 'The server response could not be interpreted.',
     malformedDescription: 'Try again in a few moments.',
     serverTitle: 'The server encountered a problem.',
@@ -203,12 +212,11 @@ const en = {
     eyebrow: 'Assessment result',
     emptyTitle: 'No consultation yet',
     emptyBody:
-      'Fill in the province, the crop and the intended date, then select “{action}”. The agronomic assessment and the decision-support indicators will appear here.',
+      'Fill in the province, the crop and the intended date, then select “{action}”. The recommendation and the decision-support indicators will appear here.',
     loadingTitle: 'Assessing suitability…',
     loadingLabel: 'Analysing historical climate data and agricultural indicators...',
     errorTitle: 'Consultation error',
     errorNoticeTitle: 'The recommendation could not be retrieved.',
-    errorNoticeBody: 'The server took too long to respond or the connection failed.',
     reportTitle: 'Consultation report',
     changeData: 'Change consultation details',
     staleTitle: 'Form details changed',
@@ -218,17 +226,17 @@ const en = {
       FAVORAVEL: {
         title: 'Favourable for sowing',
         description:
-          'Climate conditions and soil moisture reserves are suitable for the crop to develop in this period.',
+          'Based on the indicators for this consultation, the service classifies conditions as favourable for sowing. This is decision-support guidance, not a guarantee of germination or harvest.',
       },
       AGUARDAR: {
-        title: 'Wait for better conditions',
+        title: 'Wait before sowing',
         description:
-          'Transition period, or moisture at root level is still limited. Caution is advised before sowing, to protect seed and capital.',
+          'Based on the indicators for this consultation, the service does not yet classify conditions as favourable for sowing and suggests waiting. You can check again later.',
       },
       DESFAVORAVEL: {
         title: 'Not recommended / Unfavourable',
         description:
-          'High risk of losing the investment and inputs. Dry spell or insufficient water conditions.',
+          'Based on the indicators for this consultation, the service classifies conditions as unfavourable for sowing in this period. Before deciding, check conditions in the field and, where possible, with an agricultural extension officer.',
       },
       missingDescription:
         'The service did not send the status of this assessment. No classification is assumed.',
@@ -252,11 +260,47 @@ const en = {
       label: 'Expected rainfall',
       caption: 'Outlook for the next 7 days',
     },
-    recommendationTitle: 'Agronomist’s technical recommendation',
+    recommendationTitle: 'Recommendation from the assessment service',
     recommendationSubtitle:
-      'Practical guidance for the field, the 5 cm soil-clod test and protecting the investment',
+      "Generated automatically from the service's indicators; artificial intelligence may be used.",
     detailsSummary: 'View additional agronomic details and checks from the model',
     triggersLabel: 'Triggers identified: ',
+    fallback: {
+      confirmedTitle: 'Alternative weather data',
+      confirmedBody:
+        "According to the technical assessment, real-time weather data (Open-Meteo) was not available for this consultation, and historical or seasonal climatology was used instead. It could not be confirmed whether the recommendation's indicators used the same source, so the values shown may not reflect current observations.",
+      confirmedBodyAssessment:
+        'According to the technical assessment, real-time weather data (Open-Meteo) was not available for this consultation, and historical or seasonal climatology was used instead. The technical assessment does not state which of its indicators used this alternative, so the values shown may not reflect current observations.',
+      unconfirmedTitle: 'Data source not confirmed',
+      evaluateUnavailable:
+        'The technical assessment is not available, so it could not be confirmed whether real-time or alternative weather data was used.',
+      notIndicated:
+        'The technical assessment did not indicate whether real-time or alternative weather data was used.',
+    },
+    divergence: {
+      recommendation: 'Recommendation',
+      assessment: 'Technical assessment',
+      field: 'Field',
+      status: 'Status',
+      confidence: 'Confidence level',
+      tableCaption: 'Values that differ between the recommendation and the technical assessment',
+      statusTitle: 'The recommendation and the technical assessment show different statuses',
+      statusBody:
+        'Both results are shown exactly as received from the service; the platform does not choose between them. Consider both before deciding and, where possible, check conditions in the field.',
+      valuesTitle: 'The statuses match, but some values differ',
+      valuesBody:
+        'The recommendation and the technical assessment show the same status but returned different values for the fields below. Both are shown unchanged.',
+      notComparableTitle: 'Not all values could be compared',
+      notComparableBody:
+        'One of the results did not include these fields, so they were not compared: {fields}. This does not mean the values match.',
+      assessmentUnavailableTitle: 'Technical assessment unavailable',
+      assessmentUnavailableBody:
+        'The technical assessment could not be retrieved, so the recommendation is shown without that comparison.',
+      recommendationUnavailableTitle: 'Recommendation unavailable',
+      recommendationUnavailableBody:
+        'The recommendation could not be retrieved. Only the technical assessment is shown below, labelled as such; without the recommendation, the two results cannot be compared.',
+      assessmentStatusLabel: 'Status according to the technical assessment',
+    },
     sourceLanguage: {
       recommendationTitle: 'The detailed recommendation is not yet available in English.',
       justificationsTitle: 'The technical justifications are not yet available in English.',

@@ -47,16 +47,20 @@ export default function CatalogSelectField({
     extra = <LoadingIndicator label={loadingLabel} slowNotice={false} live={false} />;
   } else if (catalog.status === 'error') {
     const message = getUserErrorMessage(catalog.error, t);
+    // Nova tentativa só quando é útil (canRetry de getUserErrorMessage, a mesma regra do
+    // relatório): 400 e 404 não a mostram; 500, 503, timeout e falha de ligação sim.
     extra = (
       <InlineNotice
         tone="error"
         role="alert"
         title={errorTitle}
         action={
-          <Button variant="outline" size="sm" onClick={catalog.retry}>
-            <RetryIcon className="size-4" />
-            <span>{t('common.retry')}</span>
-          </Button>
+          message?.canRetry ? (
+            <Button variant="outline" size="sm" onClick={catalog.retry}>
+              <RetryIcon className="size-4" />
+              <span>{t('common.retry')}</span>
+            </Button>
+          ) : null
         }
       >
         {message?.description}

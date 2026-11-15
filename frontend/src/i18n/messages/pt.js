@@ -42,7 +42,8 @@ const pt = {
     consultation: 'Consulta agrícola',
     dataHeading: 'Dados',
     advisoryTerm: 'Avaliações e recomendações',
-    advisoryDescription: 'Serviço de avaliação do Detetive da Chuva (API do projecto).',
+    advisoryDescription:
+      'Serviço de avaliação do projecto. Fontes segundo a sua documentação: NASA GPM IMERG, NASA POWER e Open-Meteo.',
     trendsTerm: 'Tendências históricas',
     trendsDescription: 'NASA POWER (reanálise MERRA-2) — em preparação, ainda não disponível.',
     disclaimer:
@@ -87,7 +88,7 @@ const pt = {
       pending: 'Em preparação',
       serviceTitle: 'Serviço de avaliação do Detetive da Chuva',
       serviceText:
-        'API do projecto que devolve, para cada consulta, a classificação, o nível de confiança, os indicadores e a recomendação, bem como uma avaliação técnica complementar. A origem detalhada dos dados meteorológicos utilizados pelo serviço ainda não está documentada nesta versão.',
+        'Serviço do projecto que devolve, para cada consulta, a classificação, o nível de confiança, os indicadores e a recomendação, bem como uma avaliação técnica complementar. Segundo a sua documentação, usa dados abertos de precipitação, humidade do solo e temperatura, e previsões meteorológicas de um serviço externo; as fontes estão identificadas no rodapé. A documentação não indica que fonte alimenta cada indicador apresentado.',
       trendsTitle: 'Tendências agroclimáticas históricas',
       trendsText:
         'Análise de tendências de longo prazo a partir de dados de reanálise — um produto de modelo, não uma medição directa. Ainda não está disponível na plataforma.',
@@ -96,7 +97,7 @@ const pt = {
       nature2:
         'O nível de confiança é uma pontuação atribuída pelo sistema, não uma probabilidade confirmada.',
       nature3:
-        'O texto da recomendação é produzido pelo serviço e a sua redacção pode variar entre consultas.',
+        'O texto da recomendação é produzido automaticamente pelo serviço de avaliação, a partir dos indicadores desta consulta. Pode ser redigido com recurso a inteligência artificial generativa ou a partir de um modelo de texto fixo, e a redacção pode variar entre consultas. Não substitui o aconselhamento de um técnico de extensão agrícola.',
       nature4:
         'Não substitui o conhecimento local nem o acompanhamento de técnicos de extensão agrícola.',
     },
@@ -128,7 +129,7 @@ const pt = {
   consultation: {
     eyebrow: 'Consulta agrícola',
     title: 'Avaliar as condições para semear',
-    lead: 'Indique a província, o município (opcional), a cultura e a data pretendida — imediata ou de planeamento futuro de safra. Obtenha a recomendação agronómica e os indicadores climáticos de apoio à decisão.',
+    lead: 'Indique a província, o município (opcional), a cultura e a data pretendida, imediata ou de planeamento de safra. Obtenha a recomendação do serviço e os indicadores climáticos de apoio à decisão.',
     form: {
       title: 'Dados da consulta',
       lead: 'Indique a localização, a cultura e a data pretendida para avaliar as condições de sementeira.',
@@ -186,8 +187,16 @@ const pt = {
       'O serviço pode estar a arrancar após um período sem utilização. Aguarde alguns instantes e tente novamente.',
     networkTitle: 'Não foi possível ligar ao servidor.',
     networkDescription: 'Verifique a sua ligação à Internet e tente novamente.',
-    validationTitle: 'A consulta não foi aceite pelo servidor.',
-    validationDescription: 'Reveja a província, a cultura e a data seleccionadas.',
+    validationTitle: 'Os dados da consulta não são válidos.',
+    validationDescription:
+      'Verifique a província, a cultura e a data seleccionadas e corrija o que for necessário antes de voltar a enviar.',
+    badRequestTitle: 'O pedido não foi aceite pelo servidor.',
+    badRequestDescription:
+      'Verifique os dados da consulta e corrija o que for necessário antes de voltar a enviar.',
+    notFoundTitle: 'A informação solicitada não foi encontrada.',
+    notFoundDescription: 'O recurso poderá não estar disponível nesta versão do serviço.',
+    unavailableTitle: 'O serviço está temporariamente indisponível.',
+    unavailableDescription: 'Tente novamente dentro de alguns minutos.',
     malformedTitle: 'Não foi possível interpretar a resposta do servidor.',
     malformedDescription: 'Tente novamente dentro de alguns instantes.',
     serverTitle: 'O servidor encontrou um problema.',
@@ -202,12 +211,11 @@ const pt = {
     eyebrow: 'Resultado da Avaliação',
     emptyTitle: 'Ainda sem consulta',
     emptyBody:
-      'Preencha a província, a cultura e a data pretendida, e clique em «{action}». O parecer agronómico e os indicadores de apoio à decisão serão apresentados aqui.',
+      'Preencha a província, a cultura e a data pretendida, e seleccione «{action}». A recomendação e os indicadores de apoio à decisão serão apresentados aqui.',
     loadingTitle: 'A avaliar viabilidade…',
     loadingLabel: 'A analisar dados climáticos históricos e indicadores agrícolas...',
     errorTitle: 'Erro na consulta',
     errorNoticeTitle: 'Não foi possível obter a recomendação.',
-    errorNoticeBody: 'O servidor demorou a responder ou ocorreu uma falha de ligação.',
     reportTitle: 'Relatório da consulta',
     changeData: 'Alterar dados da consulta',
     staleTitle: 'Dados alterados no formulário',
@@ -217,17 +225,17 @@ const pt = {
       FAVORAVEL: {
         title: 'Favorável para semeadura',
         description:
-          'As condições climáticas e as reservas de humidade do solo são adequadas para o desenvolvimento da cultura neste período.',
+          'Segundo os indicadores desta consulta, o serviço classifica as condições como favoráveis à sementeira. É uma indicação de apoio à decisão, não uma garantia de germinação nem de colheita.',
       },
       AGUARDAR: {
-        title: 'Aguardar melhores condições',
+        title: 'Aguardar antes de semear',
         description:
-          'Transição ou humidade ainda incipiente na raiz. Recomenda-se cautela antes de semear para proteger sementes e capital.',
+          'Segundo os indicadores desta consulta, o serviço ainda não classifica as condições como favoráveis à sementeira e indica que é preferível aguardar. Pode voltar a consultar mais tarde.',
       },
       DESFAVORAVEL: {
         title: 'Não recomendado / Desfavorável',
         description:
-          'Risco elevado de perda do investimento e insumos. Período de estiagem ou condições hídricas insuficientes.',
+          'Segundo os indicadores desta consulta, o serviço classifica as condições como desfavoráveis à sementeira neste período. Antes de decidir, confirme as condições no terreno e, se possível, com um técnico de extensão agrícola.',
       },
       missingDescription:
         'O serviço não enviou o estado desta avaliação. Nenhuma classificação é assumida.',
@@ -251,11 +259,47 @@ const pt = {
       label: 'Chuva Prevista',
       caption: 'Expectativa para os próximos 7 dias',
     },
-    recommendationTitle: 'Recomendação Técnica do Agrónomo',
+    recommendationTitle: 'Recomendação do serviço de avaliação',
     recommendationSubtitle:
-      'Orientação prática para o terreno, teste do torrão a 5 cm e proteção do investimento',
+      'Texto gerado automaticamente a partir dos indicadores do serviço, podendo recorrer a inteligência artificial.',
     detailsSummary: 'Ver detalhes e verificações agronómicas adicionais do modelo',
     triggersLabel: 'Gatilhos identificados: ',
+    fallback: {
+      confirmedTitle: 'Dados meteorológicos alternativos',
+      confirmedBody:
+        'Segundo a avaliação técnica, os dados meteorológicos em tempo real (Open-Meteo) não estavam disponíveis para esta consulta e foi usada climatologia histórica ou sazonal como alternativa. Não foi possível confirmar se os indicadores da recomendação usaram a mesma origem; por isso, os valores apresentados podem não corresponder a observações actuais.',
+      confirmedBodyAssessment:
+        'Segundo a avaliação técnica, os dados meteorológicos em tempo real (Open-Meteo) não estavam disponíveis para esta consulta e foi usada climatologia histórica ou sazonal como alternativa. A avaliação técnica não indica quais dos seus indicadores usaram essa alternativa; por isso, os valores apresentados podem não corresponder a observações actuais.',
+      unconfirmedTitle: 'Origem dos dados por confirmar',
+      evaluateUnavailable:
+        'A avaliação técnica não está disponível, por isso não foi possível confirmar se foram usados dados meteorológicos em tempo real ou alternativos.',
+      notIndicated:
+        'A avaliação técnica não indicou se foram usados dados meteorológicos em tempo real ou alternativos.',
+    },
+    divergence: {
+      recommendation: 'Recomendação',
+      assessment: 'Avaliação técnica',
+      field: 'Campo',
+      status: 'Estado',
+      confidence: 'Nível de confiança',
+      tableCaption: 'Valores diferentes entre a recomendação e a avaliação técnica',
+      statusTitle: 'A recomendação e a avaliação técnica indicam estados diferentes',
+      statusBody:
+        'Os dois resultados são apresentados tal como foram recebidos do serviço; a plataforma não escolhe entre eles. Antes de decidir, considere ambos e, se possível, confirme as condições no terreno.',
+      valuesTitle: 'Os estados coincidem, mas alguns valores são diferentes',
+      valuesBody:
+        'A recomendação e a avaliação técnica indicam o mesmo estado, mas devolveram valores diferentes nos campos abaixo. Ambos são apresentados sem alterações.',
+      notComparableTitle: 'Não foi possível comparar todos os valores',
+      notComparableBody:
+        'Um dos resultados não incluiu estes campos, por isso não foram comparados: {fields}. Isto não significa que os valores coincidam.',
+      assessmentUnavailableTitle: 'Avaliação técnica indisponível',
+      assessmentUnavailableBody:
+        'Não foi possível obter a avaliação técnica, por isso a recomendação é apresentada sem essa comparação.',
+      recommendationUnavailableTitle: 'Recomendação indisponível',
+      recommendationUnavailableBody:
+        'Não foi possível obter a recomendação. Mostramos abaixo apenas a avaliação técnica, identificada como tal; sem a recomendação, não é possível comparar os dois resultados.',
+      assessmentStatusLabel: 'Estado segundo a avaliação técnica',
+    },
     sourceLanguage: {
       recommendationTitle: 'A recomendação detalhada ainda não está disponível em Português.',
       justificationsTitle: 'As justificações técnicas ainda não estão disponíveis em Português.',

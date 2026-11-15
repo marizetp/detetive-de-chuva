@@ -188,7 +188,7 @@ describe('ConsultationPage — submissão e parecer', () => {
     expect(screen.getByText('Chuva Recente')).toBeInTheDocument();
     expect(screen.getByText('Humidade da Raiz')).toBeInTheDocument();
     expect(screen.getByText('Chuva Prevista')).toBeInTheDocument();
-    expect(screen.getByText('Recomendação Técnica do Agrónomo')).toBeInTheDocument();
+    expect(screen.getByText('Recomendação do serviço de avaliação')).toBeInTheDocument();
   });
 
   it('o relatório não faz pedidos adicionais à API', async () => {
@@ -235,7 +235,9 @@ describe('ConsultationPage — tratamento de erros e repetição', () => {
     fillForm();
     fireEvent.click(submitButton());
 
-    expect(await screen.findByText('Não foi possível obter a recomendação.')).toBeInTheDocument();
+    // /evaluate respondeu: a recomendação aparece como indisponível e a avaliação técnica só como tal.
+    expect(await screen.findByText('Recomendação indisponível')).toBeInTheDocument();
+    expect(screen.getByText('Estado segundo a avaliação técnica')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
     expect(await screen.findByText('Favorável para semeadura')).toBeInTheDocument();
     expect(api.callsTo(ADVISORY)).toHaveLength(2);

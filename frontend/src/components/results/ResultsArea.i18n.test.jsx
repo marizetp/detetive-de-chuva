@@ -22,6 +22,9 @@ function renderReport(language, { advisoryRaw = advisoryHuamboMilho } = {}) {
   );
 }
 
+/** Cartão do veredito da recomendação (a tabela de divergências pode repetir valores). */
+const verdictCard = () => within(document.querySelector('.border-2'));
+
 const valueWithUnit = (text) => (_, element) =>
   element?.textContent === text && [...element.children].every((child) => child.textContent !== text);
 
@@ -77,7 +80,7 @@ describe('ResultsArea em English — conteúdo dinâmico do backend (Português)
     renderReport('en', { advisoryRaw: { ...advisoryHuamboMilho, status: 'DESFAVORAVEL' } });
     expect(screen.getByText('Not recommended / Unfavourable')).toBeInTheDocument();
     expect(
-      screen.getByText(valueWithUnit(`${advisoryHuamboMilho.score_confianca}/100`)),
+      verdictCard().getByText(valueWithUnit(`${advisoryHuamboMilho.score_confianca}/100`)),
     ).toBeInTheDocument();
   });
 });
@@ -90,7 +93,7 @@ describe('ResultsArea — nível de confiança', () => {
 
   it.each([['pt'], ['en']])('%s: pontuação válida no formato N/100, nunca em percentagem', (language) => {
     renderReport(language, { advisoryRaw: { ...advisoryHuamboMilho, score_confianca: 72 } });
-    expect(screen.getByText(valueWithUnit('72/100'))).toBeInTheDocument();
+    expect(verdictCard().getByText(valueWithUnit('72/100'))).toBeInTheDocument();
     expect(screen.queryByText('72%')).not.toBeInTheDocument();
   });
 
@@ -104,16 +107,16 @@ describe('ResultsArea — nível de confiança', () => {
     // O separador «·» fica preso à palavra anterior por um espaço não separável (U+00A0).
     expect(legend.textContent).toContain(`${String.fromCharCode(0xa0)}·`);
     // Hierarquia: a legenda vem depois da pontuação, no mesmo cartão.
-    const score = screen.getByText(valueWithUnit('72/100'));
+    const score = verdictCard().getByText(valueWithUnit('72/100'));
     expect(score.compareDocumentPosition(legend) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('decimais seguem o idioma (82,5/100 em pt, 82.5/100 em en)', () => {
     const { unmount } = renderReport('pt', { advisoryRaw: { ...advisoryHuamboMilho, score_confianca: 82.5 } });
-    expect(screen.getByText(valueWithUnit('82,5/100'))).toBeInTheDocument();
+    expect(verdictCard().getByText(valueWithUnit('82,5/100'))).toBeInTheDocument();
     unmount();
     renderReport('en', { advisoryRaw: { ...advisoryHuamboMilho, score_confianca: 82.5 } });
-    expect(screen.getByText(valueWithUnit('82.5/100'))).toBeInTheDocument();
+    expect(verdictCard().getByText(valueWithUnit('82.5/100'))).toBeInTheDocument();
   });
 
   it.each([

@@ -42,6 +42,9 @@ export const SCIENTIFIC_REVIEW_KEYS = Object.freeze([
   'results.verdict.DESFAVORAVEL.description',
   'results.confidence',
   'results.confidenceCaption',
+  'results.fallback.confirmedTitle',
+  'results.fallback.confirmedBody',
+  'results.fallback.confirmedBodyAssessment',
   'results.rainRecent.label',
   'results.rainRecent.caption',
   'results.rootMoisture.label',
@@ -52,3 +55,9 @@ export const SCIENTIFIC_REVIEW_KEYS = Object.freeze([
   'results.recommendationSubtitle',
   'results.detailsSummary',
 ]);
+
+/**
+ * Nomes ingleses das culturas (i18n/catalogNames.js, por `id` da API). Também precisam de revisão
+ * humana: o valor enviado à API continua a ser o `nome` original em português.
+ */
+export const CROP_NAMES_REVIEW_REQUIRED = Object.freeze(['milho', 'feijao', 'soja', 'mandioca', 'arroz']);

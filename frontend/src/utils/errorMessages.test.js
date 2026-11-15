@@ -30,10 +30,10 @@ describe('getUserErrorMessage', () => {
   });
 
   it('distingue erros 5xx de outros erros HTTP', () => {
-    expect(getUserErrorMessage(new ApiError('http', 'x', { status: 503 })).title).toBe(
+    expect(getUserErrorMessage(new ApiError('http', 'x', { status: 500 })).title).toBe(
       'O servidor encontrou um problema.',
     );
-    expect(getUserErrorMessage(new ApiError('http', 'x', { status: 404 })).title).toBe(
+    expect(getUserErrorMessage(new ApiError('http', 'x', { status: 418 })).title).toBe(
       'O pedido não foi aceite pelo servidor.',
     );
   });
@@ -64,7 +64,7 @@ describe('getUserErrorMessage', () => {
   });
 
   it('as mensagens seguem o idioma do tradutor (en)', () => {
-    expect(getMessage(new ApiError('http', 'x', { status: 503 }), en).title).toBe(
+    expect(getMessage(new ApiError('http', 'x', { status: 500 }), en).title).toBe(
       'The server encountered a problem.',
     );
     expect(getMessage(new ApiError('network', 'x'), en).description).toBe(
