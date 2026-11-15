@@ -29,6 +29,13 @@ const pt = {
     selectorLabel: 'Idioma',
     changed: 'Idioma alterado para Português.',
   },
+  demo: {
+    regionLabel: 'Modo de demonstração',
+    title: 'Modo de demonstração',
+    body: 'Os resultados são respostas reais do serviço de avaliação, gravadas em {date}. Não representam condições actuais e não são actualizados.',
+    available: 'Consultas disponíveis:',
+    assessmentOnly: 'só avaliação técnica',
+  },
   suggestion: {
     regionLabel: 'Sugestão de idioma',
     title: 'Prefere ver o site em português?',
@@ -195,6 +202,9 @@ const pt = {
       'Verifique os dados da consulta e corrija o que for necessário antes de voltar a enviar.',
     notFoundTitle: 'A informação solicitada não foi encontrada.',
     notFoundDescription: 'O recurso poderá não estar disponível nesta versão do serviço.',
+    demoUnavailableTitle: 'Esta consulta não está disponível no modo de demonstração.',
+    demoUnavailableDescription:
+      'Só as consultas gravadas indicadas no topo da página podem ser apresentadas.',
     unavailableTitle: 'O serviço está temporariamente indisponível.',
     unavailableDescription: 'Tente novamente dentro de alguns minutos.',
     malformedTitle: 'Não foi possível interpretar a resposta do servidor.',

@@ -9,6 +9,7 @@ import { isPlainObject } from '../utils/validators.js';
  * - validation: HTTP 422 — a API rejeitou os parâmetros
  * - http:       outro estado HTTP não-2xx
  * - malformed:  resposta 2xx que não é JSON ou não tem a estrutura esperada
+ * - demoUnavailable: só no modo de demonstração — pedido sem resposta gravada (nunca é inventada)
  */
 export const API_ERROR_KINDS = Object.freeze({
   network: 'network',
@@ -17,6 +18,7 @@ export const API_ERROR_KINDS = Object.freeze({
   validation: 'validation',
   http: 'http',
   malformed: 'malformed',
+  demoUnavailable: 'demoUnavailable',
 });
 
 export class ApiError extends Error {
@@ -34,6 +36,28 @@ export class ApiError extends Error {
     /** Mensagens legíveis devolvidas pela API (ex.: `detail[].msg` de um 422). */
     this.details = details;
   }
+}
+
+/**
+ * Transporte de rede: único ponto onde os pedidos saem da aplicação.
+ * Por omissão (sempre, em produção) é o `fetch` do navegador. Só o modo de demonstração
+ * (VITE_DEMO_MODE=true, carregado à parte em main.jsx) o substitui por reprodução de respostas
+ * gravadas — e, nesse caso, `fetch` nunca é chamado: as duas origens nunca se misturam.
+ */
+let customTransport = null;
+
+/** @param {(url: string, init: RequestInit) => Promise<{ ok: boolean, status: number, text: () => Promise<string> }>} transport */
+export function setTransport(transport) {
+  customTransport = transport;
+}
+
+/** Repõe o transporte por omissão (`fetch`). */
+export function resetTransport() {
+  customTransport = null;
+}
+
+function send(url, init) {
+  return customTransport ? customTransport(url, init) : fetch(url, init);
 }
 
 /** Extrai mensagens do formato de erro FastAPI observado: `{ detail: string | [{ msg }] }`. */
@@ -117,9 +141,11 @@ export async function requestJson(path, options = {}) {
 
   let response;
   try {
-    response = await fetch(`${baseUrl}${path}`, init);
+    response = await send(`${baseUrl}${path}`, init);
   } catch (error) {
     request.cleanup();
+    // Erros já classificados pelo transporte (modo de demonstração) passam sem alteração.
+    if (error instanceof ApiError) throw error;
     if (request.didTimeout()) {
       throw new ApiError('timeout', `Tempo esgotado após ${timeoutMs} ms`, { path, cause: error });
     }

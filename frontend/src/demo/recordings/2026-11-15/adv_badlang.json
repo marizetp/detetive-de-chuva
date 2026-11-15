@@ -1,0 +1,1 @@
+{"detail":[{"type":"value_error","loc":["body","lang"],"msg":"Value error, Unsupported language. Use 'pt' or 'en'.","input":"fr","ctx":{"error":{}}}]}

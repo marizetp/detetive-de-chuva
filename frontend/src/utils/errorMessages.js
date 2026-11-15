@@ -82,6 +82,14 @@ export function getUserErrorMessage(error, t = createTranslator(DEFAULT_LANGUAGE
         canRetry: false,
         serverMessages: error.details.map(cleanServerMessage).filter(Boolean),
       };
+    case 'demoUnavailable':
+      // Modo de demonstração: pedido sem resposta gravada. Repetir dá o mesmo resultado.
+      return {
+        title: t('errors.demoUnavailableTitle'),
+        description: t('errors.demoUnavailableDescription'),
+        canRetry: false,
+        serverMessages: [],
+      };
     case 'malformed':
       return {
         title: t('errors.malformedTitle'),

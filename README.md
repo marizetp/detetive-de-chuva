@@ -73,9 +73,42 @@ O Vite só lê ficheiros `.env*` **dentro de `frontend/`**. Para configurar, cop
 |---|---|---|
 | `VITE_API_BASE_URL` | `https://detetive-da-chuva.onrender.com` | Só aceita `http(s)`; a barra final é removida. Valor inválido → aviso na consola e uso da predefinição. |
 | `VITE_API_TIMEOUT_MS` | `120000` (120 s) | Inteiro entre `5000` e `300000`. Valor inválido → predefinição. |
+| `VITE_DEMO_MODE` | não definida (**desactivado**) | Só `true` activa o modo de demonstração (ver abaixo). Qualquer outro valor ou a ausência mantém a aplicação normal. |
 
 As variáveis `VITE_*` ficam **embutidas no bundle** e são públicas: nunca coloque segredos nelas.
 A API não requer autenticação. Para mudar um valor em produção é preciso gerar um novo build.
+
+### Modo de demonstração (`VITE_DEMO_MODE`)
+
+Permite apresentar a aplicação quando o backend não está disponível, **sem inventar dados**.
+
+- **Por omissão está desactivado.** A aplicação fala sempre com a API. O modo nunca é activado
+  automaticamente, nem quando a API falha.
+- **Activar:** gerar o build com `VITE_DEMO_MODE=true`, em `frontend/.env.local` ou na linha de
+  comandos:
+
+  ```sh
+  cd frontend
+  VITE_DEMO_MODE=true npm run build     # ou: VITE_DEMO_MODE=true npm run dev
+  ```
+
+- **Desactivar:** retirar a variável, ou usar outro valor, e gerar um novo build. O valor é lido
+  no build, não em tempo de execução.
+- **Com o modo activo:**
+  - a aplicação **não faz nenhum pedido à rede**;
+  - responde só com **7 respostas reais** da API v1.1, gravadas em **15 de novembro de 2026** e
+    servidas sem alterações (catálogos, estado do serviço, uma consulta completa e duas só com
+    avaliação técnica);
+  - qualquer outra consulta mostra «não disponível no modo de demonstração», sem resultado inventado.
+- **Natureza dos dados:** são **históricos**. Não representam condições actuais e não são
+  actualizados. Uma faixa permanente, em todas as páginas, indica a data da captura e as consultas
+  disponíveis.
+- **Isolamento:** num build normal, o código e as gravações de demonstração **não existem no
+  bundle**. No build de demonstração ficam num ficheiro JS à parte, só com as 7 respostas
+  elegíveis.
+- **Origem e integridade:** [frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md](frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md).
+  As 50 respostas gravadas ficam no repositório para auditoria, com o sha256 de cada uma em
+  `manifest.json`; só as 7 elegíveis são usadas pela aplicação.
 
 ## Backend
 

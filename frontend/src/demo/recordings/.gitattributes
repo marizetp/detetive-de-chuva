@@ -1,0 +1,3 @@
+# Gravações reais da API: guardar byte a byte (sem conversão de fins de linha), para que os
+# sha256 de manifest.json continuem válidos em qualquer sistema.
+* -text

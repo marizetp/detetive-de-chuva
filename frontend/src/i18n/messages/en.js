@@ -31,6 +31,13 @@ const en = {
     selectorLabel: 'Language',
     changed: 'Language changed to English.',
   },
+  demo: {
+    regionLabel: 'Demonstration mode',
+    title: 'Demonstration mode',
+    body: 'Results are real responses from the assessment service, recorded on {date}. They do not represent current conditions and are not updated.',
+    available: 'Available consultations:',
+    assessmentOnly: 'technical assessment only',
+  },
   suggestion: {
     regionLabel: 'Language suggestion',
     title: 'Would you prefer Portuguese?',
@@ -196,6 +203,9 @@ const en = {
       'Check the consultation details and correct anything needed before sending again.',
     notFoundTitle: 'The requested information was not found.',
     notFoundDescription: 'This resource may not be available in this version of the service.',
+    demoUnavailableTitle: 'This consultation is not available in demonstration mode.',
+    demoUnavailableDescription:
+      'Only the recorded consultations listed at the top of the page can be shown.',
     unavailableTitle: 'The service is temporarily unavailable.',
     unavailableDescription: 'Try again in a few minutes.',
     malformedTitle: 'The server response could not be interpreted.',

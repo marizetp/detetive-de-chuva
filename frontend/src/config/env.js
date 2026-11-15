@@ -27,6 +27,17 @@ export function resolveApiBaseUrl(env = import.meta.env) {
 }
 
 /**
+ * Modo de demonstração: activo só quando VITE_DEMO_MODE é exactamente "true". Desactivado por
+ * omissão; nunca é activado automaticamente (nem quando a API falha).
+ * Nota: main.jsx testa `import.meta.env.VITE_DEMO_MODE` directamente, para que o build de
+ * produção elimine o código e os dados de demonstração.
+ * @param {Record<string, unknown>} [env]
+ */
+export function isDemoMode(env = import.meta.env) {
+  return env?.VITE_DEMO_MODE === 'true';
+}
+
+/**
  * Devolve o tempo máximo por pedido (ms), dentro de limites razoáveis.
  * @param {Record<string, unknown>} [env]
  */

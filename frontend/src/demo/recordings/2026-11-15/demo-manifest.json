@@ -1,0 +1,117 @@
+{
+  "capturedOn": "2026-11-15",
+  "source": "https://detetive-da-chuva.onrender.com",
+  "apiVersion": "1.1.0",
+  "note": "Índice das respostas elegíveis para o modo de demonstração, derivado de manifest.json (demo: true). É o único índice carregado pela aplicação.",
+  "entries": [
+    {
+      "id": "get_health",
+      "file": "get_health.json",
+      "method": "GET",
+      "path": "/health",
+      "body": null,
+      "status": 200,
+      "contentType": "application/json",
+      "category": "metadados",
+      "demo": true,
+      "sha256": "aa8518f6a9ef699800113f7fd7aaf191183892a2cc2f790b08a74f68c432c834",
+      "note": ""
+    },
+    {
+      "id": "get_api_v1_provinces",
+      "file": "get_api_v1_provinces.json",
+      "method": "GET",
+      "path": "/api/v1/provinces",
+      "body": null,
+      "status": 200,
+      "contentType": "application/json",
+      "category": "catalogo",
+      "demo": true,
+      "sha256": "b55e00ab40deba4930439f0d554f57aa5717692481a17105fda64799410be92e",
+      "note": ""
+    },
+    {
+      "id": "get_api_v1_crops",
+      "file": "get_api_v1_crops.json",
+      "method": "GET",
+      "path": "/api/v1/crops",
+      "body": null,
+      "status": 200,
+      "contentType": "application/json",
+      "category": "catalogo",
+      "demo": true,
+      "sha256": "ef256fcd0b4f8c40bdd391a8da181774fd0fb40cc37568848a23aa69fa802851",
+      "note": "5 culturas"
+    },
+    {
+      "id": "adv_pt",
+      "file": "adv_pt.json",
+      "method": "POST",
+      "path": "/api/v1/advisory",
+      "body": {
+        "provincia": "Huambo",
+        "municipio": "Caála",
+        "cultura": "Milho",
+        "data_consulta": "2026-11-15"
+      },
+      "status": 200,
+      "contentType": "application/json",
+      "category": "consulta",
+      "demo": true,
+      "sha256": "2065ba64c1f13b55f5ccdd25285472e625686f2ae7f5a8dfea5356197c82d31f",
+      "note": "Par completo com eval_pt"
+    },
+    {
+      "id": "eval_pt",
+      "file": "eval_pt.json",
+      "method": "POST",
+      "path": "/api/v1/evaluate",
+      "body": {
+        "provincia": "Huambo",
+        "municipio": "Caála",
+        "cultura": "Milho",
+        "data_consulta": "2026-11-15"
+      },
+      "status": 200,
+      "contentType": "application/json",
+      "category": "consulta",
+      "demo": true,
+      "sha256": "633adaa680b1c866a10d4ddf0cfd5a1305e873c749efb86b89b70540d6b3cd78",
+      "note": "Par completo com adv_pt"
+    },
+    {
+      "id": "eval_arroz_bie",
+      "file": "eval_arroz_bie.json",
+      "method": "POST",
+      "path": "/api/v1/evaluate",
+      "body": {
+        "provincia": "Bié",
+        "cultura": "Arroz",
+        "data_consulta": "2026-06-15"
+      },
+      "status": 200,
+      "contentType": "application/json",
+      "category": "consulta",
+      "demo": true,
+      "sha256": "97853b5a381dfa4333a36c4878fbff9467215670d3f952d9e7c7569960dbddbf",
+      "note": "Sem /advisory correspondente (só avaliação técnica)"
+    },
+    {
+      "id": "eval_future",
+      "file": "eval_future.json",
+      "method": "POST",
+      "path": "/api/v1/evaluate",
+      "body": {
+        "provincia": "Huambo",
+        "cultura": "Milho",
+        "data_consulta": "2027-10-20"
+      },
+      "status": 200,
+      "contentType": "application/json",
+      "category": "consulta",
+      "demo": true,
+      "sha256": "60e5d56a7133b03c6df09dcca088630d97b01acd6590b1e761135fa24b029008",
+      "note": "Sem /advisory correspondente (só avaliação técnica)"
+    }
+  ]
+}
