@@ -1,309 +1,348 @@
 # AgroKairos
 
-Aplicação de apoio à decisão agrícola desenvolvida para o **NASA Space Apps Challenge 2026**.
-Este repositório reúne o **frontend** (`frontend/`, React) e o **backend** (`backend/`, FastAPI).
-O backend tem a sua própria documentação em [backend/README.md](backend/README.md).
+Agricultural decision-support application built for the **NASA Space Apps Challenge 2026**.
+This repository contains both the **frontend** (`frontend/`, React) and the **backend**
+(`backend/`, FastAPI). The backend has its own documentation in [backend/README.md](backend/README.md).
 
-Interface web:
-O utilizador escolhe uma província, uma cultura e uma data; a aplicação consulta o backend e
-apresenta um relatório com a classificação (`FAVORAVEL`, `AGUARDAR`, `DESFAVORAVEL`), o nível de
-confiança, os indicadores agroclimáticos e a recomendação de extensão.
+Web interface: the user selects a province, a crop and a date; the application queries the backend
+and presents a report with the classification (`FAVORAVEL`, `AGUARDAR`, `DESFAVORAVEL`), the
+confidence level, the agroclimatic indicators and the extension recommendation.
 
-> Projecto independente. **Não é um serviço oficial da NASA.**
+> Independent project. **Not an official NASA service.**
 
-Interface bilingue: inglês (por omissão) e português (Angola). O código, os identificadores e os
-nomes de campos da API mantêm-se inalterados.
+Bilingual interface: English (default) and Portuguese (Angola). Code, identifiers and API field
+names are kept unchanged in both languages.
 
-## Estado (15/11/2026)
+## Status (2026-11-15)
 
-| Componente | Estado | Evidência |
+| Component | Status | Evidence |
 |---|---|---|
-| Frontend em produção | **Publicado**: <https://agrokairos.netlify.app> (Netlify, projecto `agrokairos`, a partir de `main`) | Bundle servido igual ao build local de `main` |
-| API em produção | **Publicada**: <https://detetive-da-chuva.onrender.com> (serviço Render existente) | `node scripts/smoke-backend.mjs`: 16/16 verificações |
-| Backend deste repositório (`backend/`) | **Testado em CI** (GitHub Actions: `pytest`, arranque e teste de fumo). **Ainda não publicado** a partir deste repositório: o serviço novo (`backend/render.yaml`) tem de ser criado no Render | `.github/workflows/ci.yml` |
-| Idioma: recomendação (`/advisory`) | Implementado e em produção (EN pede `lang: "en"`) | Testes e verificação na API real |
-| Idioma: `/evaluate`, IMERG, janela de plantio, `content_language` | **Não implementado no backend**; o frontend está preparado com as capacidades desligadas | `docs/ESPECIFICACAO-BACKEND-I18N.md` |
-| Motor IMERG e janela de plantio na interface | **Não implementado** (serviços e mappers preparados, sem ecrã) | Decisão D11 |
-| Tendências históricas NASA POWER | **Não implementado** (a linha de base NASA POWER já é usada pelo motor de decisão) | — |
-| Textos científicos | **A aguardar revisão humana** (`frontend/src/i18n/reviewRequired.js`) | — |
+| Production frontend | **Published**: <https://agrokairos.netlify.app> (Netlify project `agrokairos`, built from `main`) | The served bundle matches the local build of `main` |
+| Production API | **Published**: <https://detetive-da-chuva.onrender.com> (existing Render service, separate from this repository's deployment configuration) | `node scripts/smoke-backend.mjs`: 16/16 checks passed |
+| Backend in this repository (`backend/`) | **Tested in CI** (GitHub Actions: `pytest`, startup and smoke test). **Not yet deployed** from this repository: the new service described in `backend/render.yaml` still has to be created on Render | `.github/workflows/ci.yml` |
+| Language: recommendation (`/advisory`) | Implemented and in production (the English interface sends `lang: "en"`) | Tests and checks against the live API |
+| Language: `/evaluate`, IMERG, planting window, `content_language` | **Not implemented in the backend**; the frontend is prepared, with these capabilities disabled | `docs/ESPECIFICACAO-BACKEND-I18N.md` |
+| IMERG engine and planting window in the interface | **Not implemented** (services and mappers prepared, no screen) | Decision D11 |
+| NASA POWER historical trends | **Not implemented** (the NASA POWER baseline is already used by the decision engine) | — |
+| Scientific texts | **Awaiting human review** (`frontend/src/i18n/reviewRequired.js`) | — |
 
-## Objectivo
+## Purpose
 
-Ajudar agricultores e técnicos de extensão a perceber se as condições actuais acompanham o
-calendário agrícola, apresentando a avaliação do backend de forma clara e honesta: sem inventar
-valores, distinguindo as duas fontes (`/advisory` e `/evaluate`), mostrando divergências entre elas
-e comunicando incerteza (o nível de confiança não é uma probabilidade nem uma garantia).
+Help farmers and extension officers understand whether current conditions match the farming
+calendar, presenting the backend's assessment clearly and honestly: without inventing values,
+distinguishing the two sources (`/advisory` and `/evaluate`), showing any divergence between them
+and communicating uncertainty (the confidence level is neither a probability nor a guarantee).
 
-## Tecnologias
+### Scientific mechanisms
 
-| Área | Escolha |
+The backend contains independent mechanisms that are never merged into a single decision:
+
+- **Decision engine** (`/advisory` and `/evaluate`): operational assessment by crop and location,
+  using a 25-year NASA POWER baseline, Open-Meteo data and crop profiles. When Open-Meteo data is
+  unavailable, it uses NASA POWER historical climatology (2000–2024) and `/evaluate` reports
+  `is_fallback_weather: true`; the interface then explains that the values are historical
+  expectations, not current observations or forecasts.
+- **IMERG engine** (`/zonas/{zona}/decisao`): independent assessment of the rainy-season onset and
+  false-start risk using NASA GPM IMERG V07. It may return "no conclusion" (`SEM_BASE_FIAVEL`) when
+  there is not enough reliable data; that is never shown as a planting decision.
+- **Planting window** (`/api/v1/optimal-planting`): planning information combining IMERG indicators
+  with crop profiles and NASA POWER historical data.
+
+Only the decision engine is shown in the interface today (see "Status").
+
+## Technologies
+
+| Area | Choice |
 |---|---|
-| UI | React 19 (JavaScript, sem TypeScript) |
+| UI | React 19 (JavaScript, no TypeScript) |
 | Build / dev server | Vite 8 |
-| Estilos | Tailwind CSS 4, com a paleta por omissão desactivada: só existem os tokens do projecto, em `frontend/src/styles/index.css` |
-| Identidade visual | NASA Earth Science — Dark Technology com destaque Aurora Blue: fundos Space Black e Mission Navy, botões com o gradiente Aurora (violeta → azul → cyan) e texto branco, rótulos e interacções em `#6F9BFD`, estados do relatório em verde, laranja e vermelho; o cyan original fica só na gota do logótipo e na ilustração (ver `CLAUDE.md` §7). Não é um serviço oficial da NASA |
-| Markdown seguro | `react-markdown` (HTML ignorado) |
-| Tipografia | Fontsource, alojamento próprio (Inter, Montserrat, Space Mono) |
-| Testes | Vitest + Testing Library + jsdom |
+| Styles | Tailwind CSS 4 with the default palette disabled: only the project tokens exist, in `frontend/src/styles/index.css` |
+| Visual identity | NASA Earth Science — Dark Technology with an Aurora Blue accent: Space Black and Mission Navy backgrounds, buttons with the Aurora gradient (violet → blue → cyan) and white text, labels and interactions in `#6F9BFD`, report statuses in green, orange and red; the original cyan is used only in the logo drop and the illustration (see `CLAUDE.md` §7). Not an official NASA service |
+| Safe Markdown | `react-markdown` (HTML ignored) |
+| Typography | Fontsource, self-hosted (Inter, Montserrat, Space Mono) |
+| Tests | Vitest + Testing Library + jsdom |
 | Lint | ESLint 10 |
-| HTTP | `fetch` nativo (sem bibliotecas) |
-| Routing | Próprio, sobre a History API (sem React Router) |
+| HTTP | Native `fetch` (no libraries) |
+| Routing | Custom, on top of the History API (no React Router) |
+| Backend | Python, FastAPI (see [backend/README.md](backend/README.md)) |
 
-## Requisitos
+## Requirements
 
-- **Node.js** `>=22.22.2 <23` ou `>=24.15.0` (campo `engines` em `frontend/package.json`;
-  desenvolvido com 24.15.0).
-- **npm** (o `package-lock.json` está versionado).
-- Acesso à Internet para consultar o backend.
+- **Node.js** `>=22.22.2 <23` or `>=24.15.0` (`engines` field in `frontend/package.json`;
+  developed with 24.15.0).
+- **npm** (`package-lock.json` is committed).
+- Internet access to reach the backend.
+- Optional, for the local backend: Python 3.11 (the version used by `backend/Dockerfile` and CI).
 
-## Instalação e execução local
+## Installation and local development
 
-Todos os comandos são executados dentro de `frontend/`:
+Frontend commands run inside `frontend/`:
 
 ```sh
 cd frontend
-npm ci            # instala as dependências exactas do package-lock.json
-npm run dev       # servidor de desenvolvimento (por omissão em http://localhost:5173)
+npm ci            # install the exact dependencies from package-lock.json
+npm run dev       # development server (http://localhost:5173 by default)
 ```
 
-Não é obrigatório configurar variáveis de ambiente: sem elas, a aplicação usa o backend documentado.
+No environment variables are required: without them, the application uses the documented API.
 
-### Backend local (opcional)
+### Local backend (optional)
 
-O backend (`backend/`) é uma API FastAPI em Python. O `Dockerfile` usa Python 3.11.
+The backend (`backend/`) is a Python FastAPI application. The `Dockerfile` and CI use Python 3.11.
 
 ```sh
 cd backend
 python -m venv .venv
-.venv/Scripts/activate            # Windows; em Linux/macOS: source .venv/bin/activate
+.venv/Scripts/activate            # Windows; on Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env              # opcional: chaves de LLM; sem chaves, o texto usa um modelo fixo
+cp .env.example .env              # optional: LLM keys; without them, the text uses a fixed template
 uvicorn main:app --reload --port 8000
-pytest                            # testes do backend
+pytest                            # backend tests
 ```
 
-Para o frontend usar o backend local, crie `frontend/.env.local` com
-`VITE_API_BASE_URL=http://localhost:8000` e reinicie `npm run dev`. O backend aceita pedidos de
-qualquer origem (CORS `*`).
+To point the frontend at the local backend, create `frontend/.env.local` with
+`VITE_API_BASE_URL=http://localhost:8000` and restart `npm run dev`. The backend accepts requests
+from any origin (CORS `*`).
 
-- Os dados necessários ao motor estão em `backend/data/` (séries IMERG e NASA POWER já processadas).
-  Os ficheiros NetCDF de origem (`data/IMERG_V07_2000-2024/`) não são versionados.
-- O deploy do backend no Render (`backend/render.yaml`, `Procfile`, `Dockerfile`) **não é alterado**
-  por este repositório. Para o Render construir a partir daqui, o serviço tem de usar `backend` como
-  directório raiz.
+- The data the engines need is in `backend/data/` (processed IMERG and NASA POWER series).
+  The source NetCDF files (`data/IMERG_V07_2000-2024/`) are not committed.
+- Render deployment from this repository is described in `backend/render.yaml` (`rootDir: backend`);
+  see "Backend on Render" below.
 
 ## Scripts
 
-| Comando | Função |
+| Command | Purpose |
 |---|---|
-| `npm run dev` | Servidor de desenvolvimento com recarregamento |
-| `npm run lint` | ESLint em todo o projecto |
-| `npm test` | Todos os testes, uma vez (`vitest run`) |
-| `npm run test:watch` | Testes em modo contínuo |
-| `npm run build` | Build de produção em `frontend/dist/` |
-| `npm run preview` | Serve localmente o conteúdo de `dist/` |
+| `npm run dev` | Development server with hot reload |
+| `npm run lint` | ESLint across the frontend project |
+| `npm test` | All tests, once (`vitest run`) |
+| `npm run test:watch` | Tests in watch mode |
+| `npm run build` | Production build into `frontend/dist/` |
+| `npm run preview` | Serve the contents of `dist/` locally |
 
-Antes de propor alterações: `npm run lint && npm test && npm run build`.
+Before proposing changes: `npm run lint && npm test && npm run build`.
 
-## Variáveis de ambiente
+Repository scripts (run from the repository root):
 
-O Vite só lê ficheiros `.env*` **dentro de `frontend/`**. Para configurar, copie
-`frontend/.env.example` para `frontend/.env.local` (ignorado pelo Git).
+| Command | Purpose |
+|---|---|
+| `node scripts/smoke-backend.mjs [URL]` | Smoke test of a backend (read and computation requests only); defaults to the production API |
+| `node scripts/check-demo-isolation.mjs <prod-dist> <demo-dist>` | Checks by SHA-256 that the production build contains no recordings and the demo build contains only the eligible ones |
+| `node scripts/geo/build.mjs` | Geographic data preparation (see [scripts/geo/README.md](scripts/geo/README.md)) |
 
-| Variável | Predefinição | Notas |
+## Environment variables
+
+Vite only reads `.env*` files **inside `frontend/`**. To configure them, copy
+`frontend/.env.example` to `frontend/.env.local` (ignored by Git).
+
+| Variable | Default | Notes |
 |---|---|---|
-| `VITE_API_BASE_URL` | `https://detetive-da-chuva.onrender.com` | Só aceita `http(s)`; a barra final é removida. Valor inválido → aviso na consola e uso da predefinição. |
-| `VITE_API_TIMEOUT_MS` | `120000` (120 s) | Inteiro entre `5000` e `300000`. Valor inválido → predefinição. |
-| `VITE_API_EVALUATE_LANG` | não definida (**desactivado**) | Só `true` envia `lang` ao `/evaluate`. Activar apenas quando o backend o suportar (ver `docs/ESPECIFICACAO-BACKEND-I18N.md`). |
-| `VITE_API_IMERG_LANG`, `VITE_API_PLANTING_LANG` | não definidas (**desactivado**) | O mesmo, para o motor IMERG e a janela de plantio (preparados, ainda sem ecrã). |
-| `VITE_DEMO_MODE` | não definida (**desactivado**) | Só `true` activa o modo de demonstração (ver abaixo). Qualquer outro valor ou a ausência mantém a aplicação normal. |
+| `VITE_API_BASE_URL` | `https://detetive-da-chuva.onrender.com` | Only `http(s)` is accepted; a trailing slash is removed. Invalid value → console warning and the default is used. |
+| `VITE_API_TIMEOUT_MS` | `120000` (120 s) | Integer between `5000` and `300000`. Invalid value → default. |
+| `VITE_API_EVALUATE_LANG` | unset (**disabled**) | Only `true` sends `lang` to `/evaluate`. Enable only once the backend supports it (see `docs/ESPECIFICACAO-BACKEND-I18N.md`). |
+| `VITE_API_IMERG_LANG`, `VITE_API_PLANTING_LANG` | unset (**disabled**) | The same, for the IMERG engine and the planting window (prepared, no screen yet). |
+| `VITE_DEMO_MODE` | unset (**disabled**) | Only `true` enables demo mode (see below). Any other value, or no value, keeps the normal application. |
 
-As variáveis `VITE_*` ficam **embutidas no bundle** e são públicas: nunca coloque segredos nelas.
-A API não requer autenticação. Para mudar um valor em produção é preciso gerar um novo build.
+`VITE_*` variables are **embedded in the bundle** and are public: never put secrets in them. The API
+requires no authentication. Changing a value in production requires a new build.
 
-### Modo de demonstração (`VITE_DEMO_MODE`)
+### Demo mode (`VITE_DEMO_MODE`)
 
-Permite apresentar a aplicação quando o backend não está disponível, **sem inventar dados**.
+Lets the application be presented when the backend is unavailable, **without inventing data**.
 
-- **Por omissão está desactivado.** A aplicação fala sempre com a API. O modo nunca é activado
-  automaticamente, nem quando a API falha.
-- **Activar:** gerar o build com `VITE_DEMO_MODE=true`, em `frontend/.env.local` ou na linha de
-  comandos:
+- **Disabled by default.** The application always talks to the API. Demo mode is never enabled
+  automatically, not even when the API fails.
+- **Enable:** build with `VITE_DEMO_MODE=true`, in `frontend/.env.local` or on the command line:
 
   ```sh
   cd frontend
-  VITE_DEMO_MODE=true npm run build     # ou: VITE_DEMO_MODE=true npm run dev
+  VITE_DEMO_MODE=true npm run build     # or: VITE_DEMO_MODE=true npm run dev
   ```
 
-- **Desactivar:** retirar a variável, ou usar outro valor, e gerar um novo build. O valor é lido
-  no build, não em tempo de execução.
-- **Com o modo activo:**
-  - a aplicação **não faz nenhum pedido à rede**;
-  - responde só com **8 respostas reais** da API v1.1, gravadas em **15 de novembro de 2026** e
-    servidas sem alterações (catálogos, estado do serviço, uma consulta completa com a
-    recomendação em português e em inglês, e duas consultas só com avaliação técnica);
-  - qualquer outra consulta mostra «não disponível no modo de demonstração», sem resultado inventado.
-- **Natureza dos dados:** são **históricos**. Não representam condições actuais e não são
-  actualizados. Uma faixa permanente, em todas as páginas, indica a data da captura e as consultas
-  disponíveis.
-- **Isolamento:** num build normal, o código e as gravações de demonstração **não existem no
-  bundle**. No build de demonstração ficam num ficheiro JS à parte, só com as 8 respostas
-  elegíveis.
-- **Origem e integridade:** [frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md](frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md).
-  As 50 respostas gravadas ficam no repositório para auditoria, com o sha256 de cada uma em
-  `manifest.json`; só as 8 elegíveis são usadas pela aplicação.
+- **Disable:** remove the variable, or use another value, and build again. The value is read at
+  build time, not at runtime.
+- **When enabled:**
+  - the application makes **no network requests**;
+  - it answers only with **8 real responses** from API v1.1, recorded on **15 November 2026** and
+    served unchanged (catalogues, service status, one complete consultation with the
+    recommendation in Portuguese and in English, and two consultations with the technical
+    assessment only);
+  - any other consultation shows "not available in demo mode", with no invented result.
+- **Nature of the data:** the responses are **historical**. They do not represent current
+  conditions and are not updated. A permanent banner on every page shows the recording date and
+  the available consultations.
+- **Isolation:** in a normal build, the demo code and recordings **are not in the bundle**. In the
+  demo build they are in a separate JS file containing only the 8 eligible responses. CI checks this
+  with `scripts/check-demo-isolation.mjs`.
+- **Provenance and integrity:** [frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md](frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md)
+  (in Portuguese). All 50 recorded responses are kept in the repository for audit, with the SHA-256
+  of each one in `manifest.json`; only the 8 eligible responses are used by the application.
 
 ## Backend
 
-- URL: `https://detetive-da-chuva.onrender.com`
-- Endpoints usados: `GET /api/v1/provinces`, `GET /api/v1/crops`, `POST /api/v1/advisory`,
-  `POST /api/v1/evaluate` (o serviço de `GET /health` existe, mas a interface não o usa).
-- Contrato, comportamento observado e questões em aberto:
-  **[docs/API-INTEGRATION.md](docs/API-INTEGRATION.md)**.
-- **Contrato actual da API (v1.1):** [docs/docs2.md](docs/docs2.md), fornecido pela equipa de
-  backend.
-- Contrato histórico (v1.0): [docs/backend-api.md](docs/backend-api.md), mantido só para registo.
-- Decisões da integração v1.1: [docs/DECISOES-ARQUITECTURAIS-API.md](docs/DECISOES-ARQUITECTURAIS-API.md).
-- Auditoria de conclusão e plano: [docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md](docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md).
-- Especificação funcional do motor IMERG (`docs/especificacao-funcional.pdf`): documento interno,
-  **não publicado**, pendente de uma versão autorizada para publicação.
+- Production API URL: `https://detetive-da-chuva.onrender.com` (existing Render service).
+- Endpoints used by the interface: `GET /api/v1/provinces`, `GET /api/v1/crops`,
+  `POST /api/v1/advisory`, `POST /api/v1/evaluate` (`GET /health` exists, but the interface does
+  not use it).
+- Contract, observed behaviour and open questions:
+  **[docs/API-INTEGRATION.md](docs/API-INTEGRATION.md)** (in Portuguese).
+- **Current API contract (v1.1):** [docs/docs2.md](docs/docs2.md), supplied by the backend team.
+- Historical contract (v1.0): [docs/backend-api.md](docs/backend-api.md), kept for the record only.
+- v1.1 integration decisions: [docs/DECISOES-ARQUITECTURAIS-API.md](docs/DECISOES-ARQUITECTURAIS-API.md) (in Portuguese).
+- Completion audit and plan: [docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md](docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md) (in Portuguese).
+- Backend language request (`lang` on every text endpoint, `content_language` in responses):
+  [docs/ESPECIFICACAO-BACKEND-I18N.md](docs/ESPECIFICACAO-BACKEND-I18N.md) (in Portuguese). This is a
+  request, not an implemented contract.
+- Functional specification of the IMERG engine (`docs/especificacao-funcional.pdf`): internal
+  document, **not published**, pending an authorised version for publication.
 
-O serviço está alojado no Render e pode demorar **cerca de 50 s** a responder ao primeiro pedido
-depois de um período sem uso (arranque a frio).
+The service is hosted on Render and may take **about 50 s** to answer the first request after a
+period of inactivity (cold start).
 
-## Funcionalidades
+## Features
 
-- **Página inicial** (`/`): apresentação, funcionamento em três passos, fontes de dados e limites.
-- **Consulta** (`/consulta`):
-  - formulário com província, município opcional e cultura carregados da API, e data (hoje ou
-    futura, para planeamento);
-  - pedidos a `/advisory` e `/evaluate` em paralelo e independentes; a recomendação é pedida no
-    idioma da interface;
-  - relatório: veredicto e confiança, indicadores, aviso de dados alternativos, recomendação e
-    detalhes técnicos, com o mecanismo científico identificado;
-  - detecção e apresentação de divergências entre as duas fontes;
-  - avisos quando `/evaluate` indica dados meteorológicos de substituição (`is_fallback_weather`);
-  - estados de carregamento (com aviso de arranque a frio), erro, nova tentativa por fonte ou das
-    duas, e aviso de relatório desactualizado quando o formulário muda.
-- **Página não encontrada** para caminhos desconhecidos.
-- Acessibilidade: navegação por teclado, foco visível, estados com texto e ícone (não só cor),
-  anúncios para leitores de ecrã.
+- **Home page** (`/`): introduction, how it works in three steps, data sources and limitations.
+- **Consultation** (`/consulta`):
+  - form with province, optional municipality and crop loaded from the API, and a date (today or a
+    future date, for planning);
+  - parallel, independent requests to `/advisory` and `/evaluate`; the recommendation is requested in
+    the interface language;
+  - report: verdict and confidence, indicators, alternative weather data notice, recommendation and
+    technical details, with the scientific mechanism identified;
+  - detection and display of divergences between the two sources;
+  - notices when `/evaluate` reports substitute weather data (`is_fallback_weather`);
+  - loading states (with a cold-start notice), errors, retry per source or for both, and a stale
+    report notice when the form changes.
+- **Not found page** for unknown paths.
+- Accessibility: keyboard navigation, visible focus, statuses shown with text and icon (not colour
+  alone), screen-reader announcements.
 
-Não implementado: ecrãs do motor IMERG e da janela de plantio, tendências históricas NASA POWER,
-mapas. Ver a tabela «Estado» acima.
+Not implemented: IMERG engine and planting window screens, NASA POWER historical trends, maps. See
+the "Status" table above.
 
-## Integração contínua
+## Continuous integration
 
-`.github/workflows/ci.yml` corre em cada push e pull request:
-- **frontend:** `npm test`, `npm run lint`, build de produção, build de demonstração e
-  `scripts/check-demo-isolation.mjs` (produção sem gravações; demonstração só com as elegíveis);
-- **backend:** Python 3.11, `pip install`, inicialização da linha de base, `pytest`, arranque do
-  FastAPI e `scripts/smoke-backend.mjs` contra a API local.
+`.github/workflows/ci.yml` runs on every push and pull request:
+- **frontend:** `npm test`, `npm run lint`, production build, demo build and
+  `scripts/check-demo-isolation.mjs` (no recordings in production; only the eligible ones in the
+  demo build);
+- **backend:** Python 3.11, `pip install`, baseline initialisation, `pytest`, FastAPI startup and
+  `scripts/smoke-backend.mjs` against the local API.
 
-## Estrutura
+## Structure
 
 ```
 .
-├── CLAUDE.md                 # Regras e decisões do projecto (também usado pelo assistente de IA)
+├── CLAUDE.md                 # Project rules and decisions (also used by the AI assistant)
 ├── README.md
+├── netlify.toml              # Netlify build configuration (frontend)
+├── .github/workflows/ci.yml  # Continuous integration (frontend and backend)
 ├── docs/
-│   ├── API-INTEGRATION.md    # Integração frontend/backend (ler primeiro)
+│   ├── API-INTEGRATION.md    # Frontend/backend integration (read first)
 │   ├── DEVELOPMENT-GUIDELINES.md
-│   ├── docs2.md              # Contrato actual da API (v1.1)
-│   ├── backend-api.md        # Contrato histórico da API (v1.0)
-│   ├── DECISOES-ARQUITECTURAIS-API.md   # Decisões da integração v1.1
-│   ├── AUDITORIA-CONCLUSAO-AGROKAIROS.md # Auditoria de conclusão e plano P0–P3
-│   ├── frontend.md           # Especificação de produto e UX
-│   └── Detetive_da_Chuva_Proposta_Formato_Dados.pdf  # Proposta (rascunho) de dados históricos
-├── scripts/geo/              # Gera e valida frontend/src/data/geo (fora da aplicação; ver o README)
-├── scripts/smoke-backend.mjs # Teste de fumo de um backend (node scripts/smoke-backend.mjs <URL>)
-├── backend/                  # API FastAPI (ver backend/README.md)
-│   ├── main.py               # Aplicação e rotas
-│   ├── ciclo_diario.py       # Motor IMERG v0.3.0 (verificado por SHA-256)
-│   ├── src/                  # Motor de decisão, linha de base, meteorologia, texto, esquemas
-│   ├── data/                 # Séries IMERG e NASA POWER processadas
-│   └── tests/                # pytest
+│   ├── docs2.md              # Current API contract (v1.1)
+│   ├── backend-api.md        # Historical API contract (v1.0)
+│   ├── DECISOES-ARQUITECTURAIS-API.md   # v1.1 integration decisions
+│   ├── AUDITORIA-CONCLUSAO-AGROKAIROS.md # Completion audit and P0–P3 plan
+│   ├── ESPECIFICACAO-BACKEND-I18N.md    # Language request to the backend team
+│   ├── frontend.md           # Product and UX specification
+│   └── Detetive_da_Chuva_Proposta_Formato_Dados.pdf  # Draft proposal for historical data
+├── scripts/
+│   ├── geo/                  # Builds and validates frontend/src/data/geo (outside the app; see its README)
+│   ├── smoke-backend.mjs     # Backend smoke test (node scripts/smoke-backend.mjs <URL>)
+│   └── check-demo-isolation.mjs  # Production/demo build isolation check
+├── backend/                  # FastAPI API (see backend/README.md)
+│   ├── main.py               # Application and routes
+│   ├── ciclo_diario.py       # IMERG engine v0.3.0 (verified by SHA-256)
+│   ├── src/                  # Decision engine, baseline, weather, text generation, schemas
+│   ├── data/                 # Processed IMERG and NASA POWER series
+│   ├── tests/                # pytest
+│   └── render.yaml · Dockerfile · Procfile
 └── frontend/
     ├── index.html
     ├── package.json · vite.config.js · eslint.config.js · .env.example
-    ├── public/_redirects     # Fallback SPA para o Netlify
+    ├── public/_redirects     # SPA fallback for Netlify
     └── src/
-        ├── main.jsx · App.jsx        # Entrada e layout global
+        ├── main.jsx · App.jsx        # Entry point and global layout
         ├── pages/                    # HomePage, ConsultationPage, NotFoundPage
         ├── components/
-        │   ├── home/                 # Secções da página inicial
-        │   ├── forms/                # Formulário de consulta e campos
-        │   ├── results/              # Relatório e as suas secções
+        │   ├── home/                 # Home page sections
+        │   ├── forms/                # Consultation form and fields
+        │   ├── results/              # Report and its sections
         │   ├── layout/ · ui/ · illustrations/
-        ├── services/                 # Única camada que fala com a API
-        │   ├── api.js                #   pedido JSON, timeout, cancelamento, erros
+        ├── services/                 # The only layer that talks to the API
+        │   ├── api.js                #   JSON requests, timeout, cancellation, errors
         │   ├── catalog.js            #   /health, /provinces, /crops
-        │   └── consultation.js       #   /advisory, /evaluate
+        │   ├── consultation.js       #   /advisory, /evaluate
+        │   └── scientific.js         #   IMERG and planting window (prepared, not used by the interface)
         ├── hooks/                    # useConsultation, useCatalogOptions, routing, etc.
-        ├── utils/                    # mappers (API → view model), validação, formatação, divergências
-        ├── config/                   # URL/timeout, caminhos da API, estados, métricas, rótulos
-        ├── routing/                  # Rotas e navegação (History API)
-        ├── styles/index.css          # Tokens de design e fontes
-        ├── data/geo/                 # Limites provinciais (ainda não usados na interface)
-        └── test/                     # Utilitários e respostas reais gravadas (só para testes)
+        ├── utils/                    # mappers (API → view model), validation, formatting, divergences
+        ├── config/                   # URL/timeout, API paths, statuses, metrics, labels
+        ├── i18n/                     # Language provider, EN/PT dictionaries, review list
+        ├── demo/                     # Isolated demo mode and real recordings
+        ├── routing/                  # Routes and navigation (History API)
+        ├── styles/index.css          # Design tokens and fonts
+        ├── data/geo/                 # Provincial boundaries (not yet used in the interface)
+        └── test/                     # Test utilities and recorded real responses (tests only)
 ```
 
-Arquitectura em camadas: **services** (JSON da API sem alterações) → **utils/mappers**
-(view models; valores em falta ficam `null`, nada é inventado) → **hooks** (estado da consulta) →
-**components**. O estado é local (hooks do React), sem bibliotecas de gestão de estado.
+Layered architecture: **services** (API JSON, unchanged) → **utils/mappers** (view models; missing
+values become `null`, nothing is invented) → **hooks** (consultation state) → **components**. State
+is local (React hooks), with no state-management libraries.
 
-## Build e publicação
+## Build and deployment
 
 ```sh
 cd frontend
-npm run build     # gera frontend/dist/ (inclui _redirects)
+npm run build     # produces frontend/dist/ (includes _redirects)
 ```
 
-O ficheiro `_redirects` (`/* /index.html 200`) permite o acesso directo e o refresh em `/consulta`.
+The `_redirects` file (`/* /index.html 200`) allows direct access to, and refresh of, `/consulta`.
 
-### Backend no Render (serviço novo, separado da produção)
+### Backend on Render (new service, separate from production)
 
-O serviço actual (`https://detetive-da-chuva.onrender.com`) não é alterado. O serviço novo pode ser
-criado de duas formas:
+The existing service (`https://detetive-da-chuva.onrender.com`) is not changed. The new service has
+**not been created yet**; it can be created in two ways:
 
-- **Blueprint:** Render → New → Blueprint → este repositório, caminho `backend/render.yaml`.
-  Cria o serviço `agrokairos-api` e pede o valor de `GEMINI_API_KEY`.
-- **Manual:** New → Web Service, com os valores abaixo (os mesmos do `backend/render.yaml`):
+- **Blueprint:** Render → New → Blueprint → this repository, path `backend/render.yaml`.
+  This creates the `agrokairos-api` service and asks for the value of `GEMINI_API_KEY`.
+- **Manual:** New → Web Service, with the values below (the same as in `backend/render.yaml`):
 
-| Campo | Valor |
+| Field | Value |
 |---|---|
-| Repositório / branch | este repositório / `main` |
+| Repository / branch | this repository / `main` |
 | Root Directory | `backend` |
 | Runtime | Python 3 |
 | Build Command | `pip install -r requirements.txt && python -c "from src.baseline_engine import BaselineEngine; BaselineEngine().load_baseline()"` |
 | Start Command | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 | Health Check Path | `/health` |
-| Variáveis | `PYTHON_VERSION=3.11.11` (a mesma versão do `Dockerfile`); `ENVIRONMENT=production`; `LLM_PROVIDER=gemini`; `LLM_MODEL=gemini-3.5-flash`; `GEMINI_API_KEY` (secreta, opcional: sem ela o texto da recomendação usa um modelo fixo) |
+| Variables | `PYTHON_VERSION=3.11.11` (the same version as the `Dockerfile`); `ENVIRONMENT=production`; `LLM_PROVIDER=gemini`; `LLM_MODEL=gemini-3.5-flash`; `GEMINI_API_KEY` (secret, optional: without it the recommendation text uses a fixed template) |
 
-- Com `ENVIRONMENT=production`, `/docs`, `/redoc` e `/openapi.json` ficam desactivados por design.
-  Para os ver no serviço de validação, usar `ENVIRONMENT=development` temporariamente.
-- Os dados de que o motor precisa estão em `backend/data/` e vão com o repositório. Em arranque, o
-  backend confirma o SHA-256 do motor IMERG (`ciclo_diario.py`).
-- Validar o serviço novo com o teste de fumo (só pedidos de leitura e de cálculo):
+- With `ENVIRONMENT=production`, `/docs`, `/redoc` and `/openapi.json` are disabled by design. To
+  view them on a validation service, set `ENVIRONMENT=development` temporarily.
+- The data the engines need is in `backend/data/` and ships with the repository. At runtime, the
+  backend verifies the SHA-256 of the IMERG engine (`ciclo_diario.py`).
+- Validate the new service with the smoke test (read and computation requests only):
 
   ```sh
-  node scripts/smoke-backend.mjs https://<novo-serviço>.onrender.com
+  node scripts/smoke-backend.mjs https://<new-service>.onrender.com
   ```
 
-### Frontend no Netlify
+### Frontend on Netlify
 
-`netlify.toml` (raiz): base `frontend`, `npm run build`, publicação de `dist`, fallback de SPA.
-O URL da API **não** está no código: vem de `VITE_API_BASE_URL` (por omissão, a API documentada).
+`netlify.toml` (repository root): base `frontend`, `npm run build`, publish `dist`, SPA fallback,
+`NODE_VERSION=24`. The API URL is **not** in the code: it comes from `VITE_API_BASE_URL` (the
+documented API by default).
 
-- Para testar o backend novo, definir `VITE_API_BASE_URL=https://<novo-serviço>.onrender.com` só no
-  contexto **Deploy Previews** (ou **Branch deploys**) nas variáveis de ambiente do site, e abrir o
-  deploy preview de um pull request. A produção não muda.
-- Depois de validado, definir a mesma variável no contexto **Production** e voltar a publicar. Para
-  reverter, apagar a variável (volta à API documentada) e voltar a publicar.
-- `NODE_VERSION=24` está em `netlify.toml` (o `engines` do `frontend/package.json` exige Node
-  `>=22.22.2 <23` ou `>=24.15.0`).
-- O valor é lido no build: depois de mudar a variável, é preciso um novo deploy.
+- To test the new backend, set `VITE_API_BASE_URL=https://<new-service>.onrender.com` only in the
+  **Deploy Previews** (or **Branch deploys**) context of the site's environment variables, and open
+  the deploy preview of a pull request. Production does not change.
+- Once validated, set the same variable in the **Production** context and redeploy. To roll back,
+  delete the variable (the documented API is used again) and redeploy.
+- `NODE_VERSION=24` matches the `engines` field of `frontend/package.json` (Node `>=22.22.2 <23` or
+  `>=24.15.0`).
+- The value is read at build time: after changing the variable, a new deploy is required.
 
-## Colaboração
+## Contributing
 
-Ver **[docs/DEVELOPMENT-GUIDELINES.md](docs/DEVELOPMENT-GUIDELINES.md)**.
+See **[docs/DEVELOPMENT-GUIDELINES.md](docs/DEVELOPMENT-GUIDELINES.md)**.

@@ -1,48 +1,48 @@
-# Preparação dos dados geográficos
+# Geographic data preparation
 
-Gera e valida `frontend/src/data/geo/angola-provincias-2021.json` a partir de uma versão fixada do
-geoBoundaries. A proveniência completa está em `frontend/src/data/geo/PROVENIENCIA.md`.
+Builds and validates `frontend/src/data/geo/angola-provincias-2021.json` from a pinned version of
+geoBoundaries. Full provenance is recorded in `frontend/src/data/geo/PROVENIENCIA.md` (in Portuguese).
 
-Estes scripts **não fazem parte da aplicação**: ficam fora de `frontend/`, não são importados pelo
-código, não entram no bundle do Vite e não acrescentam dependências ao `package.json`.
+These scripts are **not part of the application**: they live outside `frontend/`, are not imported
+by the code, are not included in the Vite bundle and add no dependencies to `package.json`.
 
-## Requisitos
+## Requirements
 
-- Node.js ≥ 22 (só módulos nativos: `fetch`, `crypto`, `zlib`, `child_process`).
-- `npx` (vem com o npm). O mapshaper é executado na versão fixada **0.7.101** com
-  `npx --yes mapshaper@0.7.101`; o npm guarda-o na sua cache, fora do projecto.
-- Rede na primeira execução (fonte ≈ 5,8 MB). A fonte fica em cache em
-  `<pasta temporária do sistema>/detetive-da-chuva-geo`, ou na pasta indicada por `GEO_WORK_DIR`.
+- Node.js ≥ 22 (native modules only: `fetch`, `crypto`, `zlib`, `child_process`).
+- `npx` (ships with npm). mapshaper runs at the pinned version **0.7.101** via
+  `npx --yes mapshaper@0.7.101`; npm keeps it in its cache, outside the project.
+- Network access on the first run (source ≈ 5.8 MB). The source is cached in
+  `<system temporary folder>/detetive-da-chuva-geo`, or in the folder given by `GEO_WORK_DIR`.
 
-## Comandos (a partir da raiz do repositório)
+## Commands (from the repository root)
 
 ```sh
-# Confirmar que o ficheiro existente é reprodutível (não escreve nada)
+# Confirm that the existing file is reproducible (writes nothing)
 node scripts/geo/build.mjs --check
 
-# Gerar de novo, validar e, só se for válido, substituir o ficheiro final
+# Build again, validate and replace the final file only if it is valid
 node scripts/geo/build.mjs
 
-# Validar um ficheiro qualquer contra a fonte fixada
-node scripts/geo/validate.mjs [caminho/para/ficheiro.json]
+# Validate any file against the pinned source
+node scripts/geo/validate.mjs [path/to/file.json]
 ```
 
-Todos terminam com código 1 se alguma verificação falhar; nesse caso o ficheiro final não é alterado.
+All commands exit with code 1 if any check fails; in that case the final file is not changed.
 
-## O que é verificado
+## What is checked
 
-| Etapa | Verificação |
+| Stage | Check |
 |---|---|
-| Fonte | SHA-256 e tamanho de cada ficheiro iguais aos do ponteiro Git LFS do commit fixado |
-| Metadados | `boundaryID`, ano, licença (`Public Domain`), origem e número de unidades iguais aos esperados |
-| Identidade | 18 províncias; ISO únicos; Huambo (AO-HUA), Bié (AO-BIE) e Huíla (AO-HUI); nomes iguais aos da fonte; só as propriedades `iso` e `nome`; ordem por ISO |
-| Topologia | anéis fechados e com ≥ 4 pontos; sem auto-intersecções; sem sobreposições (soma das áreas = área da união); sem falhas novas (buracos na união) |
-| Fidelidade | desvio de área ≤ 0,5 % por província; partes do original entre 5 e 1000 km² com ≥ 90 % dos vértices a menos de 1 km da geometria simplificada |
-| Formato | RFC 7946 (sem `crs`/`bbox`, anéis exteriores anti-horários, buracos horários); ≤ 4 casas decimais |
-| Reprodutibilidade (`--check`) | o ficheiro gerado coincide byte a byte com o existente |
+| Source | SHA-256 and size of each file match the Git LFS pointer of the pinned commit |
+| Metadata | `boundaryID`, year, licence (`Public Domain`), origin and number of units match the expected values |
+| Identity | 18 provinces; unique ISO codes; Huambo (AO-HUA), Bié (AO-BIE) and Huíla (AO-HUI); names identical to the source; only the `iso` and `nome` properties; ordered by ISO code |
+| Topology | closed rings with ≥ 4 points; no self-intersections; no overlaps (sum of areas = area of the union); no new gaps (holes in the union) |
+| Fidelity | area deviation ≤ 0.5 % per province; original parts between 5 and 1000 km² have ≥ 90 % of their vertices within 1 km of the simplified geometry |
+| Format | RFC 7946 (no `crs`/`bbox`, counter-clockwise exterior rings, clockwise holes); ≤ 4 decimal places |
+| Reproducibility (`--check`) | the generated file matches the existing one byte for byte |
 
-## Alterar parâmetros
+## Changing parameters
 
-Todos os parâmetros estão em `config.mjs` (fonte, versão do mapshaper, simplificação e critérios).
-Qualquer alteração muda o resultado: gerar de novo, rever a comparação visual e actualizar
-`PROVENIENCIA.md` (parâmetros, tamanhos e SHA-256).
+All parameters are in `config.mjs` (source, mapshaper version, simplification and criteria). Any
+change alters the result: build again, review the visual comparison and update `PROVENIENCIA.md`
+(parameters, sizes and SHA-256).

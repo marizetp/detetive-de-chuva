@@ -36,12 +36,14 @@ In strict compliance with NASA Space Apps transparency guidelines:
 
 ---
 
-## Key Capabilities & Scientific Principles ("Rule of Gold")
+## Key Capabilities & Scientific Principles ("Golden Rules")
 
 - **False-Start Risk Protection (`ciclo_diario.py v0.3.0`):** Strict mapping of official motor codes (`FAVORAVEL_INDICATIVO` → `PLANTAR (indicativo)`, `AGUARDAR_*` → `AGUARDAR`, `SEM_BASE_FIAVEL` → `SEM CONCLUSÃO`, `FORA_DA_EPOCA` → `SEM CONCLUSÃO (fora da época)`).
 - **No False Certainty:** Historical favorable planting probabilities and false-start risks use conservative **Wilson 90% confidence interval bounds** (clamped between `5.0%` and `95.0%`), never reporting `0%` or `100%` as certainty.
 - **Strict Data Provenance Separation:** 16-day Open-Meteo deterministic forecasts, 6-month ECMWF SEAS5 outlooks, 25-year NASA GPM IMERG V07 rainfall, and NASA POWER auxiliary soil indicators are labeled separately and never mixed or misrepresented as IMERG observations.
-- **Bilingual Support:** Primary documentation and technical endpoints are documented in English, while supporting both **Portuguese (Angola, `lang="pt"` default)** and **English (`lang="en"`)** in `POST /api/v1/advisory`.
+- **Bilingual Support:** Primary documentation and technical endpoints are documented in English, while supporting both **Portuguese (Angola, `lang="pt"` default)** and **English (`lang="en"`)** in `POST /api/v1/advisory`. Other endpoints (`/api/v1/evaluate`, IMERG, optimal planting) return their descriptive text in Portuguese only; a `lang` value sent to them is ignored.
+- **Independent engines:** the deterministic decision engine (`/api/v1/advisory`, `/api/v1/evaluate`) and the IMERG engine (`/zonas/...`) are separate mechanisms; the optimal planting window combines IMERG indicators with crop profiles and NASA POWER history. Their outputs are not merged into a single decision.
+- **Weather fallback:** when Open-Meteo data is unavailable, the decision engine uses NASA POWER historical climatology (2000–2024) and `/api/v1/evaluate` returns `is_fallback_weather: true`. Values produced this way are historical expectations, not current observations or forecasts.
 
 ---
 
@@ -66,7 +68,7 @@ tests/                       # Automated pytest suite (API, baseline, decision, 
 
 ## Complete API Reference
 
-For full request/response schemas, error handling, frontend UI/UX badge mapping rules, and live `curl` / `fetch` examples across all **17 endpoints**, see **[API_DOCS.md](API_DOCS.md)**.
+For full request/response schemas, error handling, frontend UI/UX badge mapping rules, and live `curl` / `fetch` examples for every endpoint, see **[API_DOCS.md](API_DOCS.md)**. The current contract used by the frontend is [`docs/docs2.md`](../docs/docs2.md) (v1.1).
 
 ### Quick Endpoint Summary
 
@@ -100,5 +102,20 @@ python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 pytest -v
 ```
 
-### 4. Production Deployment (Render / Docker / Railway)
+### 4. Deployment (Render / Docker)
 Configuration files (`render.yaml`, `Procfile`, `Dockerfile`) are included. Set `ENVIRONMENT=production` in production to automatically disable `/docs`, `/redoc`, and `/openapi.json`.
+
+- `render.yaml` is a Render Blueprint for the consolidated repository: it creates a **new** service, `agrokairos-api`, with `rootDir: backend`, health check `/health` and `PYTHON_VERSION=3.11.11`. Create it with Render → New → Blueprint → path `backend/render.yaml`; the step-by-step settings are in the [root README](../README.md#backend-on-render-new-service-separate-from-production).
+- **Deployment status:** this service has **not been created yet**. The production API at `https://detetive-da-chuva.onrender.com` is a separate, pre-existing Render service.
+- Validate any deployment with `node scripts/smoke-backend.mjs <URL>` from the repository root.
+
+---
+
+## Known Limitations (observed on the production API, 2026-11-15)
+
+- `GET /zonas/{zona}/previsao` returned HTTP 500 for every recorded request.
+- For the current date, `/api/v1/evaluate` reported `is_fallback_weather: true`, and `GET /fontes/saude` reported Open-Meteo as `nao_pedida` (not requested).
+- `/api/v1/evaluate` and `/api/v1/optimal-planting` ignore `lang`; no endpoint returns the effective language of its text (`content_language`). The requested extensions are specified in [`docs/ESPECIFICACAO-BACKEND-I18N.md`](../docs/ESPECIFICACAO-BACKEND-I18N.md).
+- For the current season (2026/27), `GET /zonas/{zona}/decisao` returns `SEM CONCLUSÃO` (`SEM_BASE_FIAVEL`) because there is no observed IMERG data for the season yet.
+- An unsupported province on `POST` endpoints returns 422, whereas `docs/docs2.md` documents 400. An invalid crop on `/api/v1/optimal-planting` is silently replaced by `Milho`.
+- The SHA-256 values listed in `data/imerg_manifest.json` differ from the committed CSV files; the CSV hashes reported by `GET /fontes/saude` match the committed files. Only the IMERG engine hash (`ciclo_diario.py`) is enforced at runtime.
