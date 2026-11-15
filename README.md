@@ -192,6 +192,7 @@ Não implementado (pendente de confirmação do backend): tendências histórica
 │   ├── frontend.md           # Especificação de produto e UX
 │   └── Detetive_da_Chuva_Proposta_Formato_Dados.pdf  # Proposta (rascunho) de dados históricos
 ├── scripts/geo/              # Gera e valida frontend/src/data/geo (fora da aplicação; ver o README)
+├── scripts/smoke-backend.mjs # Teste de fumo de um backend (node scripts/smoke-backend.mjs <URL>)
 ├── backend/                  # API FastAPI (ver backend/README.md)
 │   ├── main.py               # Aplicação e rotas
 │   ├── ciclo_diario.py       # Motor IMERG v0.3.0 (verificado por SHA-256)
@@ -234,8 +235,44 @@ cd frontend
 npm run build     # gera frontend/dist/ (inclui _redirects)
 ```
 
-O protótipo é publicado manualmente no **Netlify Drop**, arrastando a pasta `frontend/dist`.
 O ficheiro `_redirects` (`/* /index.html 200`) permite o acesso directo e o refresh em `/consulta`.
+
+### Backend no Render (serviço de validação, separado da produção)
+
+Criar um **novo** Web Service; o serviço actual (`https://detetive-da-chuva.onrender.com`) não é
+alterado. Valores tirados de `backend/render.yaml` e do `backend/Dockerfile`:
+
+| Campo | Valor |
+|---|---|
+| Repositório / branch | este repositório / `feat/aurora-blue-identity` |
+| Root Directory | `backend` |
+| Runtime | Python 3 |
+| Build Command | `pip install -r requirements.txt && python -c "from src.baseline_engine import BaselineEngine; BaselineEngine().load_baseline()"` |
+| Start Command | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+| Health Check Path | `/health` |
+| Variáveis | `PYTHON_VERSION=3.11.11` (a mesma versão do `Dockerfile`); `ENVIRONMENT=production`; `LLM_PROVIDER=gemini`; `LLM_MODEL=gemini-3.5-flash`; `GEMINI_API_KEY` (secreta, opcional: sem ela o texto da recomendação usa um modelo fixo) |
+
+- Com `ENVIRONMENT=production`, `/docs`, `/redoc` e `/openapi.json` ficam desactivados por design.
+  Para os ver no serviço de validação, usar `ENVIRONMENT=development` temporariamente.
+- Os dados de que o motor precisa estão em `backend/data/` e vão com o repositório. Em arranque, o
+  backend confirma o SHA-256 do motor IMERG (`ciclo_diario.py`).
+- Validar o serviço novo com o teste de fumo (só pedidos de leitura e de cálculo):
+
+  ```sh
+  node scripts/smoke-backend.mjs https://<novo-serviço>.onrender.com
+  ```
+
+### Frontend no Netlify
+
+`netlify.toml` (raiz): base `frontend`, `npm run build`, publicação de `dist`, fallback de SPA.
+O URL da API **não** está no código: vem de `VITE_API_BASE_URL` (por omissão, a API documentada).
+
+- Para testar o backend novo, definir `VITE_API_BASE_URL=https://<novo-serviço>.onrender.com` só no
+  contexto **Deploy Previews** (ou **Branch deploys**) nas variáveis de ambiente do site, e abrir o
+  deploy preview do pull request deste branch. A produção não muda.
+- Definir também `NODE_VERSION=24` (o `engines` do `frontend/package.json` exige Node `>=22.22.2 <23`
+  ou `>=24.15.0`).
+- O valor é lido no build: depois de mudar a variável, é preciso um novo deploy.
 
 ## Colaboração
 
