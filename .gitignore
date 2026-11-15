@@ -13,6 +13,16 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 
+# Documento interno não publicado (CLAUDE.md §3): nunca versionar
+docs/especificacao-funcional.pdf
+
+# Python (backend/)
+__pycache__/
+*.py[co]
+.venv/
+venv/
+.pytest_cache/
+
 # Sistema
 .DS_Store
 Thumbs.db

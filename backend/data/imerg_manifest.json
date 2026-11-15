@@ -1,0 +1,68 @@
+{
+  "source": "NASA GPM IMERG V07 (GPM_3IMERGDF)",
+  "files_processed": 25,
+  "provinces": {
+    "huambo": {
+      "nome": "Huambo",
+      "csv_file": "hist_imerg_huambo.csv",
+      "sha256": "a16d37fc00dd05f97c49aca82e5ff58b0fce2fecc6c300e111d978aa09db0a43",
+      "target_coords": {
+        "lat": -12.7761,
+        "lon": 15.7392
+      },
+      "imerg_pixel_coords": {
+        "lat": -12.75,
+        "lon": 15.75
+      },
+      "total_rows": 4525,
+      "valid_rain_days": 4525,
+      "coverage_pct": 100.0,
+      "date_range": {
+        "start": "2000-09-01",
+        "end": "2025-02-28"
+      }
+    },
+    "bie": {
+      "nome": "Bié",
+      "csv_file": "hist_imerg_bie.csv",
+      "sha256": "4185fb88d1ea9ddda912921862175a8f381b4f56a21f1bdfcb220fccd0fd0b1e",
+      "target_coords": {
+        "lat": -12.3833,
+        "lon": 16.9333
+      },
+      "imerg_pixel_coords": {
+        "lat": -12.35,
+        "lon": 16.95
+      },
+      "total_rows": 4525,
+      "valid_rain_days": 4525,
+      "coverage_pct": 100.0,
+      "date_range": {
+        "start": "2000-09-01",
+        "end": "2025-02-28"
+      }
+    },
+    "huila": {
+      "nome": "Huíla",
+      "csv_file": "hist_imerg_huila.csv",
+      "sha256": "cb4220973835191596f9dcbc40e6b5608a6b9f73350e3808809bd2f966682de8",
+      "target_coords": {
+        "lat": -14.9172,
+        "lon": 13.5414
+      },
+      "imerg_pixel_coords": {
+        "lat": -14.95,
+        "lon": 13.55
+      },
+      "total_rows": 4525,
+      "valid_rain_days": 4525,
+      "coverage_pct": 100.0,
+      "date_range": {
+        "start": "2000-09-01",
+        "end": "2025-02-28"
+      }
+    }
+  },
+  "produto": "GPM_3IMERGDF",
+  "versao_produto": "07"
+}
