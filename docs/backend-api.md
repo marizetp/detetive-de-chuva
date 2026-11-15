@@ -1,5 +1,10 @@
 # Backend API — AgroKairos
 
+> **Contrato histórico (v1.0).** Substituído pelo contrato actual v1.1 em [`docs2.md`](docs2.md)
+> (2026-11-15). Este documento é mantido apenas para registo e não deve ser usado como contrato
+> actual. As decisões da integração v1.1 estão em
+> [`DECISOES-ARQUITECTURAIS-API.md`](DECISOES-ARQUITECTURAIS-API.md).
+
 **Source:** API integration guide supplied by the project team.  
 **Base URL:** `https://detetive-da-chuva.onrender.com`  
 **Format:** `application/json`  

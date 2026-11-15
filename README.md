@@ -117,7 +117,13 @@ Permite apresentar a aplicação quando o backend não está disponível, **sem 
   `POST /api/v1/evaluate` (o serviço de `GET /health` existe, mas a interface não o usa).
 - Contrato, comportamento observado e questões em aberto:
   **[docs/API-INTEGRATION.md](docs/API-INTEGRATION.md)**.
-- Contrato fornecido pela equipa de backend: [docs/backend-api.md](docs/backend-api.md).
+- **Contrato actual da API (v1.1):** [docs/docs2.md](docs/docs2.md), fornecido pela equipa de
+  backend.
+- Contrato histórico (v1.0): [docs/backend-api.md](docs/backend-api.md), mantido só para registo.
+- Decisões da integração v1.1: [docs/DECISOES-ARQUITECTURAIS-API.md](docs/DECISOES-ARQUITECTURAIS-API.md).
+- Auditoria de conclusão e plano: [docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md](docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md).
+- Especificação funcional do motor IMERG (`docs/especificacao-funcional.pdf`): documento interno,
+  **não publicado**, pendente de uma versão autorizada para publicação.
 
 O serviço está alojado no Render e pode demorar **cerca de 50 s** a responder ao primeiro pedido
 depois de um período sem uso (arranque a frio).
@@ -149,7 +155,10 @@ Não implementado (pendente de confirmação do backend): tendências histórica
 ├── docs/
 │   ├── API-INTEGRATION.md    # Integração frontend/backend (ler primeiro)
 │   ├── DEVELOPMENT-GUIDELINES.md
-│   ├── backend-api.md        # Contrato fornecido pela equipa de backend
+│   ├── docs2.md              # Contrato actual da API (v1.1)
+│   ├── backend-api.md        # Contrato histórico da API (v1.0)
+│   ├── DECISOES-ARQUITECTURAIS-API.md   # Decisões da integração v1.1
+│   ├── AUDITORIA-CONCLUSAO-AGROKAIROS.md # Auditoria de conclusão e plano P0–P3
 │   ├── frontend.md           # Especificação de produto e UX
 │   └── Detetive_da_Chuva_Proposta_Formato_Dados.pdf  # Proposta (rascunho) de dados históricos
 ├── scripts/geo/              # Gera e valida frontend/src/data/geo (fora da aplicação; ver o README)

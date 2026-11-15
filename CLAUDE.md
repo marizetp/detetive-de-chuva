@@ -21,14 +21,18 @@ The interface is bilingual (decision of 2026-11-14): **English (`en`) is the def
 
 ## 3. Source-of-truth documents
 
-- `docs/backend-api.md`: API contract supplied by the backend team. Treat it as the primary source for currently documented backend endpoints.
+- `docs/docs2.md`: **current API contract (v1.1.0)**, supplied by the backend team on 2026-11-15. Treat it as the primary source for documented backend endpoints.
+- `docs/backend-api.md`: **historical API contract (v1.0)**, superseded by `docs/docs2.md`. Kept for the record; do not use it as the current contract.
+- `docs/especificacao-funcional.pdf`: functional specification of the IMERG decision engine (2026-11-14). **Internal document, not published** (kept outside Git) until an authorised version for publication is available. Describes planned and existing engine features; it is not proof that the backend implements them.
+- `docs/DECISOES-ARQUITECTURAIS-API.md`: architectural decisions for the v1.1 integration (authority of `/advisory` and `/evaluate`, alternative weather data, AI disclosure, HTTP 400/422).
+- `docs/AUDITORIA-CONCLUSAO-AGROKAIROS.md`: completion audit and prioritised plan (P0–P3), with its later status update.
 - `docs/frontend.md`: product scope, screen requirements, UX, design direction, and frontend implementation guidance.
 - `docs/Detetive_da_Chuva_Proposta_Formato_Dados.pdf`: draft proposal for historical trend data. It is not proof that those data endpoints or exports are implemented.
 
 If documents disagree:
 1. Identify the disagreement.
 2. Do not silently reconcile it.
-3. Keep the current API integration aligned with `backend-api.md`.
+3. Keep the current API integration aligned with `docs/docs2.md` (v1.1). `docs/backend-api.md` (v1.0) is historical.
 4. Record historical-trend features as pending until the backend team confirms their availability and contract.
 
 ## 4. Technology direction
