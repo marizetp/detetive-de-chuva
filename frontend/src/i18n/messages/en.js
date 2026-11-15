@@ -195,6 +195,9 @@ const en = {
       'The service may be starting up after a period of inactivity. Wait a moment and try again.',
     networkTitle: 'Could not connect to the server.',
     networkDescription: 'Check your Internet connection and try again.',
+    unsupportedLanguageTitle: 'The requested language is not supported by this service.',
+    unsupportedLanguageDescription:
+      'The assessment service did not accept the language of the request. Your consultation details were not affected. Change the interface language and check again, or try later.',
     validationTitle: 'The consultation details are not valid.',
     validationDescription:
       'Check the selected province, crop and date and correct anything needed before sending again.',
@@ -228,6 +231,8 @@ const en = {
     errorTitle: 'Consultation error',
     errorNoticeTitle: 'The recommendation could not be retrieved.',
     reportTitle: 'Consultation report',
+    mechanism:
+      'Agricultural assessment from the decision engine: it combines the 25-year NASA POWER baseline, Open-Meteo data and the crop profile for the crop and location given. It does not include the IMERG assessment of the rainy-season onset or the planting window, which are independent scientific analyses.',
     changeData: 'Change consultation details',
     staleTitle: 'Form details changed',
     staleBody:
@@ -278,9 +283,9 @@ const en = {
     fallback: {
       confirmedTitle: 'Alternative weather data',
       confirmedBody:
-        "According to the technical assessment, real-time weather data (Open-Meteo) was not available for this consultation, and historical or seasonal climatology was used instead. It could not be confirmed whether the recommendation's indicators used the same source, so the values shown may not reflect current observations.",
+        'According to the technical assessment, real-time weather data (Open-Meteo) was not available for this consultation, and the decision engine used NASA POWER climatology for 2000–2024 instead. Values obtained this way are historical expectations for the time of year, not current observations or forecasts. The recommendation was obtained in a separate request that does not state its data source, so it cannot be confirmed whether its indicators used the same alternative.',
       confirmedBodyAssessment:
-        'According to the technical assessment, real-time weather data (Open-Meteo) was not available for this consultation, and historical or seasonal climatology was used instead. The technical assessment does not state which of its indicators used this alternative, so the values shown may not reflect current observations.',
+        'According to the technical assessment, real-time weather data (Open-Meteo) was not available for this consultation, and the decision engine used NASA POWER climatology for 2000–2024 instead. Values obtained this way are historical expectations for the time of year, not current observations or forecasts. The technical assessment does not state which of its indicators used this alternative.',
       unconfirmedTitle: 'Data source not confirmed',
       evaluateUnavailable:
         'The technical assessment is not available, so it could not be confirmed whether real-time or alternative weather data was used.',
@@ -315,7 +320,52 @@ const en = {
       recommendationTitle: 'The detailed recommendation is not yet available in English.',
       justificationsTitle: 'The technical justifications are not yet available in English.',
       body: 'This text is produced by the assessment service in another language and has not been translated yet. The original text is available below for reference.',
+      recommendationBody:
+        'This recommendation was requested from the assessment service in {source}. You can request it in English: the service generates it again, so the wording may differ. The text requested in {source} is still available below.',
+      requestInLanguage: 'Get the recommendation in {language}',
+      justificationsBody:
+        'These justifications were requested from the assessment service in {source}. You can request them in English: the service repeats only the technical assessment. The text requested in {source} is still available below.',
+      requestJustificationsInLanguage: 'Get the justifications in {language}',
       viewOriginal: 'View the original text ({language})',
+    },
+  },
+  // Scientific mechanisms and IMERG engine. Prepared for integration (D11): IMERG and the planting
+  // window have no screen yet. Scientific texts: human review required.
+  mechanisms: {
+    decisionEngine: {
+      title: 'Agricultural assessment (decision engine)',
+      description:
+        'Operational assessment by crop and municipality, using the 25-year NASA POWER baseline, Open-Meteo data and crop profiles.',
+    },
+    imerg: {
+      title: 'Rainy-season onset (IMERG)',
+      description:
+        'Independent scientific assessment of the rainy-season onset and false-start risk, using NASA GPM IMERG V07 data.',
+    },
+    optimalPlanting: {
+      title: 'Planting window',
+      description:
+        'Planning information combining IMERG indicators and NASA POWER historical data. Indicative; not a guaranteed date.',
+    },
+  },
+  imerg: {
+    noDecision: {
+      noReliableBasis: {
+        title: 'No conclusion: insufficient IMERG data',
+        body: 'There is not enough reliable IMERG data to assess the current rainy season. This is not an indication to plant, wait or not plant. Consult an agricultural technician.',
+      },
+      outOfSeason: {
+        title: 'No conclusion: outside the rainy season',
+        body: 'The date given is outside the regional rainy season, so the IMERG engine gives no planting indication.',
+      },
+      unknown: {
+        title: 'Unrecognised IMERG result',
+        body: 'The IMERG engine returned a result the platform does not recognise. No planting indication is shown.',
+      },
+      missing: {
+        title: 'IMERG result unavailable',
+        body: 'The IMERG engine response does not state a result. No planting indication is shown.',
+      },
     },
   },
   notFound: {

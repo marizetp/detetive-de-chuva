@@ -549,9 +549,9 @@
       "status": 200,
       "contentType": "application/json",
       "category": "consulta",
-      "demo": false,
+      "demo": true,
       "sha256": "a086b8a16c1900c0e4e36312742057bbe02fb0db79749173ffd90eb11cbd15f2",
-      "note": "Com lang=en; o frontend não envia lang (D3 adiada)"
+      "note": "Par em inglês da consulta completa: o frontend envia lang=en ao /advisory quando a interface está em inglês (o /evaluate não recebe lang e usa eval_pt)"
     },
     {
       "id": "adv_pt",

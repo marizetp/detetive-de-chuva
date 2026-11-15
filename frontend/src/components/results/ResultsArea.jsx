@@ -1,5 +1,6 @@
 import { RESULT_SOURCES } from '../../config/api.js';
 import { STATUS_CODES } from '../../config/status.js';
+import { BACKEND_CONTENT_LANGUAGE } from '../../i18n/config.js';
 import { localizeCropValue } from '../../i18n/catalogNames.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { CONSULTATION_ANCHORS, ROUTES } from '../../routing/routes.js';
@@ -20,6 +21,7 @@ import InlineNotice from '../ui/InlineNotice.jsx';
 import LoadingIndicator from '../ui/LoadingIndicator.jsx';
 import MarkdownContent from './MarkdownContent.jsx';
 import SourceLanguageContent from './SourceLanguageContent.jsx';
+import { resolveSourceLanguage } from '../../utils/localizedContent.js';
 import { statusToneStyles } from './statusTone.js';
 
 /** Tom de cada estado documentado (cores em statusTone.js). */
@@ -91,6 +93,14 @@ function ReportHeader({ title, headingRef, submittedParams, crops, isStale }) {
             {t('results.changeData')}
           </AppLink>
         </div>
+      ) : null}
+      {/* Mecanismo científico deste relatório: o DecisionEngine (/advisory e /evaluate). O motor
+          IMERG e a janela de plantio são análises independentes, não incluídas aqui. Só com um
+          relatório (o estado de carregamento não muda). */}
+      {submittedParams ? (
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-ink-muted" data-reveal data-reveal-delay="2">
+          {t('results.mechanism')}
+        </p>
       ) : null}
 
       {isStale ? (
@@ -305,11 +315,29 @@ function SourceComparison({ advisoryResult, evaluate, onRetry }) {
   );
 }
 
+/**
+ * Acção «Obter … em {idioma}»: só quando a fonte pode ser pedida de novo e ainda não foi pedida no
+ * idioma da interface (evita repetir um pedido que o serviço já não cumpriu).
+ */
+function RequestInLanguageButton({ result, onRequest, labelKey }) {
+  const { t, language } = useI18n();
+  if (!onRequest || result?.requestedLanguage === language) return null;
+  return (
+    <Button variant="outline" size="sm" onClick={() => onRequest(language)}>
+      {t(labelKey, { language: t(`languageNames.${language}`) })}
+    </Button>
+  );
+}
+
 /** Detalhes técnicos da avaliação (/evaluate): gatilhos e justificações, num painel discreto. */
-function TechnicalDetails({ evaluate }) {
-  const { t } = useI18n();
+function TechnicalDetails({ evaluate, onRequestEvaluateLanguage }) {
+  const { t, language } = useI18n();
   const result = evaluate?.result;
   if (!(result?.triggers?.length > 0 || result?.justifications?.length > 0)) return null;
+  // Idioma das justificações: `content_language` se o backend o declarar; senão o pedido (só com
+  // VITE_API_EVALUATE_LANG); senão português.
+  const source = resolveSourceLanguage(result);
+  const canRequest = Boolean(onRequestEvaluateLanguage) && result.requestedLanguage !== language;
   return (
     <details className="rounded-xl border border-line bg-surface/30 p-4 text-xs text-ink-muted" data-reveal="fade">
       <summary className="cursor-pointer font-medium text-ink-subtle hover:text-ink">
@@ -324,7 +352,18 @@ function TechnicalDetails({ evaluate }) {
           </div>
         ) : null}
         {result.justifications?.length > 0 ? (
-          <SourceLanguageContent unavailableTitleKey="results.sourceLanguage.justificationsTitle">
+          <SourceLanguageContent
+            unavailableTitleKey="results.sourceLanguage.justificationsTitle"
+            bodyKey={canRequest ? 'results.sourceLanguage.justificationsBody' : undefined}
+            sourceLanguage={source.language}
+            action={
+              <RequestInLanguageButton
+                result={result}
+                onRequest={onRequestEvaluateLanguage}
+                labelKey="results.sourceLanguage.requestJustificationsInLanguage"
+              />
+            }
+          >
             <div className="space-y-3">
               {result.justifications.map((just, idx) => (
                 <p key={idx} className="leading-relaxed">• {just}</p>
@@ -389,10 +428,12 @@ export default function ResultsArea({
   evaluate: evaluateProp,
   crops,
   onRetry,
+  onRequestAdvisoryLanguage,
+  onRequestEvaluateLanguage,
   headingRef,
   isStale = false,
 }) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const errorMessage = useErrorMessage();
   const evaluate = evaluateProp ?? IDLE_SOURCE;
 
@@ -448,7 +489,7 @@ export default function ResultsArea({
             <p className="mt-1">{t('results.divergence.recommendationUnavailableBody')}</p>
           </InlineNotice>
           <TechnicalAssessmentOnly evaluate={evaluate} />
-          <TechnicalDetails evaluate={evaluate} />
+          <TechnicalDetails evaluate={evaluate} onRequestEvaluateLanguage={onRequestEvaluateLanguage} />
         </section>
       );
     }
@@ -573,9 +614,27 @@ export default function ResultsArea({
             </div>
           </div>
 
-          {/* Texto livre do backend (Português): nunca traduzido no browser. */}
+          {/* Texto livre do backend, no idioma efectivo (`content_language`, quando o backend o
+              declarar) ou, na falta dele, no idioma pedido (`requestedLanguage`). Nunca é traduzido
+              no browser: se a interface mudar de idioma, o original fica disponível e a
+              recomendação pode ser pedida de novo. */}
           <div className="mt-6 max-w-none text-ink leading-relaxed">
-            <SourceLanguageContent unavailableTitleKey="results.sourceLanguage.recommendationTitle">
+            <SourceLanguageContent
+              unavailableTitleKey="results.sourceLanguage.recommendationTitle"
+              bodyKey={
+                onRequestAdvisoryLanguage && result.requestedLanguage !== language
+                  ? 'results.sourceLanguage.recommendationBody'
+                  : 'results.sourceLanguage.body'
+              }
+              sourceLanguage={resolveSourceLanguage(result, BACKEND_CONTENT_LANGUAGE).language}
+              action={
+                <RequestInLanguageButton
+                  result={result}
+                  onRequest={onRequestAdvisoryLanguage}
+                  labelKey="results.sourceLanguage.requestInLanguage"
+                />
+              }
+            >
               <MarkdownContent text={result.recommendationText} />
             </SourceLanguageContent>
           </div>
@@ -583,7 +642,7 @@ export default function ResultsArea({
       ) : null}
 
       {/* 4. DETALHES TÉCNICOS OPCIONAIS (EXPANSÍVEL E DISCRETO) */}
-      <TechnicalDetails evaluate={evaluate} />
+      <TechnicalDetails evaluate={evaluate} onRequestEvaluateLanguage={onRequestEvaluateLanguage} />
     </section>
   );
 }

@@ -54,6 +54,13 @@ export const SCIENTIFIC_REVIEW_KEYS = Object.freeze([
   'results.recommendationTitle',
   'results.recommendationSubtitle',
   'results.detailsSummary',
+  'results.mechanism',
+  'mechanisms.decisionEngine.description',
+  'mechanisms.imerg.description',
+  'mechanisms.optimalPlanting.description',
+  'imerg.noDecision.noReliableBasis.title',
+  'imerg.noDecision.noReliableBasis.body',
+  'imerg.noDecision.outOfSeason.body',
 ]);
 
 /**

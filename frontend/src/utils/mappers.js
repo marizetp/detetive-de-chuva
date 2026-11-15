@@ -5,6 +5,7 @@ import { RESULT_SOURCES } from '../config/api.js';
 import { RESPONSE_FIELD } from '../config/fieldLabels.js';
 import { CONFIDENCE_SCORE_RANGE, METRIC_DEFINITIONS } from '../config/metrics.js';
 import { MISSING_STATUS, STATUS_DEFINITIONS, UNKNOWN_STATUS } from '../config/status.js';
+import { normalizeContentLanguage } from '../i18n/config.js';
 import {
   isFiniteNumber,
   isNonEmptyString,
@@ -109,6 +110,15 @@ function readUndocumentedPrimitives(raw) {
   return entries.length > 0 ? Object.fromEntries(entries) : null;
 }
 
+/**
+ * `content_language`: idioma efectivo do texto livre, pedido ao backend mas ainda não documentado
+ * na API v1.1. Opcional: a ausência não é um problema de estrutura (não entra em `issues`).
+ * @returns {string|null} 'pt' | 'en' | null
+ */
+function readContentLanguage(source) {
+  return normalizeContentLanguage(source.content_language);
+}
+
 function withCompleteness(viewModel, issues) {
   return { ...viewModel, issues, isComplete: issues.length === 0 };
 }
@@ -134,6 +144,7 @@ export function mapAdvisoryResponse(raw) {
       metrics: readMetrics(source, issues),
       /** Texto tipo Markdown. Renderizar de forma segura, nunca como HTML. */
       recommendationText,
+      contentLanguage: readContentLanguage(source),
     },
     issues,
   );
@@ -154,6 +165,7 @@ export function mapEvaluateResponse(raw) {
       /** Códigos técnicos tal como vêm da API (sem tradução inventada). */
       triggers: readStringList(source, 'triggers_ativados', issues),
       justifications: readStringList(source, 'justificacoes_tecnicas', issues),
+      contentLanguage: readContentLanguage(source),
       isFallbackWeather: readBoolean(source, 'is_fallback_weather', issues),
       /** `detalhes_agroclimaticos`: observado mas NÃO documentado — opcional e instável. */
       undocumentedDetails: readUndocumentedPrimitives(source.detalhes_agroclimaticos),

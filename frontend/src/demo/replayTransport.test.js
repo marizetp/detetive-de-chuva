@@ -65,13 +65,46 @@ describe('reprodução — respostas servidas', () => {
   });
 });
 
+describe('reprodução — idioma da recomendação', () => {
+  const params = { provincia: 'Huambo', municipio: 'Caála', cultura: 'Milho', data_consulta: '2026-11-15' };
+
+  it('inglês: o /advisory com lang=en serve a gravação real em inglês; o /evaluate (sem lang) a mesma de sempre', async () => {
+    const fetchSpy = installReplayWithNetworkSpy();
+    const advisory = await postAdvisory(params, { language: 'en' });
+    expect(advisory).toEqual(JSON.parse(recording('adv_en').text));
+    expect(advisory.recomendacao_extensao).toMatch(/^\*\*FAVORABLE/);
+    expect(await postEvaluate(params)).toEqual(JSON.parse(recording('eval_pt').text));
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('português: o /advisory sem lang serve a gravação em português', async () => {
+    installReplayWithNetworkSpy();
+    const advisory = await postAdvisory(params, { language: 'pt' });
+    expect(advisory).toEqual(JSON.parse(recording('adv_pt').text));
+    expect(advisory.recomendacao_extensao).toMatch(/^\*\*FAVORÁVEL/);
+  });
+
+  it('as duas gravações têm os mesmos estado e métricas (só o texto muda de idioma)', () => {
+    const en = JSON.parse(recording('adv_en').text);
+    const pt = JSON.parse(recording('adv_pt').text);
+    expect(en.status).toBe(pt.status);
+    expect(en.metricas).toEqual(pt.metricas);
+  });
+
+  it('lang=en no /evaluate não tem gravação elegível (o frontend nunca o envia)', async () => {
+    installReplayWithNetworkSpy();
+    await expect(
+      requestJson('/api/v1/evaluate', { method: 'POST', body: { ...params, lang: 'en' } }),
+    ).rejects.toMatchObject({ kind: 'demoUnavailable' });
+  });
+});
+
 describe('reprodução — pedidos sem gravação', () => {
   it.each([
     ['outra data', '/api/v1/advisory', { provincia: 'Huambo', municipio: 'Caála', cultura: 'Milho', data_consulta: '2026-11-16' }],
     ['/advisory só existe para a consulta completa', '/api/v1/advisory', { provincia: 'Bié', cultura: 'Arroz', data_consulta: '2026-06-15' }],
     ['cultura inexistente (gravada, mas excluída)', '/api/v1/advisory', { provincia: 'Huambo', cultura: 'Batata', data_consulta: '2026-11-15' }],
     ['município inexistente (gravado, mas excluído)', '/api/v1/advisory', { provincia: 'Huambo', municipio: 'Lisboa', cultura: 'Milho', data_consulta: '2026-11-15' }],
-    ['com lang=en (gravado, mas excluído)', '/api/v1/advisory', { provincia: 'Huambo', municipio: 'Caála', cultura: 'Milho', data_consulta: '2026-11-15', lang: 'en' }],
     ['data impossível (gravada, mas excluída)', '/api/v1/evaluate', { provincia: 'Huambo', cultura: 'Milho', data_consulta: '2026-02-30' }],
   ])('%s → demoUnavailable, sem resposta inventada', async (_, path, body) => {
     const fetchSpy = installReplayWithNetworkSpy();
@@ -111,8 +144,8 @@ describe('reprodução — pedidos sem gravação', () => {
 });
 
 describe('respostas não elegíveis', () => {
-  it('nenhuma das 43 respostas não elegíveis é servida pela demonstração', async () => {
-    expect(NOT_ELIGIBLE).toHaveLength(43);
+  it('nenhuma das 42 respostas não elegíveis é servida pela demonstração', async () => {
+    expect(NOT_ELIGIBLE).toHaveLength(42);
     const fetchSpy = installReplayWithNetworkSpy();
     for (const entry of NOT_ELIGIBLE) {
       await expect(
@@ -126,7 +159,7 @@ describe('respostas não elegíveis', () => {
 
 describe('createReplayTransport — só entradas elegíveis', () => {
   it('ignora entradas com demo !== true, mesmo que lhe sejam passadas', async () => {
-    const transport = createReplayTransport(RECORDINGS); // inclui as 43 não elegíveis
+    const transport = createReplayTransport(RECORDINGS); // inclui as 42 não elegíveis
     await expect(
       transport('https://x.invalid/api/v1/advisory', {
         method: 'POST',

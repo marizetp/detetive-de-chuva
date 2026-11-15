@@ -108,6 +108,12 @@ Qual dos dois endpoints é a fonte principal da recomendação apresentada ao ut
 
 **Decisão provisória.** Os papéis estão confirmados pela documentação e pela decisão do projecto. A relação com o motor IMERG continua por esclarecer.
 
+*Actualização de 15/11/2026.* O responsável do projecto transmitiu uma clarificação do backend:
+- `/advisory` e `/evaluate` partilham o DecisionEngine, e o `/evaluate` é a referência determinística (ponto 1);
+- o motor IMERG é independente e não deve ser combinado com os outros dois (ponto 2, em parte).
+
+O documento de origem não está no repositório. Os papéis na interface não mudam.
+
 ---
 
 ## Q2 — Proveniência dos indicadores e dados alternativos
@@ -189,6 +195,11 @@ O que significa `is_fallback_weather`? A que resposta e a que indicadores se apl
 ### Estado
 
 **Decisão provisória.** O significado e a regra de apresentação estão documentados. O âmbito exacto, isto é, a que indicadores se aplica, depende do backend.
+
+*Actualização de 15/11/2026.* Segundo a clarificação do backend transmitida pelo responsável do projecto, sem Open-Meteo o DecisionEngine usa a climatologia NASA POWER de 2000–2024.
+- O aviso passa a dizer isso e a explicar que esses valores são expectativas históricas, não observações actuais nem previsões.
+- O aviso continua atribuído ao `/evaluate`. O `/advisory` não devolve `is_fallback_weather` e é um pedido separado.
+- Os pontos 2 e 3 continuam em aberto.
 
 ---
 
@@ -328,7 +339,7 @@ Aplica-se ao relatório e aos catálogos. É o comportamento actual. Não exige 
 ### Riscos e limitações
 
 - **Um 400 num POST pode não ser culpa do utilizador.** Pode ser um corpo mal formado por defeito do cliente. A mensagem «verifique os dados» seria então enganadora. Como o frontend valida os dados antes de enviar e serializa com `JSON.stringify`, um 400 em POST indica provavelmente um defeito técnico. Fica registado; não justifica, por agora, uma mensagem diferente.
-- O mesmo vale para um 422 por `lang` inválido, que seria defeito do frontend. Hoje o frontend não envia `lang`.
+- O mesmo vale para um 422 por `lang` inválido, que seria defeito do frontend. Desde 2026-11-15 (D3), o frontend envia `lang` só ao `/advisory` e só com o valor `"en"`, que é documentado.
 
 ### Confirmação futura necessária do backend
 
@@ -342,6 +353,112 @@ Aplica-se ao relatório e aos catálogos. É o comportamento actual. Não exige 
 
 ---
 
+## D3 — Idioma da recomendação (decisão de 2026-11-15)
+
+### Questão
+
+Como apresentar o conteúdo dinâmico do backend no idioma da interface (inglês ou português), sem traduzir texto livre no frontend?
+
+### Evidências documentais
+
+- **[Doc]** `docs2.md` §3: `POST /api/v1/advisory` aceita `lang` (`"pt"` por omissão, ou `"en"`); outro valor dá 422. O `status` é sempre `FAVORAVEL`, `AGUARDAR` ou `DESFAVORAVEL`, seja qual for o `lang`.
+- **[Doc]** `docs2.md` §3: o pedido de `/evaluate` não inclui `lang`.
+- **[Obs 15-11]** `/advisory` com `lang: "en"` devolveu o texto em inglês, com os mesmos estado, confiança e métricas da resposta sem `lang` (gravações `adv_en` e `adv_pt`). `/evaluate` com `lang: "en"` devolveu uma resposta igual byte a byte à resposta sem `lang`.
+- **[Código]** O frontend só tem tradução de chaves fixas (`createTranslator`) e dos nomes das culturas por `id`. Não existe, nem deve existir, tradução de texto livre.
+
+### Alternativas consideradas
+
+1. **Inglês como referência e tradução para português no frontend.** Exigiria um serviço ou modelo de tradução, ou um dicionário de frases. Ambos estão excluídos por decisões anteriores e pelas regras científicas (preservar negações e ressalvas).
+2. **Pedir cada idioma nativamente ao backend** (escolhida).
+3. **Pedir sempre os dois idiomas.** Duplica o custo de geração, e os dois textos podem diferir.
+
+### Decisão
+
+- **Interface em inglês:** `/advisory` com `lang: "en"`.
+- **Interface em português:** `/advisory` sem `lang` (português por omissão).
+- **`/evaluate`:** nunca recebe `lang`.
+- **Mudança de idioma depois da consulta:** nada é pedido automaticamente. A recomendação fica no idioma em que foi pedida, com aviso, painel do original e o botão «Obter a recomendação em {idioma}», que repete **só** o `/advisory` no novo idioma.
+
+### Comportamento esperado do frontend
+
+| Situação | Comportamento |
+|---|---|
+| Consulta em inglês | Recomendação em inglês, mostrada directamente; justificações do `/evaluate` em português, com aviso e painel do original |
+| Consulta em português | Tudo directamente em português |
+| Interface muda depois da consulta | Aviso no idioma da interface, texto original intacto (com `lang`) e botão para pedir só a recomendação no novo idioma |
+| Nova tentativa do `/advisory` | No idioma da submissão |
+| Modo de demonstração | A consulta completa gravada funciona nos dois idiomas (`adv_pt` e `adv_en`) |
+
+### Riscos e limitações
+
+- **O idioma da resposta não é confirmado.** A API não o devolve. O frontend regista o idioma **pedido** (`requestedLanguage`). Se um backend ignorar `lang`, o texto em português seria apresentado como inglês. Não se faz detecção automática do idioma do texto.
+- Um novo pedido gera um texto novo, cuja redacção pode diferir da anterior.
+- As justificações do `/evaluate` continuam só em português.
+
+### Confirmação futura necessária do backend
+
+1. Devolver na resposta o idioma efectivo do texto (por exemplo, `lang` ou `idioma`).
+2. Suportar `lang` no `/evaluate` (`justificacoes_tecnicas`).
+
+### Estado
+
+**Confirmado** quanto ao contrato do `/advisory` (documentado e observado). O idioma efectivo da resposta e o `/evaluate` ficam pendentes do backend.
+
+## D3b — Idioma efectivo do conteúdo e `lang` no `/evaluate` (preparação, 2026-11-15)
+
+### Questão
+
+Como usar o idioma efectivo do texto, quando o backend o devolver, e pedir as justificações do `/evaluate` no idioma da interface, sem depender de comportamento que a API ainda não tem?
+
+### Evidências
+
+- **[Doc]** `docs2.md` não documenta nenhum campo com o idioma da resposta, nem `lang` no `/evaluate`, no motor IMERG ou na janela de plantio.
+- **[Obs 15-11]** O `/evaluate` ignora `lang` (`eval_en` é igual, byte a byte, a `eval_pt`). O `/optimal-planting` também (`optimal_lang_en` igual a `optimal_huambo_milho_2526`). `lang: "fr"` no `/advisory` dá 422 com `loc: ["body","lang"]` (`adv_badlang`).
+- **[Obs 15-11]** No motor IMERG, o código da tabela do docs2 §5 vem em `mensagem_agricultor.codigo`, e não em `estado_motor` (que traz `desconhecido`, `inicio_confirmado`, `fora_da_epoca`). As respostas observadas não têm `motivo_tecnico` nem `notas`.
+- **[Clarificação]** O responsável do projecto transmitiu, em 15/11/2026, a arquitectura do backend: `/advisory` e `/evaluate` partilham o DecisionEngine; o motor IMERG é independente; sem Open-Meteo, é usada a climatologia NASA POWER de 2000–2024. O documento de origem (`AgroKairos_Respostas_Backend_Frontend.pdf`) e o código do backend não estão no repositório.
+
+### Decisão
+
+- **Pedido ao backend:** está especificado em `ESPECIFICACAO-BACKEND-I18N.md`:
+  - `lang` em todos os endpoints com texto livre;
+  - `content_language` nas respostas;
+  - 422 para valores inválidos;
+  - português por omissão;
+  - códigos e números estáveis.
+- **`content_language`:**
+  - é lido quando existe e normalizado (`pt-AO` → `pt`, `en-US` → `en`); outro valor fica `null`;
+  - quando existe, tem prioridade sobre o idioma pedido;
+  - na sua falta, vale o idioma pedido e, depois, o português;
+  - nunca se detecta o idioma a partir do texto.
+- **`lang` no `/evaluate`:**
+  - está preparado, mas desligado por omissão (`VITE_API_EVALUATE_LANG=true` para o ligar);
+  - ligado, repete-se a regra do `/advisory`, e o botão «Obter as justificações em {idioma}» repete só o `/evaluate`.
+- **Botões de novo pedido:** não aparecem quando essa fonte já foi pedida no idioma da interface.
+- **Motor IMERG e janela de plantio:** sem ecrã (D11; fase de estabilização, sem funcionalidades novas). A integração fica preparada e testada com as gravações reais:
+  - serviços em `services/scientific.js`, mappers em `utils/scientificMappers.js`, tabela de códigos em `config/imerg.js`;
+  - os desfechos IMERG têm vocabulário próprio e nunca são convertidos nos estados do DecisionEngine;
+  - `SEM_BASE_FIAVEL` e `FORA_DA_EPOCA` são «sem conclusão», nunca uma decisão;
+  - `lang` atrás de `VITE_API_IMERG_LANG` e `VITE_API_PLANTING_LANG`, desligados.
+- **Relatório:** identifica o mecanismo («Avaliação agrícola do motor de decisão…»), sem incluir o IMERG nem a janela de plantio.
+- **422 sobre `lang`:** mensagem própria («idioma não suportado»), sem nova tentativa e sem o texto técnico do servidor.
+- **Aviso de dados alternativos:**
+  - menciona a climatologia NASA POWER de 2000–2024;
+  - diz que os valores são expectativas históricas, não observações actuais nem previsões;
+  - continua atribuído ao `/evaluate`, porque os pedidos são separados.
+
+### Estado
+
+| Parte | Estado |
+|---|---|
+| Leitura de `content_language` | Implementada e testada localmente; **depende de o backend a publicar** |
+| `lang` no `/evaluate` | Implementado e testado localmente, desligado; **depende do backend** |
+| IMERG e janela de plantio | Sem ecrã; serviços e mappers preparados e testados com gravações reais; idioma pedido ao backend |
+| Rótulo do mecanismo no relatório e 422 de idioma | Implementados e testados localmente |
+| Aviso de dados alternativos | Implementado; **revisão científica pendente** |
+| Em produção | Nada publicado (sem commit nem deploy) |
+
+---
+
 ## Tabela consolidada
 
 | Questão | Decisão | Base principal | Alterações ao frontend | Estado |
@@ -350,10 +467,12 @@ Aplica-se ao relatório e aos catálogos. É o comportamento actual. Não exige 
 | **Q2** Dados alternativos | Aviso atribuído à avaliação técnica, com ressalva sobre a origem dos outros indicadores; nota neutra quando não há indicação | `docs2.md` 170–171 | Nenhuma | **Decisão provisória** (falta o âmbito exacto do indicador) |
 | **Q3** Divulgação de IA | Divulgação condicional, sem fornecedores, só para o texto da recomendação | `docs2.md` 75, 167, 298 | Nenhuma | **Confirmado** |
 | **Q5** 400 e 422 | Erros de dados, sem nova tentativa, mensagens próprias, nunca como falha do servidor nem com `detail` cru | `docs2.md` 307–310; [Obs 15-11] | Nenhuma | **Confirmado** |
+| **D3b** Idioma efectivo e `/evaluate` | `content_language` lido quando existir (prioridade sobre o idioma pedido); `lang` no `/evaluate` atrás de `VITE_API_EVALUATE_LANG` (desligado); especificação para o backend | `docs2.md`; [Obs 15-11]; clarificação de 15-11 | Implementada localmente em 2026-11-15 | **Depende do backend** |
+| **D3** Idioma da recomendação | Cada idioma pedido nativamente: `lang: "en"` no `/advisory` para inglês, sem `lang` para português; `/evaluate` sem `lang`; botão para pedir de novo só a recomendação depois de mudar de idioma | `docs2.md` §3; [Obs 15-11] | Implementada em 2026-11-15 | **Confirmado** (idioma efectivo da resposta por confirmar) |
 
 ## Observações fora do âmbito destas questões
 
-- **Idioma da recomendação.** O docs2 (§3) documenta `lang: "pt" | "en"` em `/advisory`, mas o frontend ainda não o envia. Por isso, em inglês, a recomendação aparece em português atrás do painel do original. Integrar `lang` é uma decisão separada: o texto em inglês é gerado, não traduzido, e não vem acompanhado do original em português.
+- **Idioma da recomendação.** *(Resolvido em 2026-11-15 pela decisão D3, acima.)* O docs2 (§3) documenta `lang: "pt" | "en"` em `/advisory`, mas o frontend ainda não o envia. Por isso, em inglês, a recomendação aparece em português atrás do painel do original. Integrar `lang` é uma decisão separada: o texto em inglês é gerado, não traduzido, e não vem acompanhado do original em português.
 - **Motor IMERG.** A especificação funcional define-o como a única fonte da decisão. Antes de qualquer integração, a autoridade entre ele e `/advisory` tem de ser resolvida (Q1, ponto 2).
 
 ## Pedidos a fazer ao backend quando estiver disponível
@@ -363,3 +482,4 @@ Aplica-se ao relatório e aos catálogos. É o comportamento actual. Não exige 
 3. Âmbito de `is_fallback_weather`, e o mesmo campo em `/advisory` (Q2).
 4. Campo com o método de geração do texto; `/compliance` em português (Q3).
 5. Situações que produzem 400 nos POST; código uniforme para província não suportada; códigos de erro estáveis (Q5).
+6. `lang` em todos os endpoints com texto livre e `content_language` nas respostas (D3b; `ESPECIFICACAO-BACKEND-I18N.md`).

@@ -1,0 +1,1492 @@
+{
+  "metadata": {
+    "descricao": "Matrizes de Linha de Base Agroclimática (2000-2024)",
+    "fonte": "NASA POWER AG Community API",
+    "regiao": "Planalto Central de Angola (Huambo, Bié, Huíla)",
+    "anos_historicos": 25
+  },
+  "provincias": {
+    "Huambo": {
+      "id": "huambo",
+      "nome": "Huambo",
+      "coordenadas": {
+        "latitude": -12.7761,
+        "longitude": 15.7392,
+        "altitude_m": 1700
+      },
+      "zona_agroecologica": "Planalto Central Tropical de Altitude",
+      "linha_base_mensal": {
+        "1": {
+          "month": 1,
+          "chuva_media_mensal_mm": 178.7,
+          "probabilidade_dia_chuvoso_pct": 37.3,
+          "gwetroot_p25": 0.46,
+          "gwetroot_p50": 0.53,
+          "gwetroot_p75": 0.6,
+          "gwettop_media": 0.577,
+          "temperatura_media_c": 19.5,
+          "temperatura_max_c": 25.0,
+          "temperatura_min_c": 14.8
+        },
+        "2": {
+          "month": 2,
+          "chuva_media_mensal_mm": 153.2,
+          "probabilidade_dia_chuvoso_pct": 36.8,
+          "gwetroot_p25": 0.46,
+          "gwetroot_p50": 0.53,
+          "gwetroot_p75": 0.62,
+          "gwettop_media": 0.575,
+          "temperatura_media_c": 19.8,
+          "temperatura_max_c": 25.4,
+          "temperatura_min_c": 15.0
+        },
+        "3": {
+          "month": 3,
+          "chuva_media_mensal_mm": 283.9,
+          "probabilidade_dia_chuvoso_pct": 39.6,
+          "gwetroot_p25": 0.47,
+          "gwetroot_p50": 0.56,
+          "gwetroot_p75": 0.66,
+          "gwettop_media": 0.608,
+          "temperatura_media_c": 19.8,
+          "temperatura_max_c": 25.1,
+          "temperatura_min_c": 15.3
+        },
+        "4": {
+          "month": 4,
+          "chuva_media_mensal_mm": 78.8,
+          "probabilidade_dia_chuvoso_pct": 17.1,
+          "gwetroot_p25": 0.45,
+          "gwetroot_p50": 0.55,
+          "gwetroot_p75": 0.64,
+          "gwettop_media": 0.579,
+          "temperatura_media_c": 19.5,
+          "temperatura_max_c": 25.2,
+          "temperatura_min_c": 14.5
+        },
+        "5": {
+          "month": 5,
+          "chuva_media_mensal_mm": 7.3,
+          "probabilidade_dia_chuvoso_pct": 0.9,
+          "gwetroot_p25": 0.405,
+          "gwetroot_p50": 0.47,
+          "gwetroot_p75": 0.57,
+          "gwettop_media": 0.491,
+          "temperatura_media_c": 18.1,
+          "temperatura_max_c": 25.5,
+          "temperatura_min_c": 11.3
+        },
+        "6": {
+          "month": 6,
+          "chuva_media_mensal_mm": 0.4,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.39,
+          "gwetroot_p50": 0.43,
+          "gwetroot_p75": 0.51,
+          "gwettop_media": 0.444,
+          "temperatura_media_c": 16.2,
+          "temperatura_max_c": 24.8,
+          "temperatura_min_c": 8.7
+        },
+        "7": {
+          "month": 7,
+          "chuva_media_mensal_mm": 0.3,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.38,
+          "gwetroot_p50": 0.41,
+          "gwetroot_p75": 0.47,
+          "gwettop_media": 0.41,
+          "temperatura_media_c": 16.3,
+          "temperatura_max_c": 25.4,
+          "temperatura_min_c": 8.3
+        },
+        "8": {
+          "month": 8,
+          "chuva_media_mensal_mm": 3.6,
+          "probabilidade_dia_chuvoso_pct": 0.4,
+          "gwetroot_p25": 0.38,
+          "gwetroot_p50": 0.39,
+          "gwetroot_p75": 0.44,
+          "gwettop_media": 0.366,
+          "temperatura_media_c": 19.2,
+          "temperatura_max_c": 28.2,
+          "temperatura_min_c": 10.9
+        },
+        "9": {
+          "month": 9,
+          "chuva_media_mensal_mm": 21.5,
+          "probabilidade_dia_chuvoso_pct": 2.4,
+          "gwetroot_p25": 0.38,
+          "gwetroot_p50": 0.39,
+          "gwetroot_p75": 0.42,
+          "gwettop_media": 0.348,
+          "temperatura_media_c": 22.0,
+          "temperatura_max_c": 30.5,
+          "temperatura_min_c": 14.1
+        },
+        "10": {
+          "month": 10,
+          "chuva_media_mensal_mm": 79.8,
+          "probabilidade_dia_chuvoso_pct": 15.2,
+          "gwetroot_p25": 0.39,
+          "gwetroot_p50": 0.41,
+          "gwetroot_p75": 0.44,
+          "gwettop_media": 0.405,
+          "temperatura_media_c": 22.6,
+          "temperatura_max_c": 29.4,
+          "temperatura_min_c": 16.1
+        },
+        "11": {
+          "month": 11,
+          "chuva_media_mensal_mm": 219.5,
+          "probabilidade_dia_chuvoso_pct": 46.1,
+          "gwetroot_p25": 0.432,
+          "gwetroot_p50": 0.48,
+          "gwetroot_p75": 0.54,
+          "gwettop_media": 0.54,
+          "temperatura_media_c": 20.5,
+          "temperatura_max_c": 25.8,
+          "temperatura_min_c": 15.7
+        },
+        "12": {
+          "month": 12,
+          "chuva_media_mensal_mm": 178.0,
+          "probabilidade_dia_chuvoso_pct": 41.4,
+          "gwetroot_p25": 0.45,
+          "gwetroot_p50": 0.52,
+          "gwetroot_p75": 0.61,
+          "gwettop_media": 0.568,
+          "temperatura_media_c": 19.8,
+          "temperatura_max_c": 25.0,
+          "temperatura_min_c": 15.3
+        }
+      },
+      "curva_sementeira_semanal": {
+        "1": {
+          "week": 1,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.581
+        },
+        "2": {
+          "week": 2,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.575
+        },
+        "3": {
+          "week": 3,
+          "probabilidade_sementeira_pct": 56.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.562
+        },
+        "4": {
+          "week": 4,
+          "probabilidade_sementeira_pct": 76.0,
+          "gwetroot_mediana": 0.55,
+          "gwettop_media": 0.581
+        },
+        "5": {
+          "week": 5,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.55,
+          "gwettop_media": 0.577
+        },
+        "6": {
+          "week": 6,
+          "probabilidade_sementeira_pct": 44.0,
+          "gwetroot_mediana": 0.54,
+          "gwettop_media": 0.574
+        },
+        "7": {
+          "week": 7,
+          "probabilidade_sementeira_pct": 56.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.562
+        },
+        "8": {
+          "week": 8,
+          "probabilidade_sementeira_pct": 60.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.579
+        },
+        "9": {
+          "week": 9,
+          "probabilidade_sementeira_pct": 80.0,
+          "gwetroot_mediana": 0.56,
+          "gwettop_media": 0.593
+        },
+        "10": {
+          "week": 10,
+          "probabilidade_sementeira_pct": 52.0,
+          "gwetroot_mediana": 0.55,
+          "gwettop_media": 0.59
+        },
+        "11": {
+          "week": 11,
+          "probabilidade_sementeira_pct": 64.0,
+          "gwetroot_mediana": 0.55,
+          "gwettop_media": 0.601
+        },
+        "12": {
+          "week": 12,
+          "probabilidade_sementeira_pct": 76.0,
+          "gwetroot_mediana": 0.6,
+          "gwettop_media": 0.626
+        },
+        "13": {
+          "week": 13,
+          "probabilidade_sementeira_pct": 60.0,
+          "gwetroot_mediana": 0.6,
+          "gwettop_media": 0.627
+        },
+        "14": {
+          "week": 14,
+          "probabilidade_sementeira_pct": 44.0,
+          "gwetroot_mediana": 0.58,
+          "gwettop_media": 0.607
+        },
+        "15": {
+          "week": 15,
+          "probabilidade_sementeira_pct": 36.0,
+          "gwetroot_mediana": 0.56,
+          "gwettop_media": 0.594
+        },
+        "16": {
+          "week": 16,
+          "probabilidade_sementeira_pct": 20.0,
+          "gwetroot_mediana": 0.55,
+          "gwettop_media": 0.575
+        },
+        "17": {
+          "week": 17,
+          "probabilidade_sementeira_pct": 12.0,
+          "gwetroot_mediana": 0.53,
+          "gwettop_media": 0.55
+        },
+        "18": {
+          "week": 18,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.51,
+          "gwettop_media": 0.521
+        },
+        "19": {
+          "week": 19,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.49,
+          "gwettop_media": 0.502
+        },
+        "20": {
+          "week": 20,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.47,
+          "gwettop_media": 0.486
+        },
+        "21": {
+          "week": 21,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.46,
+          "gwettop_media": 0.475
+        },
+        "22": {
+          "week": 22,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.45,
+          "gwettop_media": 0.462
+        },
+        "23": {
+          "week": 23,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.44,
+          "gwettop_media": 0.453
+        },
+        "24": {
+          "week": 24,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.445
+        },
+        "25": {
+          "week": 25,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.438
+        },
+        "26": {
+          "week": 26,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.431
+        },
+        "27": {
+          "week": 27,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.42,
+          "gwettop_media": 0.424
+        },
+        "28": {
+          "week": 28,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.42,
+          "gwettop_media": 0.416
+        },
+        "29": {
+          "week": 29,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.41,
+          "gwettop_media": 0.406
+        },
+        "30": {
+          "week": 30,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.41,
+          "gwettop_media": 0.396
+        },
+        "31": {
+          "week": 31,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.4,
+          "gwettop_media": 0.386
+        },
+        "32": {
+          "week": 32,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.4,
+          "gwettop_media": 0.374
+        },
+        "33": {
+          "week": 33,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.39,
+          "gwettop_media": 0.363
+        },
+        "34": {
+          "week": 34,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.39,
+          "gwettop_media": 0.358
+        },
+        "35": {
+          "week": 35,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.39,
+          "gwettop_media": 0.348
+        },
+        "36": {
+          "week": 36,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.38,
+          "gwettop_media": 0.341
+        },
+        "37": {
+          "week": 37,
+          "probabilidade_sementeira_pct": 8.0,
+          "gwetroot_mediana": 0.38,
+          "gwettop_media": 0.345
+        },
+        "38": {
+          "week": 38,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.38,
+          "gwettop_media": 0.345
+        },
+        "39": {
+          "week": 39,
+          "probabilidade_sementeira_pct": 12.0,
+          "gwetroot_mediana": 0.39,
+          "gwettop_media": 0.365
+        },
+        "40": {
+          "week": 40,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.4,
+          "gwettop_media": 0.359
+        },
+        "41": {
+          "week": 41,
+          "probabilidade_sementeira_pct": 12.0,
+          "gwetroot_mediana": 0.4,
+          "gwettop_media": 0.371
+        },
+        "42": {
+          "week": 42,
+          "probabilidade_sementeira_pct": 24.0,
+          "gwetroot_mediana": 0.4,
+          "gwettop_media": 0.407
+        },
+        "43": {
+          "week": 43,
+          "probabilidade_sementeira_pct": 28.0,
+          "gwetroot_mediana": 0.42,
+          "gwettop_media": 0.453
+        },
+        "44": {
+          "week": 44,
+          "probabilidade_sementeira_pct": 40.0,
+          "gwetroot_mediana": 0.44,
+          "gwettop_media": 0.481
+        },
+        "45": {
+          "week": 45,
+          "probabilidade_sementeira_pct": 72.0,
+          "gwetroot_mediana": 0.47,
+          "gwettop_media": 0.511
+        },
+        "46": {
+          "week": 46,
+          "probabilidade_sementeira_pct": 72.0,
+          "gwetroot_mediana": 0.48,
+          "gwettop_media": 0.532
+        },
+        "47": {
+          "week": 47,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.49,
+          "gwettop_media": 0.564
+        },
+        "48": {
+          "week": 48,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.53,
+          "gwettop_media": 0.587
+        },
+        "49": {
+          "week": 49,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.583
+        },
+        "50": {
+          "week": 50,
+          "probabilidade_sementeira_pct": 52.0,
+          "gwetroot_mediana": 0.53,
+          "gwettop_media": 0.567
+        },
+        "51": {
+          "week": 51,
+          "probabilidade_sementeira_pct": 52.0,
+          "gwetroot_mediana": 0.51,
+          "gwettop_media": 0.559
+        },
+        "52": {
+          "week": 52,
+          "probabilidade_sementeira_pct": 60.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.563
+        }
+      },
+      "analise_tendencias_mann_kendall": {
+        "periodo_anos": "2000-2024",
+        "precipitacao_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.27234,
+          "inclinacao_sen": -10.8891,
+          "estatistica_z": -1.098,
+          "significativo_alfa_005": false
+        },
+        "temperatura_media_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.29327,
+          "inclinacao_sen": 0.0456,
+          "estatistica_z": 1.051,
+          "significativo_alfa_005": false
+        },
+        "humidade_raiz_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.38751,
+          "inclinacao_sen": -0.0015,
+          "estatistica_z": -0.864,
+          "significativo_alfa_005": false
+        }
+      }
+    },
+    "Bié": {
+      "id": "bie",
+      "nome": "Bié",
+      "coordenadas": {
+        "latitude": -12.3833,
+        "longitude": 16.9333,
+        "altitude_m": 1650
+      },
+      "zona_agroecologica": "Planalto Central Oriental",
+      "linha_base_mensal": {
+        "1": {
+          "month": 1,
+          "chuva_media_mensal_mm": 164.9,
+          "probabilidade_dia_chuvoso_pct": 36.9,
+          "gwetroot_p25": 0.32,
+          "gwetroot_p50": 0.35,
+          "gwetroot_p75": 0.41,
+          "gwettop_media": 0.454,
+          "temperatura_media_c": 20.1,
+          "temperatura_max_c": 25.3,
+          "temperatura_min_c": 15.5
+        },
+        "2": {
+          "month": 2,
+          "chuva_media_mensal_mm": 152.7,
+          "probabilidade_dia_chuvoso_pct": 35.1,
+          "gwetroot_p25": 0.32,
+          "gwetroot_p50": 0.37,
+          "gwetroot_p75": 0.45,
+          "gwettop_media": 0.467,
+          "temperatura_media_c": 20.2,
+          "temperatura_max_c": 25.4,
+          "temperatura_min_c": 15.6
+        },
+        "3": {
+          "month": 3,
+          "chuva_media_mensal_mm": 219.3,
+          "probabilidade_dia_chuvoso_pct": 33.0,
+          "gwetroot_p25": 0.33,
+          "gwetroot_p50": 0.38,
+          "gwetroot_p75": 0.47,
+          "gwettop_media": 0.478,
+          "temperatura_media_c": 20.1,
+          "temperatura_max_c": 25.2,
+          "temperatura_min_c": 15.7
+        },
+        "4": {
+          "month": 4,
+          "chuva_media_mensal_mm": 60.2,
+          "probabilidade_dia_chuvoso_pct": 11.2,
+          "gwetroot_p25": 0.3,
+          "gwetroot_p50": 0.37,
+          "gwetroot_p75": 0.45,
+          "gwettop_media": 0.434,
+          "temperatura_media_c": 19.6,
+          "temperatura_max_c": 25.4,
+          "temperatura_min_c": 14.6
+        },
+        "5": {
+          "month": 5,
+          "chuva_media_mensal_mm": 8.8,
+          "probabilidade_dia_chuvoso_pct": 1.2,
+          "gwetroot_p25": 0.27,
+          "gwetroot_p50": 0.31,
+          "gwetroot_p75": 0.38,
+          "gwettop_media": 0.342,
+          "temperatura_media_c": 18.3,
+          "temperatura_max_c": 25.9,
+          "temperatura_min_c": 11.3
+        },
+        "6": {
+          "month": 6,
+          "chuva_media_mensal_mm": 0.8,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.26,
+          "gwetroot_p50": 0.28,
+          "gwetroot_p75": 0.33,
+          "gwettop_media": 0.294,
+          "temperatura_media_c": 16.4,
+          "temperatura_max_c": 25.3,
+          "temperatura_min_c": 8.5
+        },
+        "7": {
+          "month": 7,
+          "chuva_media_mensal_mm": 0.3,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.25,
+          "gwetroot_p50": 0.27,
+          "gwetroot_p75": 0.3,
+          "gwettop_media": 0.262,
+          "temperatura_media_c": 16.4,
+          "temperatura_max_c": 25.9,
+          "temperatura_min_c": 7.9
+        },
+        "8": {
+          "month": 8,
+          "chuva_media_mensal_mm": 1.2,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.24,
+          "gwetroot_p50": 0.26,
+          "gwetroot_p75": 0.28,
+          "gwettop_media": 0.228,
+          "temperatura_media_c": 19.6,
+          "temperatura_max_c": 28.9,
+          "temperatura_min_c": 10.9
+        },
+        "9": {
+          "month": 9,
+          "chuva_media_mensal_mm": 22.7,
+          "probabilidade_dia_chuvoso_pct": 2.4,
+          "gwetroot_p25": 0.24,
+          "gwetroot_p50": 0.25,
+          "gwetroot_p75": 0.27,
+          "gwettop_media": 0.229,
+          "temperatura_media_c": 22.7,
+          "temperatura_max_c": 31.0,
+          "temperatura_min_c": 14.9
+        },
+        "10": {
+          "month": 10,
+          "chuva_media_mensal_mm": 62.1,
+          "probabilidade_dia_chuvoso_pct": 9.8,
+          "gwetroot_p25": 0.25,
+          "gwetroot_p50": 0.27,
+          "gwetroot_p75": 0.29,
+          "gwettop_media": 0.283,
+          "temperatura_media_c": 23.2,
+          "temperatura_max_c": 29.9,
+          "temperatura_min_c": 16.8
+        },
+        "11": {
+          "month": 11,
+          "chuva_media_mensal_mm": 152.9,
+          "probabilidade_dia_chuvoso_pct": 33.7,
+          "gwetroot_p25": 0.28,
+          "gwetroot_p50": 0.3,
+          "gwetroot_p75": 0.33,
+          "gwettop_media": 0.394,
+          "temperatura_media_c": 21.1,
+          "temperatura_max_c": 26.5,
+          "temperatura_min_c": 16.2
+        },
+        "12": {
+          "month": 12,
+          "chuva_media_mensal_mm": 155.9,
+          "probabilidade_dia_chuvoso_pct": 33.8,
+          "gwetroot_p25": 0.3,
+          "gwetroot_p50": 0.33,
+          "gwetroot_p75": 0.39,
+          "gwettop_media": 0.432,
+          "temperatura_media_c": 20.3,
+          "temperatura_max_c": 25.5,
+          "temperatura_min_c": 15.9
+        }
+      },
+      "curva_sementeira_semanal": {
+        "1": {
+          "week": 1,
+          "probabilidade_sementeira_pct": 64.0,
+          "gwetroot_mediana": 0.35,
+          "gwettop_media": 0.456
+        },
+        "2": {
+          "week": 2,
+          "probabilidade_sementeira_pct": 60.0,
+          "gwetroot_mediana": 0.34,
+          "gwettop_media": 0.445
+        },
+        "3": {
+          "week": 3,
+          "probabilidade_sementeira_pct": 44.0,
+          "gwetroot_mediana": 0.34,
+          "gwettop_media": 0.44
+        },
+        "4": {
+          "week": 4,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.36,
+          "gwettop_media": 0.463
+        },
+        "5": {
+          "week": 5,
+          "probabilidade_sementeira_pct": 64.0,
+          "gwetroot_mediana": 0.37,
+          "gwettop_media": 0.467
+        },
+        "6": {
+          "week": 6,
+          "probabilidade_sementeira_pct": 36.0,
+          "gwetroot_mediana": 0.37,
+          "gwettop_media": 0.456
+        },
+        "7": {
+          "week": 7,
+          "probabilidade_sementeira_pct": 52.0,
+          "gwetroot_mediana": 0.36,
+          "gwettop_media": 0.457
+        },
+        "8": {
+          "week": 8,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.37,
+          "gwettop_media": 0.481
+        },
+        "9": {
+          "week": 9,
+          "probabilidade_sementeira_pct": 72.0,
+          "gwetroot_mediana": 0.39,
+          "gwettop_media": 0.475
+        },
+        "10": {
+          "week": 10,
+          "probabilidade_sementeira_pct": 28.0,
+          "gwetroot_mediana": 0.38,
+          "gwettop_media": 0.457
+        },
+        "11": {
+          "week": 11,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.37,
+          "gwettop_media": 0.479
+        },
+        "12": {
+          "week": 12,
+          "probabilidade_sementeira_pct": 56.0,
+          "gwetroot_mediana": 0.4,
+          "gwettop_media": 0.492
+        },
+        "13": {
+          "week": 13,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.41,
+          "gwettop_media": 0.486
+        },
+        "14": {
+          "week": 14,
+          "probabilidade_sementeira_pct": 24.0,
+          "gwetroot_mediana": 0.39,
+          "gwettop_media": 0.471
+        },
+        "15": {
+          "week": 15,
+          "probabilidade_sementeira_pct": 20.0,
+          "gwetroot_mediana": 0.37,
+          "gwettop_media": 0.453
+        },
+        "16": {
+          "week": 16,
+          "probabilidade_sementeira_pct": 8.0,
+          "gwetroot_mediana": 0.37,
+          "gwettop_media": 0.425
+        },
+        "17": {
+          "week": 17,
+          "probabilidade_sementeira_pct": 8.0,
+          "gwetroot_mediana": 0.35,
+          "gwettop_media": 0.4
+        },
+        "18": {
+          "week": 18,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.33,
+          "gwettop_media": 0.367
+        },
+        "19": {
+          "week": 19,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.31,
+          "gwettop_media": 0.353
+        },
+        "20": {
+          "week": 20,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.31,
+          "gwettop_media": 0.337
+        },
+        "21": {
+          "week": 21,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.3,
+          "gwettop_media": 0.33
+        },
+        "22": {
+          "week": 22,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.29,
+          "gwettop_media": 0.314
+        },
+        "23": {
+          "week": 23,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.28,
+          "gwettop_media": 0.304
+        },
+        "24": {
+          "week": 24,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.28,
+          "gwettop_media": 0.296
+        },
+        "25": {
+          "week": 25,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.28,
+          "gwettop_media": 0.288
+        },
+        "26": {
+          "week": 26,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.27,
+          "gwettop_media": 0.282
+        },
+        "27": {
+          "week": 27,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.27,
+          "gwettop_media": 0.275
+        },
+        "28": {
+          "week": 28,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.27,
+          "gwettop_media": 0.267
+        },
+        "29": {
+          "week": 29,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.26,
+          "gwettop_media": 0.258
+        },
+        "30": {
+          "week": 30,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.26,
+          "gwettop_media": 0.249
+        },
+        "31": {
+          "week": 31,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.26,
+          "gwettop_media": 0.242
+        },
+        "32": {
+          "week": 32,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.26,
+          "gwettop_media": 0.234
+        },
+        "33": {
+          "week": 33,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.25,
+          "gwettop_media": 0.226
+        },
+        "34": {
+          "week": 34,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.25,
+          "gwettop_media": 0.223
+        },
+        "35": {
+          "week": 35,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.25,
+          "gwettop_media": 0.216
+        },
+        "36": {
+          "week": 36,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.25,
+          "gwettop_media": 0.214
+        },
+        "37": {
+          "week": 37,
+          "probabilidade_sementeira_pct": 8.0,
+          "gwetroot_mediana": 0.25,
+          "gwettop_media": 0.223
+        },
+        "38": {
+          "week": 38,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.25,
+          "gwettop_media": 0.233
+        },
+        "39": {
+          "week": 39,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.25,
+          "gwettop_media": 0.251
+        },
+        "40": {
+          "week": 40,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.26,
+          "gwettop_media": 0.248
+        },
+        "41": {
+          "week": 41,
+          "probabilidade_sementeira_pct": 8.0,
+          "gwetroot_mediana": 0.26,
+          "gwettop_media": 0.253
+        },
+        "42": {
+          "week": 42,
+          "probabilidade_sementeira_pct": 12.0,
+          "gwetroot_mediana": 0.27,
+          "gwettop_media": 0.288
+        },
+        "43": {
+          "week": 43,
+          "probabilidade_sementeira_pct": 32.0,
+          "gwetroot_mediana": 0.27,
+          "gwettop_media": 0.329
+        },
+        "44": {
+          "week": 44,
+          "probabilidade_sementeira_pct": 24.0,
+          "gwetroot_mediana": 0.29,
+          "gwettop_media": 0.338
+        },
+        "45": {
+          "week": 45,
+          "probabilidade_sementeira_pct": 40.0,
+          "gwetroot_mediana": 0.3,
+          "gwettop_media": 0.374
+        },
+        "46": {
+          "week": 46,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.3,
+          "gwettop_media": 0.381
+        },
+        "47": {
+          "week": 47,
+          "probabilidade_sementeira_pct": 60.0,
+          "gwetroot_mediana": 0.31,
+          "gwettop_media": 0.413
+        },
+        "48": {
+          "week": 48,
+          "probabilidade_sementeira_pct": 68.0,
+          "gwetroot_mediana": 0.33,
+          "gwettop_media": 0.44
+        },
+        "49": {
+          "week": 49,
+          "probabilidade_sementeira_pct": 56.0,
+          "gwetroot_mediana": 0.33,
+          "gwettop_media": 0.431
+        },
+        "50": {
+          "week": 50,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.34,
+          "gwettop_media": 0.426
+        },
+        "51": {
+          "week": 51,
+          "probabilidade_sementeira_pct": 60.0,
+          "gwetroot_mediana": 0.35,
+          "gwettop_media": 0.434
+        },
+        "52": {
+          "week": 52,
+          "probabilidade_sementeira_pct": 44.0,
+          "gwetroot_mediana": 0.33,
+          "gwettop_media": 0.438
+        }
+      },
+      "analise_tendencias_mann_kendall": {
+        "periodo_anos": "2000-2024",
+        "precipitacao_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.36238,
+          "inclinacao_sen": -5.8324,
+          "estatistica_z": -0.911,
+          "significativo_alfa_005": false
+        },
+        "temperatura_media_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.44088,
+          "inclinacao_sen": 0.034,
+          "estatistica_z": 0.771,
+          "significativo_alfa_005": false
+        },
+        "humidade_raiz_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.76142,
+          "inclinacao_sen": -0.0005,
+          "estatistica_z": -0.304,
+          "significativo_alfa_005": false
+        }
+      }
+    },
+    "Huíla": {
+      "id": "huila",
+      "nome": "Huíla",
+      "coordenadas": {
+        "latitude": -14.9172,
+        "longitude": 13.5414,
+        "altitude_m": 1760
+      },
+      "zona_agroecologica": "Planalto de Humpata e Lubango",
+      "linha_base_mensal": {
+        "1": {
+          "month": 1,
+          "chuva_media_mensal_mm": 120.7,
+          "probabilidade_dia_chuvoso_pct": 19.0,
+          "gwetroot_p25": 0.45,
+          "gwetroot_p50": 0.48,
+          "gwetroot_p75": 0.54,
+          "gwettop_media": 0.496,
+          "temperatura_media_c": 21.3,
+          "temperatura_max_c": 28.3,
+          "temperatura_min_c": 15.8
+        },
+        "2": {
+          "month": 2,
+          "chuva_media_mensal_mm": 129.6,
+          "probabilidade_dia_chuvoso_pct": 25.7,
+          "gwetroot_p25": 0.46,
+          "gwetroot_p50": 0.51,
+          "gwetroot_p75": 0.59,
+          "gwettop_media": 0.54,
+          "temperatura_media_c": 21.3,
+          "temperatura_max_c": 28.2,
+          "temperatura_min_c": 16.1
+        },
+        "3": {
+          "month": 3,
+          "chuva_media_mensal_mm": 207.4,
+          "probabilidade_dia_chuvoso_pct": 33.9,
+          "gwetroot_p25": 0.49,
+          "gwetroot_p50": 0.54,
+          "gwetroot_p75": 0.68,
+          "gwettop_media": 0.604,
+          "temperatura_media_c": 21.1,
+          "temperatura_max_c": 27.1,
+          "temperatura_min_c": 16.5
+        },
+        "4": {
+          "month": 4,
+          "chuva_media_mensal_mm": 54.9,
+          "probabilidade_dia_chuvoso_pct": 10.9,
+          "gwetroot_p25": 0.49,
+          "gwetroot_p50": 0.545,
+          "gwetroot_p75": 0.66,
+          "gwettop_media": 0.577,
+          "temperatura_media_c": 20.9,
+          "temperatura_max_c": 27.3,
+          "temperatura_min_c": 15.6
+        },
+        "5": {
+          "month": 5,
+          "chuva_media_mensal_mm": 5.0,
+          "probabilidade_dia_chuvoso_pct": 0.4,
+          "gwetroot_p25": 0.44,
+          "gwetroot_p50": 0.47,
+          "gwetroot_p75": 0.53,
+          "gwettop_media": 0.451,
+          "temperatura_media_c": 19.5,
+          "temperatura_max_c": 27.8,
+          "temperatura_min_c": 12.8
+        },
+        "6": {
+          "month": 6,
+          "chuva_media_mensal_mm": 0.1,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.43,
+          "gwetroot_p50": 0.44,
+          "gwetroot_p75": 0.47,
+          "gwettop_media": 0.35,
+          "temperatura_media_c": 17.4,
+          "temperatura_max_c": 26.8,
+          "temperatura_min_c": 10.1
+        },
+        "7": {
+          "month": 7,
+          "chuva_media_mensal_mm": 0.1,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.43,
+          "gwetroot_p50": 0.43,
+          "gwetroot_p75": 0.45,
+          "gwettop_media": 0.274,
+          "temperatura_media_c": 17.7,
+          "temperatura_max_c": 27.3,
+          "temperatura_min_c": 10.1
+        },
+        "8": {
+          "month": 8,
+          "chuva_media_mensal_mm": 0.4,
+          "probabilidade_dia_chuvoso_pct": 0.0,
+          "gwetroot_p25": 0.43,
+          "gwetroot_p50": 0.43,
+          "gwetroot_p75": 0.43,
+          "gwettop_media": 0.216,
+          "temperatura_media_c": 20.3,
+          "temperatura_max_c": 30.1,
+          "temperatura_min_c": 12.5
+        },
+        "9": {
+          "month": 9,
+          "chuva_media_mensal_mm": 5.0,
+          "probabilidade_dia_chuvoso_pct": 0.7,
+          "gwetroot_p25": 0.42,
+          "gwetroot_p50": 0.43,
+          "gwetroot_p75": 0.43,
+          "gwettop_media": 0.197,
+          "temperatura_media_c": 22.8,
+          "temperatura_max_c": 32.8,
+          "temperatura_min_c": 14.9
+        },
+        "10": {
+          "month": 10,
+          "chuva_media_mensal_mm": 31.4,
+          "probabilidade_dia_chuvoso_pct": 2.5,
+          "gwetroot_p25": 0.43,
+          "gwetroot_p50": 0.43,
+          "gwetroot_p75": 0.44,
+          "gwettop_media": 0.225,
+          "temperatura_media_c": 24.2,
+          "temperatura_max_c": 33.2,
+          "temperatura_min_c": 16.9
+        },
+        "11": {
+          "month": 11,
+          "chuva_media_mensal_mm": 137.6,
+          "probabilidade_dia_chuvoso_pct": 12.3,
+          "gwetroot_p25": 0.43,
+          "gwetroot_p50": 0.44,
+          "gwetroot_p75": 0.46,
+          "gwettop_media": 0.362,
+          "temperatura_media_c": 23.1,
+          "temperatura_max_c": 30.7,
+          "temperatura_min_c": 16.9
+        },
+        "12": {
+          "month": 12,
+          "chuva_media_mensal_mm": 106.5,
+          "probabilidade_dia_chuvoso_pct": 17.2,
+          "gwetroot_p25": 0.44,
+          "gwetroot_p50": 0.47,
+          "gwetroot_p75": 0.5,
+          "gwettop_media": 0.447,
+          "temperatura_media_c": 22.0,
+          "temperatura_max_c": 29.1,
+          "temperatura_min_c": 16.3
+        }
+      },
+      "curva_sementeira_semanal": {
+        "1": {
+          "week": 1,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.48,
+          "gwettop_media": 0.494
+        },
+        "2": {
+          "week": 2,
+          "probabilidade_sementeira_pct": 36.0,
+          "gwetroot_mediana": 0.49,
+          "gwettop_media": 0.479
+        },
+        "3": {
+          "week": 3,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.49,
+          "gwettop_media": 0.497
+        },
+        "4": {
+          "week": 4,
+          "probabilidade_sementeira_pct": 20.0,
+          "gwetroot_mediana": 0.48,
+          "gwettop_media": 0.503
+        },
+        "5": {
+          "week": 5,
+          "probabilidade_sementeira_pct": 48.0,
+          "gwetroot_mediana": 0.49,
+          "gwettop_media": 0.526
+        },
+        "6": {
+          "week": 6,
+          "probabilidade_sementeira_pct": 56.0,
+          "gwetroot_mediana": 0.5,
+          "gwettop_media": 0.539
+        },
+        "7": {
+          "week": 7,
+          "probabilidade_sementeira_pct": 36.0,
+          "gwetroot_mediana": 0.5,
+          "gwettop_media": 0.535
+        },
+        "8": {
+          "week": 8,
+          "probabilidade_sementeira_pct": 52.0,
+          "gwetroot_mediana": 0.51,
+          "gwettop_media": 0.547
+        },
+        "9": {
+          "week": 9,
+          "probabilidade_sementeira_pct": 44.0,
+          "gwetroot_mediana": 0.51,
+          "gwettop_media": 0.556
+        },
+        "10": {
+          "week": 10,
+          "probabilidade_sementeira_pct": 60.0,
+          "gwetroot_mediana": 0.51,
+          "gwettop_media": 0.58
+        },
+        "11": {
+          "week": 11,
+          "probabilidade_sementeira_pct": 52.0,
+          "gwetroot_mediana": 0.54,
+          "gwettop_media": 0.588
+        },
+        "12": {
+          "week": 12,
+          "probabilidade_sementeira_pct": 64.0,
+          "gwetroot_mediana": 0.57,
+          "gwettop_media": 0.631
+        },
+        "13": {
+          "week": 13,
+          "probabilidade_sementeira_pct": 56.0,
+          "gwetroot_mediana": 0.6,
+          "gwettop_media": 0.643
+        },
+        "14": {
+          "week": 14,
+          "probabilidade_sementeira_pct": 24.0,
+          "gwetroot_mediana": 0.59,
+          "gwettop_media": 0.612
+        },
+        "15": {
+          "week": 15,
+          "probabilidade_sementeira_pct": 24.0,
+          "gwetroot_mediana": 0.55,
+          "gwettop_media": 0.593
+        },
+        "16": {
+          "week": 16,
+          "probabilidade_sementeira_pct": 16.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.569
+        },
+        "17": {
+          "week": 17,
+          "probabilidade_sementeira_pct": 8.0,
+          "gwetroot_mediana": 0.52,
+          "gwettop_media": 0.538
+        },
+        "18": {
+          "week": 18,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.51,
+          "gwettop_media": 0.501
+        },
+        "19": {
+          "week": 19,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.48,
+          "gwettop_media": 0.469
+        },
+        "20": {
+          "week": 20,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.47,
+          "gwettop_media": 0.444
+        },
+        "21": {
+          "week": 21,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.46,
+          "gwettop_media": 0.425
+        },
+        "22": {
+          "week": 22,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.45,
+          "gwettop_media": 0.4
+        },
+        "23": {
+          "week": 23,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.45,
+          "gwettop_media": 0.376
+        },
+        "24": {
+          "week": 24,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.44,
+          "gwettop_media": 0.353
+        },
+        "25": {
+          "week": 25,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.44,
+          "gwettop_media": 0.333
+        },
+        "26": {
+          "week": 26,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.44,
+          "gwettop_media": 0.316
+        },
+        "27": {
+          "week": 27,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.3
+        },
+        "28": {
+          "week": 28,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.283
+        },
+        "29": {
+          "week": 29,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.266
+        },
+        "30": {
+          "week": 30,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.252
+        },
+        "31": {
+          "week": 31,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.239
+        },
+        "32": {
+          "week": 32,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.226
+        },
+        "33": {
+          "week": 33,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.216
+        },
+        "34": {
+          "week": 34,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.204
+        },
+        "35": {
+          "week": 35,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.199
+        },
+        "36": {
+          "week": 36,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.195
+        },
+        "37": {
+          "week": 37,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.187
+        },
+        "38": {
+          "week": 38,
+          "probabilidade_sementeira_pct": 0.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.197
+        },
+        "39": {
+          "week": 39,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.201
+        },
+        "40": {
+          "week": 40,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.206
+        },
+        "41": {
+          "week": 41,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.202
+        },
+        "42": {
+          "week": 42,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.225
+        },
+        "43": {
+          "week": 43,
+          "probabilidade_sementeira_pct": 4.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.254
+        },
+        "44": {
+          "week": 44,
+          "probabilidade_sementeira_pct": 12.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.278
+        },
+        "45": {
+          "week": 45,
+          "probabilidade_sementeira_pct": 12.0,
+          "gwetroot_mediana": 0.43,
+          "gwettop_media": 0.307
+        },
+        "46": {
+          "week": 46,
+          "probabilidade_sementeira_pct": 16.0,
+          "gwetroot_mediana": 0.44,
+          "gwettop_media": 0.363
+        },
+        "47": {
+          "week": 47,
+          "probabilidade_sementeira_pct": 24.0,
+          "gwetroot_mediana": 0.45,
+          "gwettop_media": 0.413
+        },
+        "48": {
+          "week": 48,
+          "probabilidade_sementeira_pct": 32.0,
+          "gwetroot_mediana": 0.45,
+          "gwettop_media": 0.411
+        },
+        "49": {
+          "week": 49,
+          "probabilidade_sementeira_pct": 36.0,
+          "gwetroot_mediana": 0.46,
+          "gwettop_media": 0.43
+        },
+        "50": {
+          "week": 50,
+          "probabilidade_sementeira_pct": 28.0,
+          "gwetroot_mediana": 0.47,
+          "gwettop_media": 0.46
+        },
+        "51": {
+          "week": 51,
+          "probabilidade_sementeira_pct": 24.0,
+          "gwetroot_mediana": 0.47,
+          "gwettop_media": 0.441
+        },
+        "52": {
+          "week": 52,
+          "probabilidade_sementeira_pct": 40.0,
+          "gwetroot_mediana": 0.46,
+          "gwettop_media": 0.468
+        }
+      },
+      "analise_tendencias_mann_kendall": {
+        "periodo_anos": "2000-2024",
+        "precipitacao_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.7261,
+          "inclinacao_sen": -2.0883,
+          "estatistica_z": -0.35,
+          "significativo_alfa_005": false
+        },
+        "temperatura_media_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.18311,
+          "inclinacao_sen": 0.0277,
+          "estatistica_z": 1.331,
+          "significativo_alfa_005": false
+        },
+        "humidade_raiz_anual": {
+          "tendencia": "no trend",
+          "p_valor": 0.69134,
+          "inclinacao_sen": -0.0003,
+          "estatistica_z": -0.397,
+          "significativo_alfa_005": false
+        }
+      }
+    }
+  }
+}

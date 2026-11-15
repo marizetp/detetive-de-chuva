@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.env
+.venv/
+venv/
+*.log
+data/IMERG_V07_2000-2024/
+saidas/
+*.pdf

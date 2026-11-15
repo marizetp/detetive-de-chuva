@@ -24,11 +24,32 @@ export const LANGUAGE_AUTONYMS = Object.freeze({
 });
 
 /**
- * Idioma do texto livre devolvido pelo backend (`recomendacao_extensao`, `justificacoes_tecnicas`,
- * nomes do catálogo). A API actual não tem parâmetro de idioma (docs/backend-api.md).
+ * Idioma do texto livre do backend quando nada indica outro: português por omissão do serviço
+ * (`/evaluate` sem `lang`, nomes do catálogo e `/advisory` sem `lang`; docs/docs2.md §3).
  */
 export const BACKEND_CONTENT_LANGUAGE = LANGUAGES.pt;
 
 export function isSupportedLanguage(value) {
   return SUPPORTED_LANGUAGES.includes(value);
+}
+
+/**
+ * Valores de `content_language` aceites na resposta do backend (especificação de i18n entregue ao
+ * backend em 2026-11-15: `pt`, `pt-AO`, `en`, `en-US`), normalizados para o idioma da interface.
+ * O campo ainda NÃO é documentado nem devolvido pela API v1.1: é lido só quando existir.
+ */
+const CONTENT_LANGUAGE_ALIASES = Object.freeze({
+  pt: LANGUAGES.pt,
+  'pt-ao': LANGUAGES.pt,
+  en: LANGUAGES.en,
+  'en-us': LANGUAGES.en,
+});
+
+/**
+ * Normaliza o idioma efectivo declarado pelo backend. Valor ausente, não textual ou fora da
+ * lista → `null` (o frontend volta ao idioma pedido; nunca adivinha o idioma do texto).
+ */
+export function normalizeContentLanguage(raw) {
+  if (typeof raw !== 'string') return null;
+  return CONTENT_LANGUAGE_ALIASES[raw.trim().toLowerCase()] ?? null;
 }

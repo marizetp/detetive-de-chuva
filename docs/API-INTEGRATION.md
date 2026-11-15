@@ -372,6 +372,23 @@ A interface já comunica estas incertezas ao utilizador.
 
 ---
 
+## 8.4 Idioma do conteúdo (actualização de 2026-11-15) [Front]
+
+| Endpoint | O frontend envia | Idioma do texto livre usado pela interface |
+|---|---|---|
+| `POST /api/v1/advisory` | `lang: "en"` com a interface em inglês; sem `lang` em português | `content_language` se existir; senão o idioma pedido (não confirmado) |
+| `POST /api/v1/evaluate` | Sem `lang`. Com `VITE_API_EVALUATE_LANG=true`, a mesma regra do `/advisory` | `content_language` se existir; senão o idioma pedido (com a capacidade activa) ou o português |
+| `GET /zonas/{zona}/decisao` (IMERG) | Sem ecrã. Serviço preparado: sem `lang`; com `VITE_API_IMERG_LANG=true`, `?lang=en` em inglês | `content_language` se existir; senão português |
+| `GET /api/v1/optimal-planting` | Sem ecrã. Serviço preparado: sem `lang`; com `VITE_API_PLANTING_LANG=true`, `?lang=en` em inglês (hoje ignorado) | `content_language` se existir; senão português |
+
+- **`content_language` ainda não existe na API v1.1.** É lido e normalizado (`normalizeContentLanguage`) quando existir, mas nunca é exigido.
+- **Texto noutro idioma:** quando o texto não está no idioma da interface, a interface mostra um aviso e um painel com o original (marcado com `lang`).
+  - O texto nunca é traduzido no browser.
+  - O botão «Obter … em {idioma}» repete só o endpoint correspondente.
+- **422 sobre `lang`:** mensagem própria de idioma não suportado, sem nova tentativa.
+- **IMERG:** `SEM_BASE_FIAVEL` e `FORA_DA_EPOCA` são «sem conclusão» e nunca são convertidos em `FAVORAVEL`, `AGUARDAR` ou `DESFAVORAVEL`.
+- **Pedido ao backend:** está em [`ESPECIFICACAO-BACKEND-I18N.md`](ESPECIFICACAO-BACKEND-I18N.md).
+
 ## 9. Questões para o backend
 
 Nenhuma destas questões foi respondida por suposição no frontend.

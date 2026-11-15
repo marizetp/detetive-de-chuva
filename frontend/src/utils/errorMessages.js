@@ -76,6 +76,16 @@ export function getUserErrorMessage(error, t = createTranslator(DEFAULT_LANGUAGE
         serverMessages: [],
       };
     case 'validation':
+      // 422 sobre `lang`: o idioma pedido não é suportado por este endpoint. Não é um erro dos
+      // dados da consulta; a mensagem técnica do servidor não é mostrada.
+      if (error.fields?.includes('lang')) {
+        return {
+          title: t('errors.unsupportedLanguageTitle'),
+          description: t('errors.unsupportedLanguageDescription'),
+          canRetry: false,
+          serverMessages: [],
+        };
+      }
       return {
         title: t('errors.validationTitle'),
         description: t('errors.validationDescription'),

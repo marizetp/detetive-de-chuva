@@ -307,7 +307,7 @@ original acima não foi alterado:** é o retrato do commit `6c333fc`.
 |---|---|---|
 | D1 | Versionar as respostas reais de 15/11 | **Concluída** (`ae46675`) |
 | D2 | Modo de demonstração | **Concluída** (`ae46675`) |
-| D3 | Enviar `lang` ao `/advisory` | **Adiada** por decisão do responsável do projecto. Mantêm-se o comportamento actual e o painel do original em português |
+| D3 | Enviar `lang` ao `/advisory` | **Concluída** (2026-11-15, por commitar). Cada idioma é pedido nativamente: `lang: "en"` para inglês, sem `lang` para português; `/evaluate` sem `lang`. Ver `DECISOES-ARQUITECTURAIS-API.md`, secção D3 |
 | D4 | `GET /health` ao abrir a consulta | Pendente (P1.2) |
 | D5 | Seguir o docs2 nas datas futuras e corrigir a documentação | Pendente (P1.4) |
 | D6 | Versionar documentos de referência | **Em curso.** `docs2.md`, `DECISOES-ARQUITECTURAIS-API.md` e esta auditoria são versionados. **`especificacao-funcional.pdf` fica fora do Git:** é um documento interno que menciona um membro da equipa pelo nome, e só será publicado numa versão autorizada. Referências ao contrato actualizadas (`CLAUDE.md`, `README.md`, `docs/backend-api.md`, `docs/API-INTEGRATION.md`, `docs/DEVELOPMENT-GUIDELINES.md`) |
@@ -322,13 +322,15 @@ original acima não foi alterado:** é o retrato do commit `6c333fc`.
 | ID | Tarefa | Estado |
 |---|---|---|
 | P0.1 | Preservar a evidência v1.1 | **Concluída.** 50 respostas em `frontend/src/demo/recordings/2026-11-15/`, com manifesto, sha256 e `PROVENIENCIA.md` |
-| P0.2 | Modo de demonstração | **Concluída.** Activo só com `VITE_DEMO_MODE=true`; só as 7 respostas elegíveis entram no bundle de demonstração; código e dados ausentes do build de produção; documentado no README e no `.env.example` |
+| P0.2 | Modo de demonstração | **Concluída.** Activo só com `VITE_DEMO_MODE=true`; só as 8 respostas elegíveis entram no bundle de demonstração (inclui `adv_en`, desde a D3); código e dados ausentes do build de produção; documentado no README e no `.env.example` |
 | P0.3 | Fontes de verdade versionadas; contrato de referência | **Em curso (D6)**, com a excepção do PDF acima |
 | P1.1 | Testes com fixtures v1.1 | **Parcial.** Os testes de integridade e de reprodução usam as gravações v1.1; os testes de mapeamento e do relatório continuam com as fixtures v1.0 |
 | P1.2 | Estado do serviço (`/health`) | Pendente |
 | P1.3 | Legendas dos indicadores e atribuição das justificações | Pendente. Os textos serão propostos para revisão científica antes da integração |
 | P1.4 | README, regra das datas, `API-INTEGRATION.md` para a v1.1 | Pendente. Nesta etapa só foram actualizadas as referências ao contrato; a regra das datas e a descrição das funcionalidades no README continuam por corrigir |
-| P1.5 | `lang` no `/advisory` | **Adiada** (D3) |
+| P1.5 | `lang` no `/advisory` | **Concluída** (D3, 2026-11-15, por commitar). Limitação: o idioma efectivo da resposta não é confirmado pela API |
+| P1.5b | Idioma efectivo e `lang` no `/evaluate` | **Preparado no frontend** (D3b, 2026-11-15, por commitar): leitura de `content_language`, `lang` no `/evaluate` desligado por omissão, especificação para o backend em `ESPECIFICACAO-BACKEND-I18N.md`. **Depende de o backend publicar** |
+| P1.5c | Estabilização final (15/11/2026, por commitar) | Rótulo do mecanismo científico no relatório; 422 de idioma com mensagem própria; IMERG e janela de plantio preparados (sem ecrã) e testados com gravações reais. 429 testes a passar; ESLint com os 4 erros já existentes |
 | P1.6 | Revisão científica humana | Pendente |
 | P2.1 | Remover componentes antigos | **Adiada** (D9) |
 | P2.2 | ESLint sem erros | Pendente (4 erros) |

@@ -1,6 +1,10 @@
-# AgroKairos — Frontend
+# AgroKairos
 
-Interface web de apoio à decisão agrícola desenvolvida para o **NASA Space Apps Challenge 2026**.
+Aplicação de apoio à decisão agrícola desenvolvida para o **NASA Space Apps Challenge 2026**.
+Este repositório reúne o **frontend** (`frontend/`, React) e o **backend** (`backend/`, FastAPI).
+O backend tem a sua própria documentação em [backend/README.md](backend/README.md).
+
+Interface web:
 O utilizador escolhe uma província, uma cultura e uma data; a aplicação consulta o backend e
 apresenta um relatório com a classificação (`FAVORAVEL`, `AGUARDAR`, `DESFAVORAVEL`), o nível de
 confiança, os indicadores agroclimáticos e a recomendação de extensão.
@@ -51,6 +55,30 @@ npm run dev       # servidor de desenvolvimento (por omissão em http://localhos
 
 Não é obrigatório configurar variáveis de ambiente: sem elas, a aplicação usa o backend documentado.
 
+### Backend local (opcional)
+
+O backend (`backend/`) é uma API FastAPI em Python. O `Dockerfile` usa Python 3.11.
+
+```sh
+cd backend
+python -m venv .venv
+.venv/Scripts/activate            # Windows; em Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env              # opcional: chaves de LLM; sem chaves, o texto usa um modelo fixo
+uvicorn main:app --reload --port 8000
+pytest                            # testes do backend
+```
+
+Para o frontend usar o backend local, crie `frontend/.env.local` com
+`VITE_API_BASE_URL=http://localhost:8000` e reinicie `npm run dev`. O backend aceita pedidos de
+qualquer origem (CORS `*`).
+
+- Os dados necessários ao motor estão em `backend/data/` (séries IMERG e NASA POWER já processadas).
+  Os ficheiros NetCDF de origem (`data/IMERG_V07_2000-2024/`) não são versionados.
+- O deploy do backend no Render (`backend/render.yaml`, `Procfile`, `Dockerfile`) **não é alterado**
+  por este repositório. Para o Render construir a partir daqui, o serviço tem de usar `backend` como
+  directório raiz.
+
 ## Scripts
 
 | Comando | Função |
@@ -73,6 +101,8 @@ O Vite só lê ficheiros `.env*` **dentro de `frontend/`**. Para configurar, cop
 |---|---|---|
 | `VITE_API_BASE_URL` | `https://detetive-da-chuva.onrender.com` | Só aceita `http(s)`; a barra final é removida. Valor inválido → aviso na consola e uso da predefinição. |
 | `VITE_API_TIMEOUT_MS` | `120000` (120 s) | Inteiro entre `5000` e `300000`. Valor inválido → predefinição. |
+| `VITE_API_EVALUATE_LANG` | não definida (**desactivado**) | Só `true` envia `lang` ao `/evaluate`. Activar apenas quando o backend o suportar (ver `docs/ESPECIFICACAO-BACKEND-I18N.md`). |
+| `VITE_API_IMERG_LANG`, `VITE_API_PLANTING_LANG` | não definidas (**desactivado**) | O mesmo, para o motor IMERG e a janela de plantio (preparados, ainda sem ecrã). |
 | `VITE_DEMO_MODE` | não definida (**desactivado**) | Só `true` activa o modo de demonstração (ver abaixo). Qualquer outro valor ou a ausência mantém a aplicação normal. |
 
 As variáveis `VITE_*` ficam **embutidas no bundle** e são públicas: nunca coloque segredos nelas.
@@ -96,19 +126,19 @@ Permite apresentar a aplicação quando o backend não está disponível, **sem 
   no build, não em tempo de execução.
 - **Com o modo activo:**
   - a aplicação **não faz nenhum pedido à rede**;
-  - responde só com **7 respostas reais** da API v1.1, gravadas em **15 de novembro de 2026** e
-    servidas sem alterações (catálogos, estado do serviço, uma consulta completa e duas só com
-    avaliação técnica);
+  - responde só com **8 respostas reais** da API v1.1, gravadas em **15 de novembro de 2026** e
+    servidas sem alterações (catálogos, estado do serviço, uma consulta completa com a
+    recomendação em português e em inglês, e duas consultas só com avaliação técnica);
   - qualquer outra consulta mostra «não disponível no modo de demonstração», sem resultado inventado.
 - **Natureza dos dados:** são **históricos**. Não representam condições actuais e não são
   actualizados. Uma faixa permanente, em todas as páginas, indica a data da captura e as consultas
   disponíveis.
 - **Isolamento:** num build normal, o código e as gravações de demonstração **não existem no
-  bundle**. No build de demonstração ficam num ficheiro JS à parte, só com as 7 respostas
+  bundle**. No build de demonstração ficam num ficheiro JS à parte, só com as 8 respostas
   elegíveis.
 - **Origem e integridade:** [frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md](frontend/src/demo/recordings/2026-11-15/PROVENIENCIA.md).
   As 50 respostas gravadas ficam no repositório para auditoria, com o sha256 de cada uma em
-  `manifest.json`; só as 7 elegíveis são usadas pela aplicação.
+  `manifest.json`; só as 8 elegíveis são usadas pela aplicação.
 
 ## Backend
 
@@ -162,6 +192,13 @@ Não implementado (pendente de confirmação do backend): tendências histórica
 │   ├── frontend.md           # Especificação de produto e UX
 │   └── Detetive_da_Chuva_Proposta_Formato_Dados.pdf  # Proposta (rascunho) de dados históricos
 ├── scripts/geo/              # Gera e valida frontend/src/data/geo (fora da aplicação; ver o README)
+├── scripts/smoke-backend.mjs # Teste de fumo de um backend (node scripts/smoke-backend.mjs <URL>)
+├── backend/                  # API FastAPI (ver backend/README.md)
+│   ├── main.py               # Aplicação e rotas
+│   ├── ciclo_diario.py       # Motor IMERG v0.3.0 (verificado por SHA-256)
+│   ├── src/                  # Motor de decisão, linha de base, meteorologia, texto, esquemas
+│   ├── data/                 # Séries IMERG e NASA POWER processadas
+│   └── tests/                # pytest
 └── frontend/
     ├── index.html
     ├── package.json · vite.config.js · eslint.config.js · .env.example
@@ -198,8 +235,44 @@ cd frontend
 npm run build     # gera frontend/dist/ (inclui _redirects)
 ```
 
-O protótipo é publicado manualmente no **Netlify Drop**, arrastando a pasta `frontend/dist`.
 O ficheiro `_redirects` (`/* /index.html 200`) permite o acesso directo e o refresh em `/consulta`.
+
+### Backend no Render (serviço de validação, separado da produção)
+
+Criar um **novo** Web Service; o serviço actual (`https://detetive-da-chuva.onrender.com`) não é
+alterado. Valores tirados de `backend/render.yaml` e do `backend/Dockerfile`:
+
+| Campo | Valor |
+|---|---|
+| Repositório / branch | este repositório / `feat/aurora-blue-identity` |
+| Root Directory | `backend` |
+| Runtime | Python 3 |
+| Build Command | `pip install -r requirements.txt && python -c "from src.baseline_engine import BaselineEngine; BaselineEngine().load_baseline()"` |
+| Start Command | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+| Health Check Path | `/health` |
+| Variáveis | `PYTHON_VERSION=3.11.11` (a mesma versão do `Dockerfile`); `ENVIRONMENT=production`; `LLM_PROVIDER=gemini`; `LLM_MODEL=gemini-3.5-flash`; `GEMINI_API_KEY` (secreta, opcional: sem ela o texto da recomendação usa um modelo fixo) |
+
+- Com `ENVIRONMENT=production`, `/docs`, `/redoc` e `/openapi.json` ficam desactivados por design.
+  Para os ver no serviço de validação, usar `ENVIRONMENT=development` temporariamente.
+- Os dados de que o motor precisa estão em `backend/data/` e vão com o repositório. Em arranque, o
+  backend confirma o SHA-256 do motor IMERG (`ciclo_diario.py`).
+- Validar o serviço novo com o teste de fumo (só pedidos de leitura e de cálculo):
+
+  ```sh
+  node scripts/smoke-backend.mjs https://<novo-serviço>.onrender.com
+  ```
+
+### Frontend no Netlify
+
+`netlify.toml` (raiz): base `frontend`, `npm run build`, publicação de `dist`, fallback de SPA.
+O URL da API **não** está no código: vem de `VITE_API_BASE_URL` (por omissão, a API documentada).
+
+- Para testar o backend novo, definir `VITE_API_BASE_URL=https://<novo-serviço>.onrender.com` só no
+  contexto **Deploy Previews** (ou **Branch deploys**) nas variáveis de ambiente do site, e abrir o
+  deploy preview do pull request deste branch. A produção não muda.
+- Definir também `NODE_VERSION=24` (o `engines` do `frontend/package.json` exige Node `>=22.22.2 <23`
+  ou `>=24.15.0`).
+- O valor é lido no build: depois de mudar a variável, é preciso um novo deploy.
 
 ## Colaboração
 

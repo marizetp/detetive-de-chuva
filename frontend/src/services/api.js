@@ -25,9 +25,9 @@ export class ApiError extends Error {
   /**
    * @param {keyof typeof API_ERROR_KINDS} kind
    * @param {string} message mensagem técnica (não mostrar ao utilizador)
-   * @param {{ status?: number|null, path?: string, details?: string[], cause?: unknown }} [info]
+   * @param {{ status?: number|null, path?: string, details?: string[], fields?: string[], cause?: unknown }} [info]
    */
-  constructor(kind, message, { status = null, path = '', details = [], cause } = {}) {
+  constructor(kind, message, { status = null, path = '', details = [], fields = [], cause } = {}) {
     super(message, cause === undefined ? undefined : { cause });
     this.name = 'ApiError';
     this.kind = kind;
@@ -35,6 +35,8 @@ export class ApiError extends Error {
     this.path = path;
     /** Mensagens legíveis devolvidas pela API (ex.: `detail[].msg` de um 422). */
     this.details = details;
+    /** Campos rejeitados num 422 (último elemento de `detail[].loc`, ex.: `lang`). */
+    this.fields = fields;
   }
 }
 
@@ -71,6 +73,14 @@ export function extractErrorDetails(body) {
       .filter(Boolean);
   }
   return [];
+}
+
+/** Campos rejeitados num 422 FastAPI: último elemento textual de `detail[].loc`. */
+export function extractErrorFields(body) {
+  if (!isPlainObject(body) || !Array.isArray(body.detail)) return [];
+  return body.detail
+    .map((item) => (isPlainObject(item) && Array.isArray(item.loc) ? item.loc.at(-1) : null))
+    .filter((field) => typeof field === 'string');
 }
 
 /**
@@ -171,8 +181,9 @@ export async function requestJson(path, options = {}) {
 
   if (!response.ok) {
     const details = parsed.ok ? extractErrorDetails(parsed.value) : [];
+    const fields = parsed.ok ? extractErrorFields(parsed.value) : [];
     const kind = response.status === 422 ? 'validation' : 'http';
-    throw new ApiError(kind, `HTTP ${response.status}`, { status: response.status, path, details });
+    throw new ApiError(kind, `HTTP ${response.status}`, { status: response.status, path, details, fields });
   }
 
   if (!parsed.ok) {
