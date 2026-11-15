@@ -3,11 +3,15 @@
 export const ROUTES = Object.freeze({
   home: '/',
   consultation: '/consulta',
+  map: '/mapa',
+  cycle: '/ciclo',
 });
 
 export const ROUTE_IDS = Object.freeze({
   home: 'home',
   consultation: 'consultation',
+  map: 'map',
+  cycle: 'cycle',
   notFound: 'notFound',
 });
 
@@ -28,6 +32,15 @@ export const NAV_ITEMS = Object.freeze([
   Object.freeze({ labelKey: 'nav.home', to: ROUTES.home }),
   Object.freeze({ labelKey: 'nav.howItWorks', to: `${ROUTES.home}#${SECTION_IDS.howItWorks}` }),
   Object.freeze({ labelKey: 'nav.sources', to: `${ROUTES.home}#${SECTION_IDS.sources}` }),
+  Object.freeze({ labelKey: 'nav.map', to: ROUTES.map }),
+  Object.freeze({ labelKey: 'nav.cycle', to: ROUTES.cycle }),
+]);
+
+/** Separadores de navegação do espaço de análise (logo acima da consulta tradicional). */
+export const WORKSPACE_TABS = Object.freeze([
+  Object.freeze({ id: 'map', labelKey: 'workspace.mapTab', to: ROUTES.map }),
+  Object.freeze({ id: 'cycle', labelKey: 'workspace.cycleTab', to: ROUTES.cycle }),
+  Object.freeze({ id: 'consultation', labelKey: 'workspace.consultationTab', to: ROUTES.consultation }),
 ]);
 
 /** Remove a barra final (excepto na raiz): "/consulta/" → "/consulta". */
@@ -42,5 +55,7 @@ export function resolveRouteId(pathname) {
   const path = normalizePathname(pathname);
   if (path === ROUTES.home) return ROUTE_IDS.home;
   if (path === ROUTES.consultation) return ROUTE_IDS.consultation;
+  if (path === ROUTES.map) return ROUTE_IDS.map;
+  if (path === ROUTES.cycle) return ROUTE_IDS.cycle;
   return ROUTE_IDS.notFound;
 }

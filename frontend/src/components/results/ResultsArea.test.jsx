@@ -50,7 +50,7 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
   it('em carregamento: apresenta indicador de análise agroclimática', () => {
     renderReport({ advisory: loading });
     expect(
-      screen.getByText('A analisar dados climáticos históricos e indicadores agrícolas...'),
+      screen.getByText('A consultar indicadores agroclimáticos…'),
     ).toBeInTheDocument();
     // Não sugere que a plataforma já usa dados NASA POWER.
     expect(screen.queryByText(/NASA/)).not.toBeInTheDocument();
@@ -127,7 +127,7 @@ describe('ResultsArea — Layout Agronómico Direto', () => {
     renderReport();
     expect(screen.getByText('Chuva Recente')).toBeInTheDocument();
     expect(screen.getByText('Humidade da Raiz')).toBeInTheDocument();
-    expect(screen.getByText('Chuva Prevista')).toBeInTheDocument();
+    expect(screen.getByText('Precipitação média histórica')).toBeInTheDocument();
     // A unidade está num <span> próprio (cor Aurora): o texto completo do valor mantém-se igual.
     const valueWithUnit = (text) => (_, element) =>
       element?.textContent === text && [...element.children].every((child) => child.textContent !== text);

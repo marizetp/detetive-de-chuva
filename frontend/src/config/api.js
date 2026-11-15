@@ -18,8 +18,12 @@ export const API_PATHS = Object.freeze({
   health: '/health',
   provinces: '/api/v1/provinces',
   crops: '/api/v1/crops',
+  municipalities: '/api/v1/municipalities',
   advisory: '/api/v1/advisory',
   evaluate: '/api/v1/evaluate',
+  optimalPlanting: '/api/v1/optimal-planting',
+  mapOverview: '/api/v1/map-overview',
+  baseline: (province) => `/api/v1/baseline/${encodeURIComponent(province)}`,
 });
 
 /** Fontes de resultados da consulta. A interface deve distinguir sempre uma da outra. */

@@ -12,10 +12,14 @@ describe('routes', () => {
     expect(resolveRouteId('/')).toBe(ROUTE_IDS.home);
     expect(resolveRouteId('/consulta')).toBe(ROUTE_IDS.consultation);
     expect(resolveRouteId('/consulta/')).toBe(ROUTE_IDS.consultation);
+    expect(resolveRouteId('/mapa')).toBe(ROUTE_IDS.map);
+    expect(resolveRouteId('/mapa/')).toBe(ROUTE_IDS.map);
+    expect(resolveRouteId('/ciclo')).toBe(ROUTE_IDS.cycle);
+    expect(resolveRouteId('/ciclo/')).toBe(ROUTE_IDS.cycle);
     expect(resolveRouteId('/inexistente')).toBe(ROUTE_IDS.notFound);
   });
 
-  it('a navegação aponta para secções da página inicial', () => {
-    expect(NAV_ITEMS.map((item) => item.to)).toEqual(['/', '/#como-funciona', '/#fontes']);
+  it('a navegação inclui as secções da página inicial e os separadores Mapa e Ciclo separados', () => {
+    expect(NAV_ITEMS.map((item) => item.to)).toEqual(['/', '/#como-funciona', '/#fontes', '/mapa', '/ciclo']);
   });
 });

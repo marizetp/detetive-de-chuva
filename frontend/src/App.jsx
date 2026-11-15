@@ -3,19 +3,31 @@ import LanguageSuggestion from './components/layout/LanguageSuggestion.jsx';
 import SiteFooter from './components/layout/SiteFooter.jsx';
 import SiteHeader from './components/layout/SiteHeader.jsx';
 import SkipLink from './components/layout/SkipLink.jsx';
+import { ExplorerSelectionProvider } from './contexts/ExplorerSelectionContext.jsx';
 import { useCurrentLocation } from './hooks/useCurrentLocation.js';
 import { useRevealMotion } from './hooks/useRevealMotion.js';
 import { useRouteFocus } from './hooks/useRouteFocus.js';
 import ConsultationPage from './pages/ConsultationPage.jsx';
+import CycleExplorerPage from './pages/CycleExplorerPage.jsx';
 import HomePage from './pages/HomePage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import { ROUTE_IDS, resolveRouteId } from './routing/routes.js';
 
 const MAIN_CONTENT_ID = 'conteudo';
 
+function MapPage() {
+  return <CycleExplorerPage mode="map" />;
+}
+
+function CyclePage() {
+  return <CycleExplorerPage mode="cycle" />;
+}
+
 const PAGES = {
   [ROUTE_IDS.home]: HomePage,
   [ROUTE_IDS.consultation]: ConsultationPage,
+  [ROUTE_IDS.map]: MapPage,
+  [ROUTE_IDS.cycle]: CyclePage,
   [ROUTE_IDS.notFound]: NotFoundPage,
 };
 
@@ -39,7 +51,9 @@ export default function App({ demo = null }) {
       {DemoBanner ? <DemoBanner /> : null}
       <LanguageSuggestion />
       <main id={MAIN_CONTENT_ID} ref={mainRef} tabIndex={-1} className="flex-1">
-        <Page />
+        <ExplorerSelectionProvider>
+          <Page />
+        </ExplorerSelectionProvider>
       </main>
       <SiteFooter />
     </div>

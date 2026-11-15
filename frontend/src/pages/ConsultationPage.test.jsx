@@ -187,7 +187,7 @@ describe('ConsultationPage — submissão e parecer', () => {
     expect(screen.getByText('Favorável para semeadura')).toBeInTheDocument();
     expect(screen.getByText('Chuva Recente')).toBeInTheDocument();
     expect(screen.getByText('Humidade da Raiz')).toBeInTheDocument();
-    expect(screen.getByText('Chuva Prevista')).toBeInTheDocument();
+    expect(screen.getByText('Precipitação média histórica')).toBeInTheDocument();
     expect(screen.getByText('Recomendação do serviço de avaliação')).toBeInTheDocument();
   });
 

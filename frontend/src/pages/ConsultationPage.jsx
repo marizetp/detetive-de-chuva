@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import ConsultationForm from '../components/forms/ConsultationForm.jsx';
+import ConsultationModeTabs from '../components/layout/ConsultationModeTabs.jsx';
 import ResultsArea from '../components/results/ResultsArea.jsx';
 import Container from '../components/ui/Container.jsx';
 import Eyebrow from '../components/ui/Eyebrow.jsx';
@@ -48,6 +49,8 @@ export default function ConsultationPage() {
 
   return (
     <Container className="py-14 lg:py-20">
+      <ConsultationModeTabs activeTab="consultation" />
+
       <header className="max-w-3xl">
         <Eyebrow className="font-display" data-reveal>
           {t('consultation.eyebrow')}

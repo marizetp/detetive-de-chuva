@@ -10,6 +10,9 @@
 # definido nas variáveis de ambiente do site no Netlify, por contexto, e não aqui.
 [build.environment]
   NODE_VERSION = "24"
+  VITE_API_EVALUATE_LANG = "true"
+  VITE_API_IMERG_LANG = "true"
+  VITE_API_PLANTING_LANG = "true"
 
 [[redirects]]
   from = "/*"
