@@ -1,0 +1,63 @@
+// Traduções com significado científico ou agronómico (estados, indicadores, ressalvas, confiança,
+// recomendações). A versão inglesa foi redigida sem revisão especializada e TEM de ser revista por
+// uma pessoa da equipa antes de ser considerada final (decisão de 2026-11-14).
+// Regras da revisão: preservar valores, unidades, negações e ressalvas; não acrescentar certezas.
+// Um teste garante que todas estas chaves existem nos dois dicionários.
+
+export const SCIENTIFIC_REVIEW_KEYS = Object.freeze([
+  'home.hero.question',
+  'home.hero.lead',
+  'home.about.paragraph1',
+  'home.about.paragraph2',
+  'home.howItWorks.step2Text',
+  'home.howItWorks.step3Text',
+  'home.sources.serviceText',
+  'home.sources.trendsText',
+  'home.sources.nature1',
+  'home.sources.nature2',
+  'home.sources.nature3',
+  'home.sources.nature4',
+  'footer.trendsDescription',
+  'footer.decisionSupport',
+  'status.FAVORAVEL',
+  'status.AGUARDAR',
+  'status.DESFAVORAVEL',
+  'metrics.chuva_acumulada_recente_mm.label',
+  'metrics.chuva_acumulada_recente_mm.description',
+  'metrics.humidade_solo_raiz.label',
+  'metrics.humidade_solo_raiz.description',
+  'metrics.previsao_7dias_mm.label',
+  'metrics.previsao_7dias_mm.description',
+  'consultation.lead',
+  'consultation.form.municipality.hint',
+  'consultation.form.date.label',
+  'consultation.form.date.hint',
+  'consultation.form.submit',
+  'results.loadingLabel',
+  'results.verdict.FAVORAVEL.title',
+  'results.verdict.FAVORAVEL.description',
+  'results.verdict.AGUARDAR.title',
+  'results.verdict.AGUARDAR.description',
+  'results.verdict.DESFAVORAVEL.title',
+  'results.verdict.DESFAVORAVEL.description',
+  'results.confidence',
+  'results.confidenceCaption',
+  'results.fallback.confirmedTitle',
+  'results.fallback.confirmedBody',
+  'results.fallback.confirmedBodyAssessment',
+  'results.rainRecent.label',
+  'results.rainRecent.caption',
+  'results.rootMoisture.label',
+  'results.rootMoisture.caption',
+  'results.forecastRain.label',
+  'results.forecastRain.caption',
+  'results.recommendationTitle',
+  'results.recommendationSubtitle',
+  'results.detailsSummary',
+]);
+
+/**
+ * Nomes ingleses das culturas (i18n/catalogNames.js, por `id` da API). Também precisam de revisão
+ * humana: o valor enviado à API continua a ser o `nome` original em português.
+ */
+export const CROP_NAMES_REVIEW_REQUIRED = Object.freeze(['milho', 'feijao', 'soja', 'mandioca', 'arroz']);

@@ -16,7 +16,7 @@ export default function StatusDisplay({ status, caption = 'Estado', size = 'md' 
 
   return (
     <div className={`border-l-4 pl-4 ${tone.rule}`}>
-      <p className="font-mono text-xs font-medium tracking-[0.14em] text-ink-muted uppercase">{caption}</p>
+      <p className="type-label text-ink-muted">{caption}</p>
       <p
         className={`mt-1.5 flex items-center gap-3 font-display leading-tight font-semibold ${sizes.label} ${tone.text}`}
       >

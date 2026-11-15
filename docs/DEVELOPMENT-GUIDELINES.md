@@ -42,8 +42,10 @@ Inclua:
 
 ## 4. Contrato da API
 
-- `docs/API-INTEGRATION.md` descreve o que o frontend envia e espera. `docs/backend-api.md` é o
-  contrato fornecido pelo backend.
+- `docs/docs2.md` é o **contrato actual da API (v1.1)**, fornecido pelo backend.
+  `docs/backend-api.md` é o contrato **histórico (v1.0)**, mantido só para registo.
+- `docs/API-INTEGRATION.md` descreve o que o frontend envia e espera (observações da v1.0);
+  `docs/DECISOES-ARQUITECTURAIS-API.md` regista as decisões da integração v1.1.
 - **Qualquer alteração ao contrato** (campos, tipos, nomes, códigos de estado, endpoints, formato de
   erros) é **comunicada antes de ser implementada**, numa issue ou numa PR só de documentação, e
   só depois aplicada nos dois lados.

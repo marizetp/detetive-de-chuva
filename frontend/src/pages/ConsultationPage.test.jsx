@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '../test/render.jsx';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   advisoryHuamboMilho,
@@ -184,11 +184,11 @@ describe('ConsultationPage — submissão e parecer', () => {
       data_consulta: '2026-11-10',
     });
 
-    expect(screen.getByText('FAVORÁVEL PARA SEMEADURA')).toBeInTheDocument();
+    expect(screen.getByText('Favorável para semeadura')).toBeInTheDocument();
     expect(screen.getByText('Chuva Recente')).toBeInTheDocument();
     expect(screen.getByText('Humidade da Raiz')).toBeInTheDocument();
     expect(screen.getByText('Chuva Prevista')).toBeInTheDocument();
-    expect(screen.getByText('Recomendação Técnica do Agrónomo')).toBeInTheDocument();
+    expect(screen.getByText('Recomendação do serviço de avaliação')).toBeInTheDocument();
   });
 
   it('o relatório não faz pedidos adicionais à API', async () => {
@@ -235,9 +235,11 @@ describe('ConsultationPage — tratamento de erros e repetição', () => {
     fillForm();
     fireEvent.click(submitButton());
 
-    expect(await screen.findByText('Não foi possível obter a recomendação.')).toBeInTheDocument();
+    // /evaluate respondeu: a recomendação aparece como indisponível e a avaliação técnica só como tal.
+    expect(await screen.findByText('Recomendação indisponível')).toBeInTheDocument();
+    expect(screen.getByText('Estado segundo a avaliação técnica')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
-    expect(await screen.findByText('FAVORÁVEL PARA SEMEADURA')).toBeInTheDocument();
+    expect(await screen.findByText('Favorável para semeadura')).toBeInTheDocument();
     expect(api.callsTo(ADVISORY)).toHaveLength(2);
   });
 });
@@ -262,7 +264,7 @@ describe('ConsultationPage — datas estratégicas e passadas', () => {
 
     expect(JSON.parse(api.callsTo(ADVISORY)[0][1].body).data_consulta).toBe('2025-11-12');
     expect(JSON.parse(api.callsTo(EVALUATE)[0][1].body).data_consulta).toBe('2025-11-12');
-    expect(screen.getByText('FAVORÁVEL PARA SEMEADURA')).toBeInTheDocument();
+    expect(screen.getByText('Favorável para semeadura')).toBeInTheDocument();
   });
 
   it('datas futuras: permitidas no selector e enviadas aos endpoints para planeamento de safra', async () => {

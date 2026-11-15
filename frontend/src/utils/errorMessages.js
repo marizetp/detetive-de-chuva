@@ -1,5 +1,7 @@
 // Mensagens para o utilizador final. Nunca expor stack traces nem detalhes técnicos.
 
+import { DEFAULT_LANGUAGE } from '../i18n/config.js';
+import { createTranslator } from '../i18n/translate.js';
 import { ApiError } from '../services/api.js';
 import { ConsultationInputError } from './validators.js';
 
@@ -13,14 +15,35 @@ function cleanServerMessage(message) {
 }
 
 /**
+ * Erros HTTP que não são de validação (docs/docs2.md §7).
+ * - 400 e 404: repetir o mesmo pedido dá o mesmo resultado → sem nova tentativa.
+ * - 503 e restantes 5xx: falhas temporárias do serviço → nova tentativa.
+ * - Outros 4xx (não documentados): mensagem genérica de pedido recusado, como até aqui.
+ */
+function httpErrorMessage(status, t) {
+  const message = (key, canRetry) => ({
+    title: t(`errors.${key}Title`),
+    description: t(`errors.${key}Description`),
+    canRetry,
+    serverMessages: [],
+  });
+  if (status === 400) return message('badRequest', false);
+  if (status === 404) return message('notFound', false);
+  if (status === 503) return message('unavailable', true);
+  if (typeof status === 'number' && status >= 500) return message('server', true);
+  return message('rejected', true);
+}
+
+/**
  * @param {unknown} error
+ * @param {(key: string) => string} [t] tradutor do idioma activo (useI18n().t)
  * @returns {UserErrorMessage | null} `null` para cancelamentos pedidos pelo próprio cliente
  */
-export function getUserErrorMessage(error) {
+export function getUserErrorMessage(error, t = createTranslator(DEFAULT_LANGUAGE)) {
   if (error instanceof ConsultationInputError) {
     return {
-      title: 'Verifique os dados da consulta.',
-      description: Object.values(error.fieldErrors).join(' '),
+      title: t('errors.inputTitle'),
+      description: Object.values(error.fieldErrors).map((key) => t(key)).join(' '),
       canRetry: false,
       serverMessages: [],
     };
@@ -28,8 +51,8 @@ export function getUserErrorMessage(error) {
 
   if (!(error instanceof ApiError)) {
     return {
-      title: 'Ocorreu um erro inesperado.',
-      description: 'Tente novamente. Se o problema continuar, volte mais tarde.',
+      title: t('errors.unexpectedTitle'),
+      description: t('errors.unexpectedDescription'),
       canRetry: true,
       serverMessages: [],
     };
@@ -40,46 +63,42 @@ export function getUserErrorMessage(error) {
       return null;
     case 'timeout':
       return {
-        title: 'O servidor demorou demasiado a responder.',
-        description:
-          'O serviço pode estar a arrancar após um período sem utilização. Aguarde alguns instantes e tente novamente.',
+        title: t('errors.timeoutTitle'),
+        description: t('errors.timeoutDescription'),
         canRetry: true,
         serverMessages: [],
       };
     case 'network':
       return {
-        title: 'Não foi possível ligar ao servidor.',
-        description: 'Verifique a sua ligação à Internet e tente novamente.',
+        title: t('errors.networkTitle'),
+        description: t('errors.networkDescription'),
         canRetry: true,
         serverMessages: [],
       };
     case 'validation':
       return {
-        title: 'A consulta não foi aceite pelo servidor.',
-        description: 'Reveja a província, a cultura e a data seleccionadas.',
+        title: t('errors.validationTitle'),
+        description: t('errors.validationDescription'),
         canRetry: false,
         serverMessages: error.details.map(cleanServerMessage).filter(Boolean),
       };
+    case 'demoUnavailable':
+      // Modo de demonstração: pedido sem resposta gravada. Repetir dá o mesmo resultado.
+      return {
+        title: t('errors.demoUnavailableTitle'),
+        description: t('errors.demoUnavailableDescription'),
+        canRetry: false,
+        serverMessages: [],
+      };
     case 'malformed':
       return {
-        title: 'Não foi possível interpretar a resposta do servidor.',
-        description: 'Tente novamente dentro de alguns instantes.',
+        title: t('errors.malformedTitle'),
+        description: t('errors.malformedDescription'),
         canRetry: true,
         serverMessages: [],
       };
     case 'http':
-    default: {
-      const isServerError = typeof error.status === 'number' && error.status >= 500;
-      return {
-        title: isServerError
-          ? 'O servidor encontrou um problema.'
-          : 'O pedido não foi aceite pelo servidor.',
-        description: isServerError
-          ? 'Tente novamente dentro de alguns instantes.'
-          : 'Reveja os dados da consulta e tente novamente.',
-        canRetry: true,
-        serverMessages: [],
-      };
-    }
+    default:
+      return httpErrorMessage(error.status, t);
   }
 }

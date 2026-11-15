@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen } from '../../test/render.jsx';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import LoadingIndicator from './LoadingIndicator.jsx';
 

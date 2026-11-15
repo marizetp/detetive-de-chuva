@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '../../test/render.jsx';
 import { beforeEach, describe, expect, it } from 'vitest';
 import SiteHeader from './SiteHeader.jsx';
 

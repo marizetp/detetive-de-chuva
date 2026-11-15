@@ -23,10 +23,11 @@ export const CONSULTATION_ANCHORS = Object.freeze({
   form: 'consulta-formulario',
 });
 
+/** `labelKey`: chave do dicionário (i18n), traduzida pelos componentes. */
 export const NAV_ITEMS = Object.freeze([
-  Object.freeze({ label: 'Início', to: ROUTES.home }),
-  Object.freeze({ label: 'Como funciona', to: `${ROUTES.home}#${SECTION_IDS.howItWorks}` }),
-  Object.freeze({ label: 'Fontes de dados', to: `${ROUTES.home}#${SECTION_IDS.sources}` }),
+  Object.freeze({ labelKey: 'nav.home', to: ROUTES.home }),
+  Object.freeze({ labelKey: 'nav.howItWorks', to: `${ROUTES.home}#${SECTION_IDS.howItWorks}` }),
+  Object.freeze({ labelKey: 'nav.sources', to: `${ROUTES.home}#${SECTION_IDS.sources}` }),
 ]);
 
 /** Remove a barra final (excepto na raiz): "/consulta/" → "/consulta". */

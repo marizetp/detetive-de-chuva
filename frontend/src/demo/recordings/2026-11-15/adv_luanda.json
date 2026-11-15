@@ -1,0 +1,1 @@
+{"detail":[{"type":"value_error","loc":["body","provincia"],"msg":"Value error, Província 'Luanda' não suportada. Selecione uma das seguintes províncias: Huambo, Bié ou Huíla.","input":"Luanda","ctx":{"error":{}}}]}

@@ -1,4 +1,5 @@
 import { SLOW_REQUEST_NOTICE_MS, useDelayedFlag } from '../../hooks/useDelayedFlag.js';
+import { useI18n } from '../../i18n/useI18n.js';
 
 const DROP_DELAYS_MS = [0, 180, 360];
 
@@ -18,6 +19,7 @@ export default function LoadingIndicator({
   slowNoticeMs = SLOW_REQUEST_NOTICE_MS,
 }) {
   const isSlow = useDelayedFlag(slowNoticeMs);
+  const { t } = useI18n();
 
   return (
     <div role={live ? 'status' : undefined} className="flex items-start gap-4">
@@ -25,7 +27,7 @@ export default function LoadingIndicator({
         {DROP_DELAYS_MS.map((delay) => (
           <span
             key={delay}
-            className="block h-3 w-1.5 rounded-full bg-accent motion-safe:animate-pulse"
+            className="block h-3 w-1.5 rounded-full bg-aurora-y motion-safe:animate-pulse"
             style={{ animationDelay: `${delay}ms` }}
           />
         ))}
@@ -33,10 +35,7 @@ export default function LoadingIndicator({
       <div className="text-sm leading-relaxed">
         <p className="font-semibold text-ink">{label}</p>
         {slowNotice && isSlow ? (
-          <p className="mt-1 text-ink-muted">
-            Está a demorar mais do que o habitual. O serviço pode estar a arrancar depois de um
-            período sem utilização — pode levar até dois minutos.
-          </p>
+          <p className="mt-1 text-ink-muted">{t('loading.slow')}</p>
         ) : null}
       </div>
     </div>

@@ -1,9 +1,15 @@
 /* Tipos de letra alojados com a aplicação (Fontsource, SIL Open Font License 1.1): sem pedidos a
-   serviços externos. O navegador só descarrega os subconjuntos de caracteres que a página usa. */
+   serviços externos. O navegador só descarrega os subconjuntos de caracteres que a página usa
+   (latin cobre todos os caracteres portugueses).
+   - Inter (variável 100–900, normal + itálico): interface e texto.
+   - Montserrat (variável 100–900, só normal): títulos e valores de destaque.
+   - Space Mono (estática 400 e 700, só normal): rótulos técnicos, metadados e código. O 700 só
+     é descarregado se for usado (ex.: <code> dentro de negrito), evitando negrito sintético. */
 @import '@fontsource-variable/inter/wght.css';
 @import '@fontsource-variable/inter/wght-italic.css';
-@import '@fontsource-variable/space-grotesk/wght.css';
-@import '@fontsource-variable/jetbrains-mono/wght.css';
+@import '@fontsource-variable/montserrat/wght.css';
+@import '@fontsource/space-mono/400.css';
+@import '@fontsource/space-mono/700.css';
 @import 'tailwindcss';
 
 /*
@@ -11,21 +17,35 @@
  *
  * Duas camadas:
  *  1. Paleta — as 7 cores aprovadas. Não usar directamente nos componentes.
- *  2. Tokens semânticos — o que os componentes usam (bg-canvas, text-ink, border-line…).
+ *  2. Tokens semânticos, por função — o que os componentes usam (bg-canvas, text-ink…).
  *     Mudar a paleta só exige alterar este ficheiro.
  *
- * Contraste WCAG 2.1 dos tokens de texto (sobre Space Black / sobre Mission Navy):
- *   ink         Orbital White           16,9:1 / 14,9:1
- *   ink-muted   Orbital White a 74 %     9,4:1 /  8,3:1
- *   ink-subtle  Orbital White a 60 %     6,5:1 /  5,7:1
- *   accent      Telemetry Cyan           6,8:1 /  6,0:1
- *   danger      NASA Red                 5,3:1 /  4,7:1
- *   line-strong Steel Blue               4,6:1 /  4,1:1  (contornos de controlos, ≥ 3:1)
- * Texto sobre accent (botão principal): Space Black sobre Telemetry Cyan 6,8:1.
- * NASA Blue não serve para texto sobre fundos escuros (1,9:1): só como fundo de destaque, com
- * texto Orbital White (8,9:1).
+ * Destaque: Aurora Blue (violeta → azul → cyan, 110°), aprovado a 2026-11-14.
+ *  - Gradiente de acção (botões): pontos com o mesmo tom do Aurora e luminosidade reduzida, para
+ *    que o texto branco puro tenha ≥ 4,5:1 em toda a extensão (mínimo medido: 4,58:1).
+ *  - Gradiente decorativo (Aurora original): só ornamento — desce a 2,83:1 sobre surface, por isso
+ *    nunca é o único sinal de informação ou interacção.
+ *  - Aurora text #6F9BFD: cor sólida derivada, para texto pequeno, hover e foco.
+ *  - Telemetry Cyan fica reservado à gota do logótipo e à ilustração (`brand`).
+ *
+ * Contraste WCAG 2.2 (sobre Space Black / sobre Mission Navy):
+ *   ink          Orbital White           16,9:1 / 14,9:1
+ *   ink-muted    Orbital White a 74 %     9,4:1 /  8,3:1
+ *   ink-subtle   Orbital White a 60 %     6,5:1 /  5,7:1
+ *   label        Aurora text #6F9BFD      7,1:1 /  6,3:1  (rótulos, unidades, ícones, marcadores)
+ *   interactive  Aurora text #6F9BFD      7,1:1 /  6,3:1  (também anel de foco, ≥ 3:1)
+ *   danger       NASA Red                 5,3:1 /  4,7:1  (margem curta sobre surface)
+ *   line-strong  Steel Blue               4,6:1 /  4,1:1  (contornos e ícones, ≥ 3:1)
+ * Botão principal: branco #FFF sobre o gradiente de acção ≥ 4,58:1 (hover 5,43:1; active
+ * 6,49:1). Orbital White não serve aí (4,05:1 no ponto azul).
+ * Selecção de texto: branco sobre #2B6AFD (4,58:1).
+ * NASA Blue e Telemetry Cyan ficam só na paleta para a ilustração e a gota do logótipo.
  */
 @theme {
+  /* Desactiva a paleta por omissão do Tailwind (emerald, amber, slate, white…): só existem as
+     cores abaixo, e uma classe fora da paleta não gera CSS. */
+  --color-*: initial;
+
   /* 1. Paleta */
   --color-space-black: #080f1e;
   --color-mission-navy: #0b1d35;
@@ -34,27 +54,166 @@
   --color-nasa-red: #fc3d21;
   --color-orbital-white: #eaf2f8;
   --color-steel-blue: #647f9b;
+  --color-white: #ffffff; /* só texto sobre o gradiente de acção */
+
+  /* Aurora Blue — gradiente de destaque (violeta, azul, cyan) e cor sólida derivada */
+  --color-aurora-violet: #5b3bff;
+  --color-aurora-blue: #2d6cff;
+  --color-aurora-cyan: #20cfff;
+  --color-aurora-text: #6f9bfd; /* azul do Aurora aclarado: texto pequeno, hover, foco */
+  --color-aurora-deep: #2b6afd; /* azul do gradiente de acção: fundo da selecção (branco 4,58:1) */
+
+  /* Cores semânticas dos resultados — exclusivas dos estados e dos seus avisos; nunca em botões */
+  --color-signal-green: #22a06b;
+  --color-signal-orange: #e58a32;
 
   /* 2. Tokens semânticos */
+  /* Identidade */
+  --color-brand: var(--color-telemetry-cyan); /* só a gota do logótipo (a ilustração usa a paleta) */
+
+  /* Superfícies e linhas */
   --color-canvas: var(--color-space-black); /* fundo da página */
-  --color-surface: var(--color-mission-navy); /* painéis, faixas, rodapé */
-  --color-raised: var(--color-nasa-blue); /* destaque com texto ink (8,9:1) */
+  --color-surface: var(--color-mission-navy); /* painéis, faixas, rodapé, cartões */
+  --color-line: color-mix(in srgb, var(--color-orbital-white) 14%, transparent); /* fios decorativos */
+  --color-line-strong: var(--color-steel-blue); /* contornos, ícones e marcadores (≥ 3:1) */
+
+  /* Texto */
   --color-ink: var(--color-orbital-white); /* texto principal e títulos */
   --color-ink-muted: color-mix(in srgb, var(--color-orbital-white) 74%, var(--color-space-black));
   --color-ink-subtle: color-mix(in srgb, var(--color-orbital-white) 60%, var(--color-space-black));
-  --color-accent: var(--color-telemetry-cyan); /* acção, ligações, rótulos técnicos, foco */
-  --color-danger: var(--color-nasa-red); /* erros e estado desfavorável */
-  --color-caution: var(--color-steel-blue); /* estado «aguardar» (filete) */
-  --color-line: color-mix(in srgb, var(--color-orbital-white) 14%, transparent); /* fios decorativos */
-  --color-line-strong: var(--color-steel-blue); /* contornos com significado (≥ 3:1) */
+  --color-label: var(--color-aurora-text); /* rótulos, eyebrows, unidades, ícones (7,1:1 / 6,3:1) */
+  --color-selection: var(--color-aurora-deep); /* fundo da selecção de texto, com texto branco */
 
-  /* Tipografia */
+  /* Acção e interacção. O fundo dos botões principais é o gradiente `bg-action` (utilitário
+     abaixo), não uma cor. */
+  --color-action-ink: var(--color-white); /* texto sobre bg-action (≥ 4,58:1) */
+  --color-interactive: var(--color-aurora-text); /* hover de navegação, ligações e campos */
+  --color-focus: var(--color-aurora-text); /* anel de foco: 7,1:1 sobre canvas, 6,3:1 sobre surface */
+
+  /* Estados da recomendação — texto, ícone, contorno e barra na cor do estado; nunca preenchidos.
+     Contraste (texto sobre surface / contorno e barra sobre canvas): favorável 5,1:1 / 5,8:1;
+     aguardar 6,5:1 / 7,3:1; desfavorável 4,7:1 / 5,3:1. Ausente e não reconhecido: neutros. */
+  --color-status-favorable: var(--color-signal-green);
+  --color-status-wait: var(--color-signal-orange);
+  --color-status-unfavorable: var(--color-nasa-red);
+
+  /* Feedback de funcionamento — filete + ícone; o texto fica em ink */
+  --color-danger: var(--color-nasa-red); /* erros técnicos (falha de serviço, validação) */
+  --color-info: var(--color-steel-blue); /* avisos informativos (4,6:1 / 4,1:1, gráfico) */
+
+  /* Tipografia. `--font-mono` é o único token monoespaçado: serve `font-mono`, `type-label`,
+     `type-meta` e, pelo preflight do Tailwind, todos os <code> e <pre>. */
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Space Grotesk Variable', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-display: 'Montserrat Variable', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+/*
+ * Space Mono só em textos curtos — nunca em parágrafos, unidades (ficam em Inter) nem valores de
+ * destaque (Montserrat). Peso 400 explícito: evita herdar 600/700 de um contexto em negrito.
+ *
+ * type-label — eyebrows, rótulos de secção, títulos do rodapé, «Nível de confiança».
+ *   12 px em maiúsculas: a Space Mono é larga (~0,61 em por carácter); maior pesaria demais
+ *   ao lado da Montserrat.
+ * type-meta — metadados em caixa mista: etiquetas de estado, identificação de fontes de dados.
+ */
+@utility type-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@utility type-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+/*
+ * Gradientes Aurora Blue.
+ *
+ * Acção (botões principais): o violeta original e azul/cyan com o mesmo tom (OKLCH) e
+ * luminosidade reduzida, para texto branco ≥ 4,5:1 em toda a extensão (amostrado em 201 pontos):
+ *   repouso #5B3BFF → #2B6AFD → #097F9F   mínimo 4,58:1
+ *   hover   #5228F1 → #1F5DEF → #017390   mínimo 5,43:1  (luminosidade − 0,04)
+ *   active  #4A0BE2 → #134FE1 → #016681   mínimo 6,49:1  (luminosidade − 0,08)
+ * Para os desactivar (botão indisponível) usar `bg-none`: estes utilitários definem
+ * background-image, não background-color.
+ */
+/* Os valores vivem em variáveis (--gradient-*, em @layer base), partilhadas com motion.css. */
+@utility bg-action {
+  background-image: var(--gradient-action);
+}
+
+@utility bg-action-hover {
+  background-image: var(--gradient-action-hover);
+}
+
+@utility bg-action-active {
+  background-image: var(--gradient-action-active);
+}
+
+/*
+ * Decorativo (Aurora original). Só ornamento: 3,2:1 sobre canvas, 2,83:1 sobre surface no início
+ * violeta — nunca o único sinal de informação ou interacção.
+ *   bg-aurora        110°, superfícies e filetes horizontais
+ *   bg-aurora-y      180°, elementos verticais estreitos (a 110° pareceriam de uma só cor)
+ *   indicator-aurora barra de 2 px sob um texto (ex.: página actual, a par de outra pista)
+ */
+@utility bg-aurora {
+  background-image: var(--gradient-aurora);
+}
+
+@utility bg-aurora-y {
+  background-image: var(--gradient-aurora-y);
+}
+
+/* Filetes em gradiente (border-image: não respeita cantos arredondados — só em filetes rectos). */
+@utility border-l-aurora {
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-image: var(--gradient-aurora-y) 1;
+}
+
+@utility border-t-aurora {
+  border-top-width: 2px;
+  border-top-style: solid;
+  border-image: var(--gradient-aurora) 1;
+}
+
+@utility indicator-aurora {
+  background-image: var(--gradient-aurora);
+  background-size: 100% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 0.375rem;
 }
 
 @layer base {
+  /* Gradientes Aurora Blue — fonte única (utilitários acima e motion.css). */
+  :root {
+    --gradient-action: linear-gradient(110deg, #5b3bff, #2b6afd, #097f9f);
+    --gradient-action-hover: linear-gradient(110deg, #5228f1, #1f5def, #017390);
+    --gradient-action-active: linear-gradient(110deg, #4a0be2, #134fe1, #016681);
+    --gradient-aurora: linear-gradient(
+      110deg,
+      var(--color-aurora-violet),
+      var(--color-aurora-blue),
+      var(--color-aurora-cyan)
+    );
+    --gradient-aurora-y: linear-gradient(
+      180deg,
+      var(--color-aurora-violet),
+      var(--color-aurora-blue),
+      var(--color-aurora-cyan)
+    );
+  }
+
   html {
     background-color: var(--color-canvas);
     color: var(--color-ink);
@@ -67,7 +226,6 @@
     line-height: 1.6;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: 'cv11', 'ss01'; /* Inter: «a» e «1» mais legíveis */
   }
 
   h1,
@@ -84,13 +242,13 @@
   }
 
   ::selection {
-    background-color: var(--color-raised);
-    color: var(--color-ink);
+    background-color: var(--color-selection);
+    color: var(--color-white);
   }
 
   /* Foco sempre visível para navegação por teclado (Telemetry Cyan ≥ 6:1 nos fundos escuros). */
   :focus-visible {
-    outline: 3px solid var(--color-accent);
+    outline: 3px solid var(--color-focus);
     outline-offset: 3px;
     border-radius: 2px;
   }

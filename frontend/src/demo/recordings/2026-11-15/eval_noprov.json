@@ -1,0 +1,1 @@
+{"detail":[{"type":"missing","loc":["body","provincia"],"msg":"Field required","input":{"cultura":"Milho"}}]}

@@ -89,9 +89,15 @@ describe('isSameConsultation', () => {
 
 describe('describeConsultation', () => {
   it('identifica a consulta numa linha', () => {
-    expect(describeConsultation({ provincia: 'Bié', cultura: 'Feijão', data_consulta: '2026-08-01' })).toBe(
-      'Bié · Feijão · 1 de agosto de 2026',
-    );
+    const params = { provincia: 'Bié', cultura: 'Feijão', data_consulta: '2026-08-01' };
+    expect(describeConsultation(params, { language: 'pt' })).toBe('Bié · Feijão · 1 de agosto de 2026');
     expect(describeConsultation(null)).toBe('');
+  });
+
+  it('en: data em inglês e nome da cultura traduzido; a província não se traduz', () => {
+    const params = { provincia: 'Bié', municipio: 'Kuito', cultura: 'Feijão', data_consulta: '2026-08-01' };
+    expect(
+      describeConsultation(params, { language: 'en', cropLabel: (value) => (value === 'Feijão' ? 'Beans' : value) }),
+    ).toBe('Bié (Kuito) · Beans · 1 August 2026');
   });
 });

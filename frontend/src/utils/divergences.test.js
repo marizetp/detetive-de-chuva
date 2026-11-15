@@ -18,7 +18,13 @@ describe('compareConsultationResults', () => {
     const result = compare(advisoryHuamboMilho, { ...evaluateHuamboMilho, status: 'AGUARDAR' });
     expect(result.hasDivergences).toBe(true);
     expect(result.divergences).toEqual([
-      { field: 'status', label: 'Estado', advisoryValue: 'FAVORAVEL', evaluateValue: 'AGUARDAR' },
+      {
+        field: 'status',
+        label: 'Estado',
+        labelKey: 'results.divergence.status',
+        advisoryValue: 'FAVORAVEL',
+        evaluateValue: 'AGUARDAR',
+      },
     ]);
   });
 

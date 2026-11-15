@@ -1,4 +1,4 @@
-# Integração frontend/backend — Detetive da Chuva
+# Integração frontend/backend — AgroKairos
 
 Documento de referência para quem trabalha no backend ou na integração. Descreve **o que o
 frontend envia, o que espera receber e como reage**, e lista o que ainda precisa de confirmação.
@@ -6,7 +6,13 @@ frontend envia, o que espera receber e como reage**, e lista o que ainda precisa
 - Base URL: `https://detetive-da-chuva.onrender.com` (substituível por `VITE_API_BASE_URL`).
 - Código da integração: `frontend/src/services/` (pedidos) e `frontend/src/utils/mappers.js`
   (interpretação das respostas). Constantes em `frontend/src/config/api.js`.
-- Contrato original fornecido pela equipa de backend: [`backend-api.md`](backend-api.md).
+- Contrato original fornecido pela equipa de backend: [`backend-api.md`](backend-api.md) (**v1.0, histórico**).
+
+> **Âmbito deste documento:** descreve a integração com a **API v1.0** e as observações de
+> 2026-11-12. O **contrato actual é a v1.1**, em [`docs2.md`](docs2.md). As decisões da integração
+> v1.1 (autoridade de `/advisory` e `/evaluate`, dados alternativos, divulgação de IA, HTTP 400 e
+> 422) estão em [`DECISOES-ARQUITECTURAIS-API.md`](DECISOES-ARQUITECTURAIS-API.md), e as respostas
+> reais da v1.1 gravadas em 2026-11-15 estão em `frontend/src/demo/recordings/2026-11-15/`.
 
 ## Como ler este documento
 

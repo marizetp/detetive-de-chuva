@@ -98,7 +98,7 @@ export default function IndicatorsSection({ params, advisory, evaluate, today, c
                   <th scope="row" className="py-4 pr-3 font-normal sm:py-5 sm:pr-4">
                     <span className="block font-display text-base leading-snug text-ink sm:text-lg">
                       {definition.label}{' '}
-                      <span className="font-mono text-sm text-accent">
+                      <span className="text-sm text-label">
                         ({METRIC_UNIT_LABELS[definition.unit]})
                       </span>
                     </span>

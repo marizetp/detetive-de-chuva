@@ -3,11 +3,11 @@ import { StatusIcon } from './icons.jsx';
 /**
  * Aviso em linha, sem caixa: filete lateral + ícone + texto.
  * - error: NASA Red no filete e no ícone (triângulo); o título e o texto ficam em Orbital White
- * - info:  Telemetry Cyan no filete e no ícone (círculo com «i»)
+ * - info:  Steel Blue no filete e no ícone (círculo com «i»); ≥ 4,1:1 como elemento gráfico
  */
 const TONES = {
   error: { rule: 'border-danger', icon: 'warning', iconColor: 'text-danger' },
-  info: { rule: 'border-accent', icon: 'neutral-info', iconColor: 'text-accent' },
+  info: { rule: 'border-info', icon: 'neutral-info', iconColor: 'text-info' },
 };
 
 export default function InlineNotice({ tone = 'info', title, children, action, role, className = '' }) {

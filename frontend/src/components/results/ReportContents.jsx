@@ -11,9 +11,9 @@ export default function ReportContents() {
           <li key={section.id}>
             <AppLink
               to={`${ROUTES.consultation}#${section.id}`}
-              className="inline-flex min-h-9 items-center gap-2 rounded-sm text-ink-muted hover:text-accent"
+              className="inline-flex min-h-9 items-center gap-2 rounded-sm text-ink-muted hover:text-interactive"
             >
-              <span className="font-mono text-xs text-accent" aria-hidden="true">
+              <span className="type-label text-label" aria-hidden="true">
                 {section.index}
               </span>
               <span className="underline decoration-ink/25 underline-offset-4">{section.title}</span>
