@@ -333,5 +333,5 @@ Therefore:
 3. Are actual historical NASA POWER trend data available to the frontend during this release?
 4. Is there a documented offline/demo requirement?
 5. Are there approved thresholds or explanatory descriptions for the metrics?
-6. ~~Should the date of consultation be user-selectable?~~ **Decided 2026-11-12:** yes — today or any past date; future dates disabled. Validated against the device's local date (known limitation: an incorrect device clock can affect validation). See `CLAUDE.md` §11.
+6. ~~Should the date of consultation be user-selectable?~~ **Decided 2026-11-12:** yes — today or any past date; future dates disabled. *(Superseded: the form now accepts today or any future date, per `docs2.md` §3; see `CLAUDE.md` §11.)* Validated against the device's local date (known limitation: an incorrect device clock can affect validation). See `CLAUDE.md` §11.
 7. **Multilingual API (requested 2026-11-14):** can `/advisory` and `/evaluate` accept an `idioma` parameter and return the free text (`recomendacao_extensao`, `justificacoes_tecnicas`) in English, together with the Portuguese original and translation metadata? Can the list of `triggers_ativados` codes be documented? Until confirmed, the frontend shows the Portuguese original with a notice in English.

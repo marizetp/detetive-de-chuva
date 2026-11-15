@@ -11,8 +11,21 @@ confiança, os indicadores agroclimáticos e a recomendação de extensão.
 
 > Projecto independente. **Não é um serviço oficial da NASA.**
 
-A língua da interface é o português (Angola). O código, os identificadores e os nomes de campos da
-API mantêm-se inalterados.
+Interface bilingue: inglês (por omissão) e português (Angola). O código, os identificadores e os
+nomes de campos da API mantêm-se inalterados.
+
+## Estado (15/11/2026)
+
+| Componente | Estado | Evidência |
+|---|---|---|
+| Frontend em produção | **Publicado**: <https://agrokairos.netlify.app> (Netlify, projecto `agrokairos`, a partir de `main`) | Bundle servido igual ao build local de `main` |
+| API em produção | **Publicada**: <https://detetive-da-chuva.onrender.com> (serviço Render existente) | `node scripts/smoke-backend.mjs`: 16/16 verificações |
+| Backend deste repositório (`backend/`) | **Testado em CI** (GitHub Actions: `pytest`, arranque e teste de fumo). **Ainda não publicado** a partir deste repositório: o serviço novo (`backend/render.yaml`) tem de ser criado no Render | `.github/workflows/ci.yml` |
+| Idioma: recomendação (`/advisory`) | Implementado e em produção (EN pede `lang: "en"`) | Testes e verificação na API real |
+| Idioma: `/evaluate`, IMERG, janela de plantio, `content_language` | **Não implementado no backend**; o frontend está preparado com as capacidades desligadas | `docs/ESPECIFICACAO-BACKEND-I18N.md` |
+| Motor IMERG e janela de plantio na interface | **Não implementado** (serviços e mappers preparados, sem ecrã) | Decisão D11 |
+| Tendências históricas NASA POWER | **Não implementado** (a linha de base NASA POWER já é usada pelo motor de decisão) | — |
+| Textos científicos | **A aguardar revisão humana** (`frontend/src/i18n/reviewRequired.js`) | — |
 
 ## Objectivo
 
@@ -162,10 +175,12 @@ depois de um período sem uso (arranque a frio).
 
 - **Página inicial** (`/`): apresentação, funcionamento em três passos, fontes de dados e limites.
 - **Consulta** (`/consulta`):
-  - formulário com província e cultura carregadas da API e data (hoje ou anterior);
-  - pedidos a `/advisory` e `/evaluate` em paralelo e independentes;
-  - relatório em cinco secções: resumo, indicadores, recomendação, fundamentação técnica,
-    transparência e limitações;
+  - formulário com província, município opcional e cultura carregados da API, e data (hoje ou
+    futura, para planeamento);
+  - pedidos a `/advisory` e `/evaluate` em paralelo e independentes; a recomendação é pedida no
+    idioma da interface;
+  - relatório: veredicto e confiança, indicadores, aviso de dados alternativos, recomendação e
+    detalhes técnicos, com o mecanismo científico identificado;
   - detecção e apresentação de divergências entre as duas fontes;
   - avisos quando `/evaluate` indica dados meteorológicos de substituição (`is_fallback_weather`);
   - estados de carregamento (com aviso de arranque a frio), erro, nova tentativa por fonte ou das
@@ -174,7 +189,16 @@ depois de um período sem uso (arranque a frio).
 - Acessibilidade: navegação por teclado, foco visível, estados com texto e ícone (não só cor),
   anúncios para leitores de ecrã.
 
-Não implementado (pendente de confirmação do backend): tendências históricas NASA POWER, mapas.
+Não implementado: ecrãs do motor IMERG e da janela de plantio, tendências históricas NASA POWER,
+mapas. Ver a tabela «Estado» acima.
+
+## Integração contínua
+
+`.github/workflows/ci.yml` corre em cada push e pull request:
+- **frontend:** `npm test`, `npm run lint`, build de produção, build de demonstração e
+  `scripts/check-demo-isolation.mjs` (produção sem gravações; demonstração só com as elegíveis);
+- **backend:** Python 3.11, `pip install`, inicialização da linha de base, `pytest`, arranque do
+  FastAPI e `scripts/smoke-backend.mjs` contra a API local.
 
 ## Estrutura
 
@@ -237,14 +261,18 @@ npm run build     # gera frontend/dist/ (inclui _redirects)
 
 O ficheiro `_redirects` (`/* /index.html 200`) permite o acesso directo e o refresh em `/consulta`.
 
-### Backend no Render (serviço de validação, separado da produção)
+### Backend no Render (serviço novo, separado da produção)
 
-Criar um **novo** Web Service; o serviço actual (`https://detetive-da-chuva.onrender.com`) não é
-alterado. Valores tirados de `backend/render.yaml` e do `backend/Dockerfile`:
+O serviço actual (`https://detetive-da-chuva.onrender.com`) não é alterado. O serviço novo pode ser
+criado de duas formas:
+
+- **Blueprint:** Render → New → Blueprint → este repositório, caminho `backend/render.yaml`.
+  Cria o serviço `agrokairos-api` e pede o valor de `GEMINI_API_KEY`.
+- **Manual:** New → Web Service, com os valores abaixo (os mesmos do `backend/render.yaml`):
 
 | Campo | Valor |
 |---|---|
-| Repositório / branch | este repositório / `feat/aurora-blue-identity` |
+| Repositório / branch | este repositório / `main` |
 | Root Directory | `backend` |
 | Runtime | Python 3 |
 | Build Command | `pip install -r requirements.txt && python -c "from src.baseline_engine import BaselineEngine; BaselineEngine().load_baseline()"` |
@@ -269,9 +297,11 @@ O URL da API **não** está no código: vem de `VITE_API_BASE_URL` (por omissão
 
 - Para testar o backend novo, definir `VITE_API_BASE_URL=https://<novo-serviço>.onrender.com` só no
   contexto **Deploy Previews** (ou **Branch deploys**) nas variáveis de ambiente do site, e abrir o
-  deploy preview do pull request deste branch. A produção não muda.
-- Definir também `NODE_VERSION=24` (o `engines` do `frontend/package.json` exige Node `>=22.22.2 <23`
-  ou `>=24.15.0`).
+  deploy preview de um pull request. A produção não muda.
+- Depois de validado, definir a mesma variável no contexto **Production** e voltar a publicar. Para
+  reverter, apagar a variável (volta à API documentada) e voltar a publicar.
+- `NODE_VERSION=24` está em `netlify.toml` (o `engines` do `frontend/package.json` exige Node
+  `>=22.22.2 <23` ou `>=24.15.0`).
 - O valor é lido no build: depois de mudar a variável, é preciso um novo deploy.
 
 ## Colaboração
