@@ -1,6 +1,5 @@
 // Verificações puras de tipos e valores. Não lançam excepções, excepto onde indicado.
 
-import { getLocalIsoDate } from './dates.js';
 
 export function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -49,12 +48,13 @@ export function isFutureIsoDate(isoDate, today) {
  * - `requireDate`: o formulário exige data; a API trata-a como opcional.
  * - Suporta datas actuais e datas futuras para planeamento de safra e investimento.
  * @param {{ provincia?: unknown, cultura?: unknown, data_consulta?: unknown, municipio?: unknown }} params
- * @param {{ requireDate?: boolean, today?: string }} [options]
+ * @param {{ requireDate?: boolean }} [options] (`today` ainda é aceite, mas deixou de ser usado:
+ *   as datas futuras são válidas)
  * @returns {Record<string, string>} chaves de mensagem (i18n) por campo; vazio quando válido
  */
 export function validateConsultationParams(
   params,
-  { requireDate = false, today = getLocalIsoDate() } = {},
+  { requireDate = false } = {},
 ) {
   const errors = {};
   const { provincia, cultura, data_consulta } = params ?? {};
