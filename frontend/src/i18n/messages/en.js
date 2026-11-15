@@ -49,7 +49,7 @@ const en = {
     trendsTerm: 'Historical trends',
     trendsDescription: 'NASA POWER (MERRA-2 reanalysis) — in preparation, not yet available.',
     disclaimer:
-      'Project developed for the NASA Space Apps Challenge 2026. Detetive da Chuva is not an official NASA service.',
+      'Project developed for the NASA Space Apps Challenge 2026. AgroKairos is not an official NASA service.',
     decisionSupport: 'Decision-support tool — it does not guarantee farming outcomes.',
   },
   home: {
@@ -62,7 +62,7 @@ const en = {
     about: {
       title: 'Agroclimatic information to decide when to sow',
       paragraph1:
-        'For generations, the traditional farming calendar has guided sowing on the Central Plateau. Detetive da Chuva starts from a simple question: do current conditions match that calendar?',
+        'For generations, the traditional farming calendar has guided sowing on the Central Plateau. AgroKairos starts from a simple question: do current conditions match that calendar?',
       paragraph2:
         'For each province and crop, the platform queries an agroclimatic assessment service and presents the result clearly: a classification, a confidence level, the indicators it is based on and practical guidance for the field.',
       indicatorsHeading: 'Indicators considered',
@@ -88,7 +88,7 @@ const en = {
       sourcesHeading: 'Data sources',
       available: 'Available',
       pending: 'In preparation',
-      serviceTitle: 'Detetive da Chuva assessment service',
+      serviceTitle: 'AgroKairos assessment service',
       serviceText:
         "The project's service that returns, for each consultation, the classification, the confidence level, the indicators and the recommendation, as well as a complementary technical assessment. According to its documentation, it uses open precipitation, soil moisture and temperature data, and weather forecasts from an external service; the sources are listed in the footer. The documentation does not state which source feeds each indicator shown.",
       trendsTitle: 'Historical agroclimatic trends',

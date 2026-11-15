@@ -16,7 +16,7 @@ export default function HeroSection() {
             data-reveal
             className="text-5xl leading-[0.98] font-semibold tracking-tight text-ink sm:text-6xl lg:text-7xl"
           >
-            Detetive da Chuva
+            AgroKairos
           </h1>
 
           <p

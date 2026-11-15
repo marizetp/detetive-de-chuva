@@ -47,7 +47,7 @@ const pt = {
     trendsTerm: 'Tendências históricas',
     trendsDescription: 'NASA POWER (reanálise MERRA-2) — em preparação, ainda não disponível.',
     disclaimer:
-      'Projecto desenvolvido no âmbito do NASA Space Apps Challenge 2026. O Detetive da Chuva não é um serviço oficial da NASA.',
+      'Projecto desenvolvido no âmbito do NASA Space Apps Challenge 2026. O AgroKairos não é um serviço oficial da NASA.',
     decisionSupport: 'Ferramenta de apoio à decisão — não garante resultados agrícolas.',
   },
   home: {
@@ -60,7 +60,7 @@ const pt = {
     about: {
       title: 'Informação agroclimática para decidir quando semear',
       paragraph1:
-        'O calendário agrícola tradicional orienta a sementeira no Planalto Central há gerações. O Detetive da Chuva parte de uma pergunta simples: as condições deste momento acompanham esse calendário?',
+        'O calendário agrícola tradicional orienta a sementeira no Planalto Central há gerações. O AgroKairos parte de uma pergunta simples: as condições deste momento acompanham esse calendário?',
       paragraph2:
         'Para cada província e cultura, a plataforma consulta um serviço de avaliação agroclimática e apresenta o resultado de forma clara: uma classificação, um nível de confiança, os indicadores em que se baseia e orientações práticas para o terreno.',
       indicatorsHeading: 'Indicadores considerados',
@@ -86,7 +86,7 @@ const pt = {
       sourcesHeading: 'Fontes de dados',
       available: 'Disponível',
       pending: 'Em preparação',
-      serviceTitle: 'Serviço de avaliação do Detetive da Chuva',
+      serviceTitle: 'Serviço de avaliação do AgroKairos',
       serviceText:
         'Serviço do projecto que devolve, para cada consulta, a classificação, o nível de confiança, os indicadores e a recomendação, bem como uma avaliação técnica complementar. Segundo a sua documentação, usa dados abertos de precipitação, humidade do solo e temperatura, e previsões meteorológicas de um serviço externo; as fontes estão identificadas no rodapé. A documentação não indica que fonte alimenta cada indicador apresentado.',
       trendsTitle: 'Tendências agroclimáticas históricas',

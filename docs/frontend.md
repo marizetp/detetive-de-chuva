@@ -1,4 +1,4 @@
-# Frontend Specification — Detetive da Chuva
+# Frontend Specification — AgroKairos
 
 **Status:** Initial implementation specification  
 **Product languages:** English (`en`, default) and Portuguese (`pt`, Angola) — decided 2026-11-14  

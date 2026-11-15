@@ -46,7 +46,7 @@ export default function SiteHeader({ currentPath }) {
         >
           <BrandMark className="size-8 shrink-0" />
           <span className="font-display text-xl leading-none font-semibold tracking-tight">
-            Detetive da Chuva
+            AgroKairos
           </span>
           <span className="sr-only">{t('header.homeLink')}</span>
         </AppLink>

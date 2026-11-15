@@ -1,4 +1,4 @@
-# Integração frontend/backend — Detetive da Chuva
+# Integração frontend/backend — AgroKairos
 
 Documento de referência para quem trabalha no backend ou na integração. Descreve **o que o
 frontend envia, o que espera receber e como reage**, e lista o que ainda precisa de confirmação.

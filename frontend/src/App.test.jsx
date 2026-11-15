@@ -47,7 +47,7 @@ describe('estrutura global', () => {
 describe('página inicial', () => {
   it('apresenta o nome, o slogan e a chamada à acção', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { level: 1, name: 'Detetive da Chuva' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'AgroKairos' })).toBeInTheDocument();
     expect(screen.getByText('O calendário agrícola de sempre ainda é fiável?')).toBeInTheDocument();
 
     const ctas = screen.getAllByRole('link', { name: /Iniciar consulta agrícola/ });
@@ -117,7 +117,7 @@ describe('navegação', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Avaliar as condições para semear' }),
     ).toBeInTheDocument();
-    expect(document.title).toBe('Consulta agrícola · Detetive da Chuva');
+    expect(document.title).toBe('Consulta agrícola · AgroKairos');
     expect(document.activeElement).toBe(screen.getByRole('main'));
 
     // Abrir a página só carrega os catálogos; nenhuma consulta é enviada sem o utilizador pedir.
@@ -145,7 +145,7 @@ describe('navegação', () => {
       window.history.replaceState(null, '', '/');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
-    expect(screen.getByRole('heading', { level: 1, name: 'Detetive da Chuva' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'AgroKairos' })).toBeInTheDocument();
   });
 
   it('as ligações de secção levam à âncora correspondente', () => {

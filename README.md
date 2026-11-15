@@ -1,4 +1,4 @@
-# Detetive da Chuva — Frontend
+# AgroKairos — Frontend
 
 Interface web de apoio à decisão agrícola desenvolvida para o **NASA Space Apps Challenge 2026**.
 O utilizador escolhe uma província, uma cultura e uma data; a aplicação consulta o backend e

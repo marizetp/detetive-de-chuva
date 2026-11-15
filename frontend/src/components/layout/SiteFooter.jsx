@@ -19,7 +19,7 @@ export default function SiteFooter() {
           <div className="md:col-span-5">
             <p className="flex items-center gap-3 text-ink">
               <BrandMark className="size-8 shrink-0" />
-              <span className="font-display text-xl font-semibold">Detetive da Chuva</span>
+              <span className="font-display text-xl font-semibold">AgroKairos</span>
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed">
               {t('footer.tagline')}

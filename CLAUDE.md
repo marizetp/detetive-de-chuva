@@ -1,12 +1,12 @@
-# CLAUDE.md — Detetive da Chuva
+# CLAUDE.md — AgroKairos
 
 ## 1. Project overview
 
-**Detetive da Chuva** is a web application for environmental intelligence and agricultural decision support, developed for the NASA Space Apps Challenge 2026.
+**AgroKairos** (formerly «Detetive da Chuva») is a web application for environmental intelligence and agricultural decision support, developed for the NASA Space Apps Challenge 2026.
 
 The current backend exposes an agricultural advisory API. The frontend must allow a user to select a province and crop, request an assessment, and understand the returned status, confidence score, metrics, and practical recommendation.
 
-The interface is bilingual (decision of 2026-11-14): **English (`en`) is the default language** and **Portuguese (`pt`, pt-AO)** is the second language. Use clear, accessible wording in both — Portuguese suitable for users in Angola, plain English for international readers. Every interface text lives in the dictionaries in `frontend/src/i18n/messages/` (see §11). Keep technical identifiers, code, API field names and the brand name «Detetive da Chuva» unchanged in both languages.
+The interface is bilingual (decision of 2026-11-14): **English (`en`) is the default language** and **Portuguese (`pt`, pt-AO)** is the second language. Use clear, accessible wording in both — Portuguese suitable for users in Angola, plain English for international readers. Every interface text lives in the dictionaries in `frontend/src/i18n/messages/` (see §11). Keep technical identifiers, code, API field names and the brand name «AgroKairos» unchanged in both languages.
 
 ## 2. Working mode and repository boundaries
 
@@ -249,6 +249,10 @@ Do not build the entire application in one unreviewed operation.
 - Crop names are translated by stable `id` (`i18n/catalogNames.js`); the value sent to the API stays the original `nome`. Province and municipality names are proper nouns and are not translated.
 - English texts with scientific or agronomic meaning are listed in `i18n/reviewRequired.js` and **must be reviewed by a person** before being considered final. Translations must preserve values, units, dates, negations and caveats; a test checks that the numbers in those texts match in both languages.
 - Tests render components through `src/test/render.jsx` (Portuguese by default, `{ language: 'en' }` for English).
+
+**2026-11-15 — Product name: AgroKairos** (decided by the project owner)
+- «AgroKairos» replaces «Detetive da Chuva» in the interface, page titles, metadata and project documentation, in both languages.
+- Technical identifiers keep the old name: the backend URL `https://detetive-da-chuva.onrender.com`, the npm package name, the internal navigation event, the `ddc.*` storage keys (renaming them would discard saved language preferences), file names such as `docs/Detetive_da_Chuva_Proposta_Formato_Dados.pdf`, and historical documents (`docs/PROMPT-01-RECONNAISSANCE.md`).
 
 ## 12. Known pending decisions
 

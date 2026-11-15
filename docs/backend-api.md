@@ -1,4 +1,4 @@
-# Backend API — Detetive da Chuva
+# Backend API — AgroKairos
 
 **Source:** API integration guide supplied by the project team.  
 **Base URL:** `https://detetive-da-chuva.onrender.com`  
